@@ -73,10 +73,19 @@ Sinnvoll, wenn mehrere Maschinen dasselbe Image ziehen sollen oder der Zielhost 
 
 Der Workflow `.github/workflows/docker-image.yml` läuft bei jedem Push und legt das Image unter `ghcr.io/<dein-github-user>/grocy-modern` ab. Es ist nichts einzurichten — `GITHUB_TOKEN` reicht, ein eigenes Secret brauchst du nicht.
 
-**Weil dein Repository privat ist, ist auch das Package privat.** Zum Ziehen brauchst du auf dem Zielhost einen Personal Access Token (classic) mit dem Scope `read:packages`:
+Die Sichtbarkeit des Packages ist unabhängig von der des Repositories und lässt sich unter *GitHub → dein Profil → Packages → grocy-modern → Package settings* umstellen.
+
+- **Package öffentlich** (Standard bei öffentlichem Repository): nichts weiter zu tun, jeder Host kann ziehen.
+- **Package privat**: auf jedem ziehenden Host einmalig anmelden, mit einem Personal Access Token (classic) mit Scope `read:packages`:
 
 ```bash
 echo '<DEIN_TOKEN>' | docker login ghcr.io -u $GH_USER --password-stdin
+```
+
+Prüfen, welche Tags es gibt und ob anonym gezogen werden kann:
+
+```bash
+docker pull ghcr.io/<dein-github-user>/grocy-modern:latest
 ```
 
 Dann in der `.env`:
@@ -92,13 +101,13 @@ docker compose pull
 docker compose up -d
 ```
 
-> Wenn du das Package in den GitHub-Einstellungen auf *public* stellst, entfällt der `docker login` — das Repository selbst bleibt dabei privat.
-
 ### Als Portainer-Stack
 
-Portainer kann aus dem Web-Editor heraus nicht bauen — es braucht ein fertiges Image, also Variante B. Vorher einmalig die Registry hinterlegen: *Registries* → *Add registry* → *Custom registry*, URL `ghcr.io`, Benutzername dein GitHub-Name, Passwort ein PAT mit `read:packages`.
+Portainer kann aus dem Web-Editor heraus nicht bauen — es braucht ein fertiges Image, also Variante B.
 
-Dann *Stacks* → *Add stack* → *Web editor*, als Namen `grocy` vergeben und einfügen:
+> Nur falls das Package **privat** ist, vorher einmalig die Registry hinterlegen: *Registries* → *Add registry* → *Custom registry*, URL `ghcr.io`, Benutzername dein GitHub-Name, Passwort ein PAT mit `read:packages`. Bei öffentlichem Package entfällt das.
+
+*Stacks* → *Add stack* → *Web editor*, als Namen `grocy` vergeben und einfügen:
 
 ```yaml
 services:
