@@ -1,376 +1,160 @@
-body.night-mode,
-.night-mode .sticky-form-footer {
-	color: #c1c1c1;
-	background-color: #333131;
+/* ==========================================================================
+   Grocy Modern - Dark theme
+   --------------------------------------------------------------------------
+   The whole UI is driven by the tokens defined in grocy_theme.css, so dark
+   mode is mostly a matter of re-declaring them. Only a handful of rules below
+   deal with things that cannot be expressed as a token.
+   ========================================================================== */
+
+body.night-mode {
+	color-scheme: dark;
+
+	/* ---- Brand ---------------------------------------------------------- */
+	--g-brand: #2bb094;
+	--g-brand-hover: #35c4a6;
+	--g-brand-active: #1f9a80;
+	--g-brand-contrast: #04231d;
+	--g-brand-soft: rgba(43, 176, 148, 0.16);
+	--g-brand-soft-text: #6bd8bf;
+	--g-brand-ring: rgba(43, 176, 148, 0.35);
+
+	/* ---- Semantic ------------------------------------------------------- */
+	--g-success: #1f8f4d;
+	--g-success-hover: #24a259;
+	--g-success-soft: rgba(45, 173, 96, 0.18);
+	--g-success-soft-text: #74d99b;
+
+	--g-danger: #c9453f;
+	--g-danger-hover: #d9524c;
+	--g-danger-soft: rgba(224, 90, 84, 0.18);
+	--g-danger-soft-text: #f39b96;
+
+	--g-warning: #a86a15;
+	--g-warning-hover: #bc781a;
+	--g-warning-soft: rgba(212, 148, 47, 0.18);
+	--g-warning-soft-text: #eab861;
+
+	--g-info: #2a72ab;
+	--g-info-hover: #3182bf;
+	--g-info-soft: rgba(63, 143, 206, 0.18);
+	--g-info-soft-text: #8ec5ec;
+
+	--g-neutral-soft: rgba(148, 163, 184, 0.16);
+	--g-neutral-soft-text: #b6c3ce;
+
+	/* ---- Surfaces & text ------------------------------------------------ */
+	--g-bg: #10151a;
+	--g-surface: #171e24;
+	--g-surface-2: #1b232a;
+	--g-surface-3: #232d35;
+	--g-surface-inset: #131920;
+	--g-overlay: rgba(0, 0, 0, 0.62);
+
+	--g-border: #2a353e;
+	--g-border-strong: #3c4954;
+
+	--g-text: #e4ebf1;
+	--g-text-muted: #98a7b5;
+	--g-text-subtle: #7b8996;
+
+	/* ---- Elevation ------------------------------------------------------ */
+	--g-shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.4);
+	--g-shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.45), 0 1px 2px rgba(0, 0, 0, 0.3);
+	--g-shadow-md: 0 6px 16px rgba(0, 0, 0, 0.5), 0 2px 6px rgba(0, 0, 0, 0.35);
+	--g-shadow-lg: 0 16px 40px rgba(0, 0, 0, 0.6), 0 4px 10px rgba(0, 0, 0, 0.4);
+
+	color: var(--g-text);
+	background-color: var(--g-bg);
 }
 
-.navbar-light .navbar-toggler {
-	color: rgba(255, 255, 255, .5);
-	border-color: rgba(255, 255, 255, .1);
-}
+/* --------------------------------------------------------------------------
+   Bootstrap utility classes that hard-code a light value
+   -------------------------------------------------------------------------- */
 
-.night-mode .navbar-light .navbar-toggler-icon {
-	background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' width='30' height='30' viewBox='0 0 30 30'%3e%3cpath stroke='rgba%28255, 255, 255, 0.5%29' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e");
-}
-
-.night-mode .table-info,
-.night-mode .table-info>td,
-.night-mode .table-info>th,
-.night-mode .alert-info {
-	background-color: #07373f;
-	color: #6c757d;
-}
-
-.night-mode .table-info>td,
-.night-mode .alert-info {
-	color: #c1c1c1;
-}
-
-.night-mode .table,
-.night-mode .list-group-item {
-	color: #c1c1c1;
-}
-
-.night-mode table.dataTable tr.dtrg-group td,
-.night-mode .nav-tabs .nav-link.active {
-	background-color: #2f3031;
-	color: #c1c1c1;
-}
-
-.night-mode .btn,
-.night-mode .nav-link,
-.night-mode #mainNav.navbar-light .navbar-collapse .navbar-nav>.nav-item.dropdown>.nav-link::after,
-.night-mode #mainNav.navbar-light .navbar-collapse .navbar-sidenav .nav-link-collapse::after,
-.night-mode .dropdown-item {
-	color: #c1c1c1 !important;
-}
-
-.night-mode .btn-outline-dark {
-	border-color: #c1c1c1;
-}
-
-.night-mode .btn-outline-info {
-	color: #1ed1ee !important;
-	border-color: #1ed1ee !important;
-}
-
-.night-mode .btn-outline-info:hover {
-	color: #e1e1e1 !important;
-}
-
-.night-mode .btn-info {
-	color: #c1c1c1;
-	background-color: #0c5f6e;
-	border-color: #0c5f6e;
-}
-
-.night-mode .btn-warning {
-	color: #c1c1c1;
-	background-color: #a9810a;
-	border-color: #a9810a;
-}
-
-.night-mode .btn-danger,
-.night-mode .alert-danger {
-	color: #c1c1c1;
-	background-color: #6f1b23;
-	border-color: #6f1b23;
-}
-
-.night-mode .btn-success {
-	color: #c1c1c1;
-	background-color: #17642a;
-	border-color: #17642a;
-}
-
-.night-mode .btn-light,
-.night-mode .input-group-text,
-.night-mode .note-editor.note-frame .note-statusbar,
-.night-mode .img-thumbnail {
-	color: #c1c1c1;
-	background-color: #292b2a;
-	border-color: #292b2a;
-}
-
-.night-mode .form-control {
-	color: #ced4da;
-	background-color: #333131;
-	border: 1px solid #ced4da;
-}
-
-.night-mode ::placeholder {
-	color: #b1bac4;
-}
-
-.night-mode .content-wrapper {
-	background: #333131;
-}
-
-.night-mode table.dataTable tr.group td {
-	font-weight: bold;
-	background-color: #333131;
-}
-
-.night-mode .table-danger,
-.night-mode .table-danger>td,
-.night-mode .table-danger>th {
-	background-color: #471116;
-}
-
-.night-mode .table-warning,
-.night-mode .table-warning>td,
-.night-mode .table-warning>th {
-	background-color: #473604;
-}
-
-.night-mode .bg-warning {
-	background-color: #473604 !important;
-}
-
-.night-mode .bg-info {
-	background-color: #07373f !important;
-}
-
-.night-mode .bg-danger {
-	background-color: #471116 !important;
-}
-
-.night-mode .form-control:focus {
-	color: #ced4da;
-	background-color: #333131;
-	border-color: #80bdff;
-}
-
-.night-mode select {
-	color: #ced4da;
-	background-color: #333131;
-}
-
-.night-mode .custom-select {
-	color: #c1c1c1;
-	background: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' width='4' height='5' viewBox='0 0 4 5'%3e%3cpath fill='%23c1c1c1' d='M2 0L0 2h4zm0 5L0 3h4z'/%3e%3c/svg%3e") no-repeat right .75rem center/8px 10px;
-	background-color: #333131 !important;
-}
-
-.night-mode .custom-select:valid,
-.night-mode .custom-select:invalid {
-	background: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 4 5'%3e%3cpath fill='%23c1c1c1' d='M2 0L0 2h4zm0 5L0 3h4z'/%3e%3c/svg%3e") no-repeat right .75rem center/8px 10px;
-	background-color: #333131;
-}
-
-.night-mode .custom-select:disabled {
-	color: #c1c1c1;
-	background-color: #292b2a;
-	border-color: #292b2a;
-}
-
-.night-mode .custom-file-input,
-.night-mode .custom-file-label,
-.night-mode .custom-file-label::after {
-	background-color: #333131;
-	color: #c1c1c1;
-}
-
-.night-mode .dropdown-item:focus,
-.night-mode .dropdown-item:hover {
-	color: #16181b;
-	background-color: #333131;
-}
-
-.night-mode .dropdown-item {
-	color: #c1c1c1;
-	background-color: #333131;
-}
-
-.night-mode .dropdown-item-text {
-	color: #c1c1c1;
-	background-color: #333131;
-}
-
-.night-mode .list-group-item {
-	background-color: #333131;
-}
-
-.night-mode .modal-content {
-	background-color: #333131;
-	border: 1px solid rgba(186, 189, 189, 0.66);
-}
-
-.night-mode .card-body .shadow {
-	background-color: #333131 !important;
-	box-shadow: 0 .5rem 1rem rgba(56, 56, 56, 0.705) !important;
-}
-
-.night-mode .card-title {
-	color: #c1c1c1;
-}
-
-.night-mode .modal-footer {
-	border-top: 1px solid #6f7173;
-}
-
-.night-mode .container-fluid {
-	background-color: #333131;
-}
-
-.night-mode a.discrete-link:not(.nav-link):hover {
-	color: #83c6ff !important;
-	text-decoration: none !important;
-	background-color: #333131;
-}
-
-.night-mode a.discrete-link:focus {
-	color: #ffa8af !important;
-	background-color: #333131;
-}
-
-.night-mode .card {
-	border: 2px solid;
-	border-color: #383838;
-	background-color: #333131;
-}
-
-.night-mode .card-header {
-	background-color: #333131;
-}
-
-.night-mode #mainNav {
-	background-color: #333131 !important;
-	border-bottom: 2px solid !important;
-	border-color: #383838 !important;
-}
-
-.night-mode .navbar-sidenav,
-.night-mode .sidenav-second-level {
-	background-color: #333131 !important;
-	border-right: 2px solid !important;
-	border-color: #383838 !important;
-}
-
-.night-mode .navbar-nav .dropdown-menu {
-	background-color: #333131 !important;
-}
-
-.night-mode .navbar-nav .dropdown-divider {
-	border-color: #383838 !important;
-	background-color: #333131;
-}
-
-.night-mode .sidenav-toggler {
-	background-color: #383838 !important;
-	border-right: 2px solid !important;
-	border-color: #383838 !important;
-}
-
-.night-mode .navbar-sidenav>li:hover,
-.night-mode .sidenav-second-level>li:hover,
-.night-mode .navbar-nav .dropdown-item:hover,
-.night-mode .navbar-sidenav>li>a:focus,
-.night-mode .sidenav-second-level>li>a:focus,
-.night-mode .navbar-nav .dropdown-item:focus,
-.night-mode .active-page {
-	box-shadow: inset 7px 0 0 #ff7585 !important;
-	background-color: #383838 !important;
-}
-
-#mainNav.fixed-top.navbar-light .sidenav-toggler a i {
-	color: #c1c1c1;
-}
-
-.night-mode .toast-success {
-	background-color: #092810;
-}
-
-.night-mode .toast-error {
-	background-color: #471015;
-}
-
-.night-mode .typeahead .active {
-	background-color: #333131;
-}
-
-.night-mode .note-editor.note-frame .note-editing-area .note-editable {
-	color: #c1c1c1;
-	background-color: #333131;
-}
-
-.night-mode .bootstrap-datetimepicker-widget table td.day {
-	background-color: #333131;
-	color: #c1c1c1;
-}
-
-.night-mode .bootstrap-datetimepicker-widget table td {
-	background-color: #333131;
-	color: #c1c1c1;
-}
-
-.night-mode .bootstrap-datetimepicker-widget table td,
-.night-mode .bootstrap-datetimepicker-widget table th {
-	background-color: #333131;
-	color: #c1c1c1;
-}
-
-.night-mode .dropdown-menu {
-	background-color: #333131;
-}
-
-.night-mode .table-secondary td,
-.night-mode .table-secondary th {
-	background-color: #4c4e50;
-}
-
-.night-mode .warning-message {
-	background-color: #7c5e10;
-	color: #d1d1d1;
-}
-
-.night-mode .secondary-message {
-	background-color: #4e575f;
-	color: #d1d1d1;
-}
-
-.night-mode .error-message {
-	background-color: #780a0a;
-	color: #d1d1d1;
-}
-
+.night-mode .text-dark,
 .night-mode a.text-dark {
-	color: #8f9ba5 !important;
+	color: var(--g-text) !important;
 }
 
 .night-mode a.text-dark:hover {
-	color: #d1d1d1 !important;
+	color: var(--g-brand-soft-text) !important;
 }
 
-.night-mode .normal-message {
-	background-color: #2d3a8c;
-	color: #d1d1d1;
+.night-mode .text-black-50 {
+	color: var(--g-text-muted) !important;
 }
 
-.night-mode .text-muted {
-	color: #8f9ba5 !important;
+.night-mode .text-white {
+	color: #fff !important;
 }
 
-.night-mode .qr-code {
-	background-color: #eee;
+.night-mode .bg-warning { background-color: var(--g-warning-soft) !important; }
+.night-mode .bg-info { background-color: var(--g-info-soft) !important; }
+.night-mode .bg-danger { background-color: var(--g-danger-soft) !important; }
+.night-mode .bg-success { background-color: var(--g-success-soft) !important; }
+.night-mode .bg-secondary { background-color: var(--g-neutral-soft) !important; }
+
+/* --------------------------------------------------------------------------
+   Bits that are not token driven
+   -------------------------------------------------------------------------- */
+
+/* Native form control chrome */
+.night-mode select,
+.night-mode input,
+.night-mode textarea {
+	color-scheme: dark;
+}
+
+.night-mode .custom-select {
+	background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 16 16' fill='none' stroke='%2398a7b5' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'%3e%3cpath d='M4 6l4 4 4-4'/%3e%3c/svg%3e");
+}
+
+/* The logo is a flat single-colour SVG - lift it off the dark surface */
+.night-mode #mainNav .navbar-brand img,
+.night-mode .app-sidebar .drawer-header img {
+	filter: brightness(1.65) saturate(1.15);
+}
+
+/* Tooltips invert in dark mode */
+.night-mode .tooltip-inner {
+	background-color: #e4ebf1;
+	color: #111820;
+}
+
+.night-mode .bs-tooltip-top .arrow::before { border-top-color: #e4ebf1; }
+.night-mode .bs-tooltip-bottom .arrow::before { border-bottom-color: #e4ebf1; }
+.night-mode .bs-tooltip-left .arrow::before { border-left-color: #e4ebf1; }
+.night-mode .bs-tooltip-right .arrow::before { border-right-color: #e4ebf1; }
+
+/* Barcodes and QR codes need a light backing to stay scannable */
+.night-mode .qr-code,
+.night-mode img.barcode {
+	background-color: #fff;
 	padding: min(1.5vw, 20px);
-	border-radius: 10px;
+	border-radius: var(--g-radius-sm);
 }
 
-.night-mode .custom-control-label:before {
-	background-color: #333131;
+/* Product/recipe pictures shouldn't glow against the dark surface */
+.night-mode .card-img-top,
+.night-mode .img-thumbnail {
+	background-color: var(--g-surface-2);
+	border-color: var(--g-border);
 }
 
-@media (max-width: 992px) {
+/* The Bootstrap navbar toggler icon is a hard-coded dark SVG */
+.night-mode .navbar-light .navbar-toggler-icon {
+	background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' width='30' height='30' viewBox='0 0 30 30'%3e%3cpath stroke='rgba%28255, 255, 255, 0.6%29' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e");
+}
 
-	.night-mode .navbar-sidenav>li:hover,
-	.night-mode .sidenav-second-level>li:hover,
-	.night-mode .navbar-nav .dropdown-item:hover,
-	.night-mode .navbar-sidenav>li>a:focus,
-	.night-mode .sidenav-second-level>li>a:focus,
-	.night-mode .navbar-nav .dropdown-item:focus,
-	.night-mode .active-page {
-		box-shadow: inset -10px 0 0 #ff7585 !important;
-	}
+/* Summernote toolbar buttons */
+.night-mode .note-btn,
+.night-mode .note-editor.note-frame .note-statusbar {
+	background-color: var(--g-surface-2);
+	border-color: var(--g-border);
+	color: var(--g-text);
+}
 
+/* Chart.js renders on canvas - lighten the surrounding chrome only */
+.night-mode canvas {
+	filter: none;
 }

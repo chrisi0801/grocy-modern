@@ -1,0 +1,419 @@
+/* ==========================================================================
+   Grocy Modern - Mobile layer
+   --------------------------------------------------------------------------
+   Everything that makes the UI work well on a phone: data tables rendered as
+   stacked cards, comfortable touch targets, stacked filter bars and the
+   bottom navigation spacing.
+   ========================================================================== */
+
+/* --------------------------------------------------------------------------
+   Data tables as cards
+   --------------------------------------------------------------------------
+   `grocy_datatables.js` tags every body cell with `data-label` (taken from
+   its column header) and marks the action / title cells, so a table can be
+   re-flowed into a list of cards without touching any view.
+   -------------------------------------------------------------------------- */
+
+/* Toolbar that replaces the hidden table header on phones */
+.dt-card-toolbar {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 0.4rem;
+	margin-bottom: 0.6rem;
+}
+
+.dt-card-toolbar .btn {
+	border-radius: var(--g-radius-pill);
+}
+
+.dt-card-toolbar .dt-sort-menu {
+	max-height: 60vh;
+	overflow-y: auto;
+}
+
+.dt-card-toolbar .dt-sort-item.active {
+	background-color: var(--g-brand-soft);
+	color: var(--g-brand-soft-text);
+	font-weight: 600;
+}
+
+@media (max-width: 767.98px) {
+
+	/* Let the table breathe out of its scroll container */
+	.dataTables_wrapper {
+		background: transparent;
+		border: 0;
+		box-shadow: none;
+		overflow: visible;
+	}
+
+	.dataTables_wrapper .dataTables_scroll,
+	.dataTables_wrapper .dataTables_scrollBody {
+		overflow: visible !important;
+		width: 100% !important;
+	}
+
+	.dataTables_wrapper .dataTables_scrollHead {
+		display: none !important;
+	}
+
+	table.dt-cards,
+	table.dt-cards > tbody,
+	table.dt-cards > tbody > tr {
+		display: block;
+		width: 100% !important;
+		max-width: 100% !important;
+	}
+
+	table.dt-cards > thead {
+		display: none;
+	}
+
+	table.dt-cards {
+		border-collapse: separate;
+		border-spacing: 0;
+	}
+
+	/* --- the card ---------------------------------------------------- */
+	table.dt-cards > tbody > tr {
+		position: relative;
+		display: flex;
+		flex-direction: column;
+		border: 1px solid var(--g-border);
+		border-radius: var(--g-radius-lg);
+		box-shadow: var(--g-shadow-sm);
+		margin-bottom: 0.6rem;
+		padding: 0.75rem 0.85rem 0.6rem 0.85rem;
+		/* No `overflow: hidden` - the row action menu lives inside the card */
+	}
+
+	/* A row menu can be long; keep it inside the viewport */
+	.table-inline-menu.dropdown-menu {
+		max-height: 60vh;
+		overflow-y: auto;
+	}
+
+	/* `.table-striped` zebra rules are more specific than a plain row
+	   selector, so the card surface has to match their specificity */
+	table.dt-cards > tbody > tr,
+	table.dt-cards.table-striped > tbody > tr:nth-of-type(odd),
+	table.dt-cards.table-striped > tbody > tr:nth-of-type(even),
+	table.dt-cards.table > tbody > tr:hover {
+		background-color: var(--g-surface);
+	}
+
+	/* No zebra striping in card mode - each card is its own surface */
+	table.dt-cards.table-striped > tbody > tr.odd > *,
+	table.dt-cards.table-striped > tbody > tr.even > *,
+	table.dt-cards.table-hover > tbody > tr:hover > * {
+		box-shadow: none;
+	}
+
+	/* Status colours become a left accent bar + a very soft tint */
+	table.dt-cards > tbody > tr.table-danger,
+	table.dt-cards > tbody > tr.table-warning,
+	table.dt-cards > tbody > tr.table-info,
+	table.dt-cards > tbody > tr.table-secondary {
+		border-left-width: 4px;
+	}
+
+	table.dt-cards > tbody > tr.table-danger,
+	table.dt-cards.table-striped > tbody > tr.table-danger {
+		border-left-color: var(--g-danger);
+		background-color: var(--g-danger-soft);
+	}
+
+	table.dt-cards > tbody > tr.table-warning,
+	table.dt-cards.table-striped > tbody > tr.table-warning {
+		border-left-color: var(--g-warning);
+		background-color: var(--g-warning-soft);
+	}
+
+	table.dt-cards > tbody > tr.table-info,
+	table.dt-cards.table-striped > tbody > tr.table-info {
+		border-left-color: var(--g-info);
+		background-color: var(--g-info-soft);
+	}
+
+	table.dt-cards > tbody > tr.table-secondary,
+	table.dt-cards.table-striped > tbody > tr.table-secondary {
+		border-left-color: var(--g-text-subtle);
+		background-color: var(--g-neutral-soft);
+	}
+
+	table.dt-cards > tbody > tr.table-danger > td,
+	table.dt-cards > tbody > tr.table-warning > td,
+	table.dt-cards > tbody > tr.table-info > td,
+	table.dt-cards > tbody > tr.table-secondary > td {
+		background-color: transparent;
+	}
+
+	/* --- the cells ---------------------------------------------------- */
+	table.dt-cards > tbody > tr > td {
+		display: flex;
+		align-items: baseline;
+		flex-wrap: wrap;
+		justify-content: flex-start;
+		gap: 0.1rem 0.35rem;
+		width: auto !important;
+		max-width: none !important;
+		border: 0;
+		border-top: 1px dashed var(--g-border);
+		padding: 0.3rem 0;
+		white-space: normal !important;
+		text-align: left !important;
+		word-break: break-word;
+		font-size: 0.875rem;
+	}
+
+	/* `margin-right: auto` (instead of space-between) keeps multi-part values
+	   like "5 Packungen" together on the right */
+	table.dt-cards > tbody > tr > td::before {
+		content: attr(data-label);
+		flex: 0 0 auto;
+		max-width: 46%;
+		margin-right: auto;
+		color: var(--g-text-muted);
+		font-size: 0.75rem;
+		font-weight: 600;
+		letter-spacing: 0.03em;
+		text-transform: uppercase;
+		line-height: 1.4;
+	}
+
+	/* The value side of the row */
+	table.dt-cards > tbody > tr > td > * {
+		text-align: right;
+	}
+
+	/* Card headline (first content column, e.g. the product name) */
+	table.dt-cards > tbody > tr > td.dt-cell-title {
+		order: -2;
+		display: block;
+		border-top: 0;
+		padding: 0 0 0.25rem 0;
+		font-size: 1.0625rem;
+		font-weight: 600;
+		line-height: 1.3;
+		letter-spacing: -0.01em;
+		color: var(--g-text);
+	}
+
+	table.dt-cards > tbody > tr > td.dt-cell-title::before {
+		content: none;
+	}
+
+	table.dt-cards > tbody > tr > td.dt-cell-title > * {
+		text-align: left;
+	}
+
+	/* Cells without content just waste vertical space on a phone */
+	table.dt-cards > tbody > tr > td.dt-cell-empty {
+		display: none;
+	}
+
+	/* Hidden helper columns must stay hidden */
+	table.dt-cards > tbody > tr > td.d-none {
+		display: none !important;
+	}
+
+	/* --- the action row ------------------------------------------------ */
+	table.dt-cards > tbody > tr > td.dt-cell-actions {
+		order: 99;
+		display: flex;
+		flex-wrap: wrap;
+		align-items: center;
+		justify-content: flex-start;
+		gap: 0.4rem;
+		border: 0;
+		border-top: 1px solid var(--g-border);
+		border-right: 0 !important;
+		margin-top: 0.45rem;
+		padding: 0.6rem 0 0 0;
+		white-space: normal;
+	}
+
+	table.dt-cards > tbody > tr > td.dt-cell-actions::before {
+		content: none;
+	}
+
+	table.dt-cards > tbody > tr > td.dt-cell-actions > * {
+		text-align: center;
+	}
+
+	table.dt-cards > tbody > tr > td.dt-cell-actions .btn {
+		min-height: 38px;
+		padding-left: 0.75rem;
+		padding-right: 0.75rem;
+		font-size: 0.875rem;
+	}
+
+	/* Push the overflow menu to the far right of the action row */
+	table.dt-cards > tbody > tr > td.dt-cell-actions > .dropdown:last-child {
+		margin-left: auto;
+	}
+
+	/* --- row group headers --------------------------------------------- */
+	table.dt-cards > tbody > tr.dtrg-group,
+	table.dt-cards.table-striped > tbody > tr.dtrg-group {
+		display: block;
+		background-color: transparent;
+		border: 0;
+		box-shadow: none;
+		margin: 0.9rem 0 0.4rem 0;
+		padding: 0;
+	}
+
+	table.dt-cards > tbody > tr.dtrg-group > td {
+		display: block;
+		border: 0;
+		padding: 0 0.15rem;
+		font-size: 0.75rem;
+		font-weight: 700;
+		letter-spacing: 0.09em;
+		text-transform: uppercase;
+		color: var(--g-text-subtle);
+		background-color: transparent;
+	}
+
+	table.dt-cards > tbody > tr.dtrg-group > td::before {
+		content: none;
+	}
+
+	/* --- empty table --------------------------------------------------- */
+	table.dt-cards > tbody > tr > td.dataTables_empty {
+		display: block;
+		text-align: center !important;
+		color: var(--g-text-muted);
+		border: 0;
+		padding: 1.5rem 0;
+	}
+
+	table.dt-cards > tbody > tr > td.dataTables_empty::before {
+		content: none;
+	}
+}
+
+/* --------------------------------------------------------------------------
+   General phone ergonomics
+   -------------------------------------------------------------------------- */
+
+@media (max-width: 767.98px) {
+
+	body {
+		font-size: 0.9375rem;
+	}
+
+	/* Comfortable touch targets */
+	.btn:not(.btn-xs):not(.btn-sm) {
+		min-height: 42px;
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+		gap: 0.35rem;
+	}
+
+	.form-control,
+	.custom-select,
+	.input-group-text {
+		font-size: 1rem; /* prevents iOS from zooming on focus */
+		min-height: 46px;
+	}
+
+	/* Filter / search bars stack instead of squeezing */
+	#table-filter-row {
+		gap: 0.5rem 0;
+		margin-bottom: 0.5rem;
+	}
+
+	#table-filter-row > div:not(:first-of-type) {
+		margin-top: 0.5rem;
+	}
+
+	#table-filter-row .input-group {
+		flex-wrap: nowrap;
+	}
+
+	#table-filter-row .input-group-text {
+		white-space: nowrap;
+	}
+
+	/* Page header actions become a horizontally scrollable chip row */
+	.related-links.d-md-flex.show,
+	.related-links.d-md-flex.collapsing {
+		display: flex !important;
+		flex-wrap: wrap;
+		gap: 0.4rem;
+	}
+
+	.related-links .btn {
+		float: none !important;
+		margin: 0 !important;
+		border-radius: var(--g-radius-pill);
+	}
+
+	/* Status chips row scrolls sideways rather than wrapping into a wall */
+	.border-top.border-bottom.my-2.py-1 {
+		flex-wrap: wrap;
+	}
+
+	.status-filter-message,
+	.user-filter-message {
+		margin-right: 0 !important;
+	}
+
+	/* Cards */
+	.card {
+		border-radius: var(--g-radius);
+	}
+
+	.card-body {
+		padding: 0.9rem;
+	}
+
+	/* Bootbox dialogs are full-width sheets - reclaim the padding */
+	.modal-body {
+		padding: 0.75rem;
+	}
+
+	/* Number picker / amount inputs stay usable */
+	.input-group > .btn {
+		min-height: 46px;
+	}
+}
+
+/* --------------------------------------------------------------------------
+   Bottom navigation spacing
+   -------------------------------------------------------------------------- */
+
+@media (max-width: 991.98px) {
+
+	body.has-bottom-nav .content-wrapper {
+		padding-bottom: calc(var(--g-bottomnav-h) + var(--g-safe-bottom) + 0.5rem);
+	}
+
+	body.has-bottom-nav .sticky-form-footer {
+		bottom: calc(var(--g-bottomnav-h) + var(--g-safe-bottom));
+		padding-bottom: 0;
+	}
+
+	/* Toast stack must not hide behind the bottom bar */
+	body.has-bottom-nav #toast-container.toast-bottom-right,
+	body.has-bottom-nav #toast-container.toast-bottom-center,
+	body.has-bottom-nav #toast-container.toast-bottom-left {
+		bottom: calc(var(--g-bottomnav-h) + var(--g-safe-bottom) + 0.5rem);
+	}
+}
+
+/* Never show the app chrome inside embedded (iframe/dialog) views */
+.embedded #bottom-nav,
+.embedded #nav-drawer-backdrop {
+	display: none !important;
+}
+
+@media print {
+	#bottom-nav,
+	#nav-drawer-backdrop {
+		display: none !important;
+	}
+}

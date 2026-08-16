@@ -2874,3 +2874,24 @@ msgid "Pack"
 msgid_plural "Packs"
 msgstr[0] "Packung"
 msgstr[1] "Packungen"
+
+msgid "Stock"
+msgstr "Bestand"
+
+msgid "More"
+msgstr "Mehr"
+
+msgid "Menu"
+msgstr "Menü"
+
+msgid "Quick actions"
+msgstr "Schnellaktionen"
+
+msgid "Sort by"
+msgstr "Sortieren nach"
+
+msgid "Ascending"
+msgstr "Aufsteigend"
+
+msgid "Descending"
+msgstr "Absteigend"

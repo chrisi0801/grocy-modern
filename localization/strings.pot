@@ -2483,3 +2483,24 @@ msgid "Pack"
 msgid_plural "Packs"
 msgstr[0] ""
 msgstr[1] ""
+
+msgid "Stock"
+msgstr ""
+
+msgid "More"
+msgstr ""
+
+msgid "Menu"
+msgstr ""
+
+msgid "Quick actions"
+msgstr ""
+
+msgid "Sort by"
+msgstr ""
+
+msgid "Ascending"
+msgstr ""
+
+msgid "Descending"
+msgstr ""

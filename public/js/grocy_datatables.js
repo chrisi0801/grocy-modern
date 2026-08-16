@@ -187,7 +187,7 @@ $(document).on("hide.bs.dropdown", "td .dropdown", function (e)
 	}
 });
 
-$(".change-table-columns-visibility-button").on("click", function (e)
+$(document).on("click", ".change-table-columns-visibility-button", function (e)
 {
 	e.preventDefault();
 
@@ -403,3 +403,250 @@ $(document).on("click", ".change-table-columns-rowgroup-toggle", function ()
 
 	dataTable.draw();
 });
+
+// ---------------------------------------------------------------------------
+// Mobile card mode
+// ---------------------------------------------------------------------------
+// On small screens a wide table is unusable, so every DataTable is re-flowed
+// into a list of cards (see grocy_mobile.css). All the CSS needs is a label per
+// cell plus a marker for the headline and the action cell - both are derived
+// from the column headers here, so no view has to be adjusted.
+
+var GrocyDataTablesCardMode = {
+	Breakpoint: 768
+};
+
+GrocyDataTablesCardMode.IsActive = function ()
+{
+	return window.innerWidth < GrocyDataTablesCardMode.Breakpoint;
+};
+
+// The captions of all currently visible columns, in the same order as the
+// cells of a body row (invisible columns are removed from the DOM by DataTables)
+GrocyDataTablesCardMode.VisibleColumns = function (api)
+{
+	var columns = [];
+
+	// Note: the ":visible" column selector isn't supported by the bundled
+	// DataTables version, so filter manually
+	api.columns().every(function ()
+	{
+		if (!this.visible())
+		{
+			return;
+		}
+
+		columns.push({
+			index: this.index(),
+			header: $(this.header()),
+			title: $(this.header()).text().replace(/\s+/g, " ").trim()
+		});
+	});
+
+	return columns;
+};
+
+GrocyDataTablesCardMode.Apply = function (api)
+{
+	var headers = GrocyDataTablesCardMode.VisibleColumns(api).map(function (column)
+	{
+		return column.title;
+	});
+
+	// The first column carrying an actual caption is the card headline
+	// (the leading caption-less column holds the row actions)
+	var titleIndex = headers.findIndex(function (title)
+	{
+		return title.length > 0;
+	});
+
+	var body = api.table().body();
+
+	if (!body)
+	{
+		return;
+	}
+
+	var rows = body.children;
+
+	for (var r = 0; r < rows.length; r++)
+	{
+		var cells = rows[r].children;
+
+		// Row group headers and the "no data" row don't map to columns
+		if (cells.length !== headers.length)
+		{
+			continue;
+		}
+
+		for (var c = 0; c < cells.length; c++)
+		{
+			var cell = cells[c];
+			var label = headers[c];
+
+			cell.setAttribute("data-label", label);
+			cell.classList.toggle("dt-cell-actions", label.length === 0);
+			cell.classList.toggle("dt-cell-title", c === titleIndex);
+			cell.classList.toggle("dt-cell-empty", label.length !== 0
+				&& c !== titleIndex
+				&& cell.children.length === 0
+				&& cell.textContent.trim().length === 0);
+		}
+	}
+};
+
+// A hidden <thead> also hides the table options and the sort handles, so both
+// get a dedicated toolbar above the cards
+GrocyDataTablesCardMode.AddToolbar = function (api)
+{
+	var tableNode = api.table().node();
+	var wrapper = $(api.table().container());
+
+	if (wrapper.find("> .dt-card-toolbar").length > 0)
+	{
+		return;
+	}
+
+	var tableSelector = "#" + tableNode.id;
+	var hasOptionsButton = $(tableNode).find("thead .change-table-columns-visibility-button").length > 0
+		|| $(api.table().header()).find(".change-table-columns-visibility-button").length > 0;
+
+	var toolbar = $('<div class="dt-card-toolbar d-md-none"></div>');
+
+	toolbar.append('\
+		<div class="dropdown"> \
+			<button class="btn btn-sm btn-outline-dark dropdown-toggle dt-sort-button" type="button" data-toggle="dropdown"> \
+				<i class="fa-solid fa-arrow-down-short-wide"></i> ' + __t("Sort by") + ' \
+			</button> \
+			<div class="dropdown-menu dt-sort-menu"></div> \
+		</div>');
+
+	if (hasOptionsButton && tableNode.id)
+	{
+		toolbar.append('\
+			<button class="btn btn-sm btn-outline-dark change-table-columns-visibility-button" type="button" data-table-selector="' + tableSelector + '"> \
+				<i class="fa-solid fa-eye"></i> ' + __t("Table options") + ' \
+			</button>');
+	}
+
+	wrapper.prepend(toolbar);
+};
+
+GrocyDataTablesCardMode.BuildSortMenu = function (api, menu)
+{
+	var order = api.order();
+	var currentColumn = (order.length > 0) ? order[0][0] : -1;
+	var currentDirection = (order.length > 0) ? order[0][1] : "asc";
+	var html = "";
+
+	GrocyDataTablesCardMode.VisibleColumns(api).forEach(function (column)
+	{
+		var index = column.index;
+		var header = column.header;
+		var title = column.title;
+
+		if (title.length === 0 || title.startsWith("Hidden") || header.hasClass("d-none"))
+		{
+			return;
+		}
+
+		var isCurrent = (index === currentColumn);
+		var nextDirection = (isCurrent && currentDirection === "asc") ? "desc" : "asc";
+		var icon = "fa-arrow-down-a-z";
+
+		if (isCurrent)
+		{
+			icon = (currentDirection === "asc") ? "fa-arrow-down-a-z" : "fa-arrow-up-a-z";
+		}
+
+		html += '<a class="dropdown-item dt-sort-item' + (isCurrent ? " active" : "") + '" href="#" \
+			data-column-index="' + index + '" data-direction="' + nextDirection + '"> \
+			<i class="fa-solid fa-fw ' + (isCurrent ? icon : "fa-arrow-right-arrow-left fa-rotate-90") + '"></i>&nbsp;' + title + '</a>';
+	});
+
+	menu.html(html);
+};
+
+$(document).on("show.bs.dropdown", ".dt-card-toolbar .dropdown", function ()
+{
+	var menu = $(this).find(".dt-sort-menu");
+	var table = $(this).closest(".dataTables_wrapper").find("table.dataTable").first();
+
+	if (table.length === 0)
+	{
+		return;
+	}
+
+	GrocyDataTablesCardMode.BuildSortMenu(table.DataTable(), menu);
+});
+
+$(document).on("click", ".dt-sort-item", function (e)
+{
+	e.preventDefault();
+
+	var table = $(this).closest(".dataTables_wrapper").find("table.dataTable").first();
+
+	if (table.length === 0)
+	{
+		return;
+	}
+
+	table.DataTable().order([parseInt($(this).attr("data-column-index")), $(this).attr("data-direction")]).draw();
+});
+
+$(document).on("init.dt", function (e, settings)
+{
+	var api = new $.fn.dataTable.Api(settings);
+
+	$(api.table().node()).addClass("dt-cards");
+	GrocyDataTablesCardMode.AddToolbar(api);
+});
+
+$(document).on("draw.dt", function (e, settings)
+{
+	if (!GrocyDataTablesCardMode.IsActive())
+	{
+		return;
+	}
+
+	GrocyDataTablesCardMode.Apply(new $.fn.dataTable.Api(settings));
+});
+
+(function ()
+{
+	var resizeTimeout = null;
+	var wasCardMode = GrocyDataTablesCardMode.IsActive();
+
+	$(window).on("resize", function ()
+	{
+		window.clearTimeout(resizeTimeout);
+
+		resizeTimeout = window.setTimeout(function ()
+		{
+			var isCardMode = GrocyDataTablesCardMode.IsActive();
+
+			if (isCardMode === wasCardMode)
+			{
+				return;
+			}
+
+			wasCardMode = isCardMode;
+
+			$("table.dt-cards").each(function ()
+			{
+				var api = $(this).DataTable();
+
+				if (isCardMode)
+				{
+					GrocyDataTablesCardMode.Apply(api);
+				}
+				else
+				{
+					// Column widths were calculated while the table was
+					// rendered as cards - recalculate them for the grid layout
+					api.columns.adjust();
+				}
+			});
+		}, 150);
+	});
+})();

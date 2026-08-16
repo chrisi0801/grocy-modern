@@ -59,6 +59,13 @@
 
 ### General
 
+- Completely reworked the user interface: modern, mobile first design
+  - New design system: all colors, radii, elevations and typography are driven by CSS custom properties (`/public/css/grocy_theme.css`), so re-theming (also via `custom_css.html`) only means overriding a handful of variables
+  - New app shell: sticky top bar, a quieter sidebar which can be collapsed to an icon rail, and on phones/tablets a proper off-canvas navigation drawer (swipe or tap outside to close) instead of the menu pushing the page down
+  - New bottom tab bar on phones/tablets with the most used views plus a quick action button for purchase / consume / transfer / inventory
+  - Tables are rendered as cards on small screens: every cell is labelled with its column header, the row actions move into a footer, empty cells are omitted and a toolbar above the list offers sorting and the table options (both were only reachable via the table header before)
+  - Dialogs are shown as bottom sheets on phones
+  - Dark mode was rebuilt on top of the same design tokens, so it now covers all components consistently
 - Fixed accent insensitive searching using the general table search field was broken
 - Fixed that it wasn't possible to log in using passwords containing special escape sequences (e.g. `<<`)
 - Fixed that the initially created location and quantity units weren't localized (only applies to new installations)

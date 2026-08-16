@@ -1,12 +1,4 @@
-﻿/* Main style customizations */
-body {
-	font-family: 'Roboto', sans-serif;
-}
-
-.content-text {
-	font-size: 0.85rem;
-}
-
+﻿/* Functional style customizations - the visual layer lives in grocy_theme.css */
 .responsive-button {
 	white-space: normal;
 }
@@ -14,26 +6,6 @@ body {
 .timeago-contextual {
 	font-style: italic;
 	font-size: 0.8em;
-}
-
-a:not(.btn):not(.nav-link):not(.dropdown-item):not(.list-group-item) {
-	color: inherit;
-	text-decoration: underline;
-	text-decoration-style: dotted;
-	text-underline-offset: 0.2rem;
-}
-
-a:not(.btn):not(.nav-link):not(.dropdown-item):not(.list-group-item):hover {
-	text-decoration: underline;
-}
-
-a.discrete-link {
-	color: inherit !important;
-	text-decoration: none !important;
-}
-
-a.discrete-link:hover {
-	text-decoration: none !important;
 }
 
 .grocy-card .card-header {
@@ -63,7 +35,6 @@ a.discrete-link:hover {
 	top: 0;
 	left: 0;
 	overflow: auto;
-	background-color: #ffffff;
 	width: 100%;
 }
 
@@ -126,12 +97,9 @@ input::-webkit-inner-spin-button {
 }
 
 .sticky-form-footer {
-	border-top: 1px solid #d6d6d6;
-	background-color: white;
 	bottom: 0;
 	position: fixed;
 	width: 100%;
-	z-index: 1030;
 }
 
 form.has-sticky-form-footer .form-group:nth-last-child(2) {
@@ -190,25 +158,6 @@ a:not([href]) {
 	}
 }
 
-.table-inline-menu .dropdown-item {
-	width: auto;
-	text-indent: -24px;
-}
-
-.table-inline-menu .dropdown-item .dropdown-item-icon {
-	min-width: 24px;
-	padding-left: 20px;
-	text-align: center;
-	display: inline;
-}
-
-.table-inline-menu .dropdown-item .dropdown-item-text {
-	display: inline;
-	padding: 0;
-	word-wrap: break-word;
-	white-space: pre-wrap;
-}
-
 /* Camera Barcodescanner */
 #camerabarcodescanner-container {
 	max-height: 90vh;
@@ -242,14 +191,6 @@ a:not([href]) {
 /* There is a little too much padding on form inputs */
 .form-control {
 	padding-right: 0.75rem !important;
-}
-
-.btn-group-xs>.btn,
-.btn-xs {
-	padding: 0.25rem 0.4rem;
-	font-size: 0.875rem;
-	line-height: 0.5;
-	border-radius: 0.2rem;
 }
 
 .ls-n1 {
@@ -297,14 +238,6 @@ a:not([href]) {
 	overflow-y: auto;
 }
 
-.btn.dropdown-toggle:after {
-	vertical-align: 0;
-	margin: 0;
-	border: none;
-	content: '\f107';
-	font-family: 'Font Awesome 6 Free';
-}
-
 /* Third party component customizations - DataTables */
 .dataTable td {
 	vertical-align: middle !important;
@@ -330,23 +263,6 @@ tr.dtrg-group {
 }
 
 /* Third party component customizations - toastr */
-#toast-container>div {
-	opacity: 1;
-	filter: alpha(opacity=100);
-}
-
-.toast-success {
-	background-color: #28a745;
-}
-
-.toast-error {
-	background-color: #dc3545;
-}
-
-#toast-container>div {
-	box-shadow: none;
-}
-
 /* Third party component customizations - Font Awesome */
 .fa-custom-sigma-sign:before {
 	content: "\03a3";
@@ -369,10 +285,6 @@ html {
 }
 
 /* Third party component customizations - Bootstrap Combobox */
-.typeahead .active {
-	background-color: #e5e5e5;
-}
-
 .combobox-container .input-group-append {
 	max-width: 36px;
 }
@@ -381,40 +293,6 @@ html {
 .tooltip {
 	pointer-events: none;
 	z-index: 99999 !important;
-}
-
-.warning-message,
-.error-message,
-.normal-message,
-.secondary-message {
-	padding: 12px;
-	font-weight: bold;
-	width: fit-content;
-	border-top: 6px solid;
-}
-
-.warning-message {
-	background-color: #fffaeb;
-	color: #7c5e10;
-	border-top-color: #e9b949;
-}
-
-.error-message {
-	background-color: #ffeeee;
-	color: #780a0a;
-	border-top-color: #ba2525;
-}
-
-.normal-message {
-	background-color: #e0e8f9;
-	color: #2d3a8c;
-	border-top-color: #4c63b6;
-}
-
-.secondary-message {
-	background-color: #e1e4e8;
-	color: #4e575f;
-	border-top-color: #68696b;
 }
 
 .status-filter-message,
@@ -463,30 +341,6 @@ html {
 
 .fc-event {
 	cursor: pointer;
-}
-
-.grocy-tabs .nav-link {
-	color: inherit;
-	text-transform: uppercase;
-}
-
-.grocy-tabs .nav-link {
-	border: 2px solid transparent;
-	transition: border-bottom-color ease-in 0.1s;
-}
-
-.grocy-tabs .nav-link.active {
-	border: 2px solid transparent;
-	border-bottom-color: #000 !important;
-}
-
-.grocy-tabs .nav-link:hover {
-	border: 2px solid transparent;
-	border-bottom-color: #000;
-}
-
-.grocy-tabs .nav-item {
-	margin-bottom: -2px;
 }
 
 .grocy-tabs.card-header-tabs {
