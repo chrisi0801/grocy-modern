@@ -261,82 +261,19 @@ Dafür `a2enmod proxy proxy_http ssl`. Mit Nginx Proxy Manager, Traefik oder Cad
 
 HTTPS lohnt sich nicht nur aus Prinzip: Der Kamera-Barcodescanner und die Installation als App aufs Handy funktionieren in Browsern nur in einem „secure context".
 
-### ⚠️ „Keine sichere Verbindung" hinter dem Reverse Proxy
+### Hinweis: HTTPS-Schema muss beim Proxy ankommen
 
-Das ist die mit Abstand häufigste Stolperfalle — und der Grund, warum eine ganz normale Webseite hinter demselben Proxy problemlos läuft, Grocy aber nicht.
+Grocy erzeugt **absolute** URLs und leitet `http` vs. `https` aus `X-Forwarded-Proto` ab (siehe `helpers/UrlManager.php`). Nginx Proxy Manager, Traefik und Caddy senden diesen Header standardmäßig — dort ist **nichts zu konfigurieren**.
 
-**Warum:** Grocy erzeugt **absolute** URLs. Steht `BASE_URL` auf dem Standardwert `/`, baut sich Grocy die Basis-URL bei jedem Request selbst zusammen — und das Schema (`http` oder `https`) leitet es aus `$_SERVER['HTTPS']` bzw. dem Header `X-Forwarded-Proto` ab (siehe `helpers/UrlManager.php`). Terminiert der Proxy TLS und spricht dann per **HTTP** mit dem Container, sieht Grocy nur eine unverschlüsselte Anfrage. Ohne den Header schreibt es folglich in jeden Link und jeden `<script>`/`<link>`-Tag `http://…`:
-
-```
-Seite:      https://grocy.deine-domain.de/stockoverview
-darin aber: http://grocy.deine-domain.de/css/grocy_theme.css
-            http://grocy.deine-domain.de/packages/jquery/dist/jquery.min.js
-```
-
-Der Browser blockt das als *Mixed Content*: das Schloss verschwindet, das Design fehlt, nichts funktioniert. Und ein Klick auf die Startseite wirft dich per `Location: http://…` komplett aus HTTPS heraus. Eine statische Apache-Seite mit relativen Links kann das gar nicht passieren.
-
-**Prüfen** (von irgendeinem Rechner aus):
+Nur wenn ein Proxy den Header nicht mitschickt, verlinkt Grocy alle Assets mit `http://`, der Browser blockt das als Mixed Content und das Schloss verschwindet. Test:
 
 ```bash
 curl -sI https://grocy.deine-domain.de/ | grep -i location
 ```
 
-Kommt dort `Location: http://…` zurück, ist genau das der Fehler. Ebenso eindeutig: F12 → Konsole zeigt „Mixed Content"-Meldungen.
+Steht dort `http://`, fehlt der Header. Bei Apache als Proxy nachrüsten mit `a2enmod headers` und `RequestHeader set X-Forwarded-Proto "https"`.
 
-**Lösung 1 (empfohlen) — den Proxy den Header schicken lassen.** `BASE_URL` bleibt auf `/`, der Proxy sendet `X-Forwarded-Proto: https`. Im Nginx Proxy Manager beim Proxy Host unter *Advanced* → *Custom Nginx Configuration*:
-
-```nginx
-proxy_set_header X-Forwarded-Proto $scheme;
-proxy_set_header X-Forwarded-For   $proxy_add_x_forwarded_for;
-proxy_set_header Host              $host;
-```
-
-Bei Apache als Proxy übernimmt `ProxyPass` das nicht automatisch:
-
-```apache
-RequestHeader set X-Forwarded-Proto "https"
-```
-
-(dafür `a2enmod headers`).
-
-Vorteil: Grocy bestimmt das Schema weiterhin pro Request und bleibt parallel über `http://<ip>:9283` erreichbar.
-
-**Lösung 2 — `BASE_URL` fest verdrahten.** Nur, wenn Lösung 1 nicht funktioniert:
-
-```yaml
-environment:
-  GROCY_BASE_URL: "https://grocy.deine-domain.de"   # exakt deine echte Domain!
-```
-
-Damit rät Grocy nicht mehr, sondern nutzt exakt diese Basis — unabhängig von jedem Proxy-Header.
-
-> ⚠️ **Danach ist Grocy nur noch über genau diese Domain erreichbar.** Der Aufruf über `http://<ip>:9283/` wird per Redirect auf die Domain geschickt, und alle Assets verlinken dorthin. Setz das nur, wenn die Domain auch aus deinem LAN auflöst (Split-DNS oder `hosts`-Eintrag) — und trag deine echte Domain ein, nicht den Beispielwert.
-
-#### Wieder rauskommen, wenn `BASE_URL` falsch gesetzt wurde
-
-Die App läuft weiter, sie schickt den Browser nur an eine Adresse, die du nicht erreichst:
-
-```bash
-# Was ist aktiv? (zeigt das Redirect-Ziel)
-docker compose exec grocy php -r 'echo getenv("GROCY_BASE_URL") ?: "(nicht gesetzt)", PHP_EOL;'
-curl -sI http://<host>:9283/ | grep -i location
-
-# Zeile aus docker-compose.yml bzw. .env wieder entfernen, dann
-docker compose up -d
-```
-
-Wurde `BASE_URL` stattdessen in der `config.php` im Volume gesetzt:
-
-```bash
-docker compose exec grocy sed -i "s|^Setting('BASE_URL'.*|Setting('BASE_URL', '/');|" /var/www/html/data/config.php
-docker compose restart grocy
-```
-
-**Weitere Punkte, die im Nginx Proxy Manager gern schiefgehen:**
-
-- Beim Proxy Host muss **Scheme = `http`** stehen (nicht `https`) — der Container spricht selbst kein TLS. Steht dort `https`, läuft der Proxy in einen Handshake-Fehler und zeigt „keine sichere Verbindung", ohne dass Grocy überhaupt beteiligt ist.
-- *Force SSL* im Proxy Host einschalten, damit HTTP-Aufrufe auf HTTPS umgeleitet werden.
-- *Websockets Support* wird von Grocy nicht gebraucht, schadet aber nicht.
+**`GROCY_BASE_URL` dabei nicht setzen.** Mit einer festen Domain darin wird jeder Zugriff über `http://<ip>:9283` auf diese Domain umgeleitet — der Container wirkt dann von innen unerreichbar. Einfach die Zeile wieder aus dem Stack entfernen.
 
 Läuft Grocy nicht auf einer eigenen (Sub-)Domain, sondern in einem Unterpfad, zusätzlich `GROCY_BASE_URL=https://deine-domain.de/grocy` und `GROCY_BASE_PATH=/grocy` setzen.
 
@@ -389,7 +326,8 @@ Die `-dev`-Pakete werden bewusst nicht wieder deinstalliert: Das `apt-get purge 
 | Build bricht bei `yarn install` mit `exit code 128` ab | 128 ist Gits Fehlercode: `bootstrap-combobox` wird per Git von GitHub geholt. Im Image sind dafür `git` **und** `ca-certificates` nötig — Letzteres wird vom node-Image beim Aufräumen wieder entfernt und im Dockerfile deshalb explizit nachinstalliert. |
 | Build bricht bei `composer install` mit `exit code 2` ab | Eine von der Lock-Datei geforderte PHP-Erweiterung fehlt in der Build-Stage. Welche, zeigt `composer check-platform-reqs`. |
 | Container startet, aber `unhealthy` | `docker compose logs grocy`. Meist Rechte im Datenverzeichnis: bei Bind-Mount `PUID`/`PGID` setzen. |
-| Startseite lädt, Unterseiten 404 | Sollte im Image nicht passieren (`mod_rewrite` und `AllowOverride All` sind gesetzt). Tritt es hinter einem Reverse Proxy auf, fehlt meist `GROCY_BASE_URL`. |
+| Startseite lädt, Unterseiten 404 | Sollte im Image nicht passieren, `mod_rewrite` und `AllowOverride All` sind gesetzt. |
+| Über die Domain nicht erreichbar, Timeout | Zeigt der DNS-Eintrag auf den **Reverse Proxy** oder versehentlich direkt auf den Container-Host? Nur der Proxy nimmt Port 443 an. |
 | Alle Zeiten sind um Stunden verschoben | `TZ` nicht gesetzt — Container läuft auf UTC. |
 | `permission denied` beim Speichern | `docker compose exec grocy chown -R www-data:www-data /var/www/html/data` |
 | Docker startet im LXC nicht | `nesting=1,keyctl=1` am Container fehlen (siehe oben). |
