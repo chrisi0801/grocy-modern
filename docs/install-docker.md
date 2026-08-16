@@ -334,7 +334,12 @@ Läuft Grocy nicht auf einer eigenen (Sub-)Domain, sondern in einem Unterpfad, z
 
 ```bash
 cd /opt/grocy
+
+# Einzeln und mit Blick auf die Ausgabe - schlaegt der Pull fehl, darf
+# nichts weiterlaufen (bei privaten Repos fragt er ggf. nach Zugangsdaten)
 git pull
+git log -1 --format='%h %s'           # steht hier der erwartete Commit?
+
 docker compose up -d --build          # Variante A
 # bzw.
 docker compose pull && docker compose up -d   # Varianten B/C

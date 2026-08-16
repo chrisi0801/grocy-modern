@@ -296,19 +296,27 @@ Danach lohnt ein Blick auf:
 Für diesen Fork stattdessen:
 
 ```bash
-cd /opt/grocy
-systemctl stop apache2                      # optional, aber sauberer
-
 # Backup: die Datenbank ist eine einzige Datei
+cd /opt/grocy
 tar czf /root/grocy-backup-$(date +%F).tgz data/
 
+# Erst der Pull, ALLEIN und mit Blick auf die Ausgabe.
+# Schlaegt er fehl (Zugangsdaten, lokale Aenderungen), darf der Rest nicht laufen.
 git pull
-composer install --no-dev --optimize-autoloader
-yarn install
 
-chown -R www-data:www-data data/
-systemctl start apache2
+# Dann der Rest, mit && verkettet, damit ein Fehler die Kette abbricht
+systemctl stop apache2 \
+  && composer install --no-dev --optimize-autoloader \
+  && yarn install \
+  && chown -R www-data:www-data data/ \
+  && systemctl start apache2
 ```
+
+> Das `git pull` bewusst einzeln: Bei einem privaten Repository kann es nach Zugangsdaten fragen. Fügst du den ganzen Block auf einmal ein, wird die nächste Zeile als Benutzername verschluckt, der Pull scheitert — und alles danach läuft trotzdem weiter, als wäre nichts gewesen. Nach dem Update also immer gegenprüfen:
+>
+> ```bash
+> git log -1 --format='%h %s'
+> ```
 
 Danach einmal die Startseite `/` aufrufen — dort laufen fällige Datenbank-Migrationen.
 
