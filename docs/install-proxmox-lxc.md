@@ -384,23 +384,43 @@ curl -sI https://grocy.deine-domain.de/ | grep -i location
 
 Steht dort `http://`, ist es genau das.
 
-**Lösung 1 — `BASE_URL` fest setzen (wirkt immer):**
-
-```php
-// data/config.php
-Setting('BASE_URL', 'https://grocy.deine-domain.de');
-```
-
-Nachteil: Grocy ist danach nur noch über diese Domain sinnvoll nutzbar, nicht mehr parallel über die interne IP.
-
-**Lösung 2 — Header durchreichen (interner IP-Zugriff bleibt möglich):**
-
-`BASE_URL` bleibt `/`, der Proxy muss `X-Forwarded-Proto: https` senden. Im Nginx Proxy Manager beim Proxy Host unter *Advanced*:
+**Lösung 1 (empfohlen) — Header durchreichen.** `BASE_URL` bleibt auf `/`, der Proxy muss `X-Forwarded-Proto: https` senden. Im Nginx Proxy Manager beim Proxy Host unter *Advanced* → *Custom Nginx Configuration*:
 
 ```nginx
 proxy_set_header X-Forwarded-Proto $scheme;
 proxy_set_header Host              $host;
 ```
+
+Vorteil: Grocy bleibt parallel über die interne IP erreichbar, weil es das Schema weiterhin pro Request bestimmt.
+
+**Lösung 2 — `BASE_URL` fest setzen.** Nur, wenn Lösung 1 nicht geht:
+
+```php
+// data/config.php
+Setting('BASE_URL', 'https://grocy.deine-domain.de');   // exakt deine echte Domain!
+```
+
+> ⚠️ **Damit ist Grocy nur noch über genau diese Domain erreichbar.** Ein Aufruf über die interne IP wird ab sofort per Redirect auf die Domain geschickt, und alle Assets verlinken dorthin. Setz das nur, wenn die Domain auch aus deinem LAN heraus auflöst (Split-DNS oder ein Eintrag in der `hosts`-Datei) — und trag deine echte Domain ein, nicht den Beispielwert.
+
+#### Wieder rauskommen, wenn `BASE_URL` falsch gesetzt wurde
+
+Die App ist dann nicht kaputt, sie schickt den Browser nur an eine Adresse, die du nicht erreichst. Auf dem Container:
+
+```bash
+# Was ist aktuell aktiv?
+grep BASE_URL /opt/grocy/data/config.php
+curl -sI http://127.0.0.1/ | grep -i location     # zeigt das Redirect-Ziel
+
+# Zurücksetzen
+sed -i "s|^Setting('BASE_URL'.*|Setting('BASE_URL', '/');|" /opt/grocy/data/config.php
+
+# Kompilierte Views verwerfen (macht Grocy zwar selbst, schadet aber nicht)
+rm -rf /opt/grocy/data/viewcache/*
+chown -R www-data:www-data /opt/grocy/data
+systemctl reload apache2
+```
+
+Danach zeigt `curl -sI http://127.0.0.1/ | grep -i location` wieder auf den Host, über den du zugreifst.
 
 **Zwei weitere Punkte, die hier gern schiefgehen:**
 

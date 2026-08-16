@@ -241,20 +241,7 @@ curl -sI https://grocy.deine-domain.de/ | grep -i location
 
 Kommt dort `Location: http://…` zurück, ist genau das der Fehler. Ebenso eindeutig: F12 → Konsole zeigt „Mixed Content"-Meldungen.
 
-**Lösung 1 — `BASE_URL` fest verdrahten (funktioniert immer):**
-
-```yaml
-environment:
-  GROCY_BASE_URL: "https://grocy.deine-domain.de"
-```
-
-Damit rät Grocy nicht mehr, sondern nutzt exakt diese Basis. Unabhängig von jedem Proxy-Header.
-
-> Nachteil: Grocy ist danach **nur noch über diese Domain** sinnvoll erreichbar. Ein direkter Aufruf über `http://<ip>:9283` liefert dann Seiten, deren Links auf die Domain zeigen.
-
-**Lösung 2 — den Proxy den Header schicken lassen (behält den IP-Zugriff):**
-
-`BASE_URL` bleibt auf `/`, der Proxy muss `X-Forwarded-Proto: https` senden. Im Nginx Proxy Manager beim Proxy Host unter *Advanced* → *Custom Nginx Configuration*:
+**Lösung 1 (empfohlen) — den Proxy den Header schicken lassen.** `BASE_URL` bleibt auf `/`, der Proxy sendet `X-Forwarded-Proto: https`. Im Nginx Proxy Manager beim Proxy Host unter *Advanced* → *Custom Nginx Configuration*:
 
 ```nginx
 proxy_set_header X-Forwarded-Proto $scheme;
@@ -269,6 +256,39 @@ RequestHeader set X-Forwarded-Proto "https"
 ```
 
 (dafür `a2enmod headers`).
+
+Vorteil: Grocy bestimmt das Schema weiterhin pro Request und bleibt parallel über `http://<ip>:9283` erreichbar.
+
+**Lösung 2 — `BASE_URL` fest verdrahten.** Nur, wenn Lösung 1 nicht funktioniert:
+
+```yaml
+environment:
+  GROCY_BASE_URL: "https://grocy.deine-domain.de"   # exakt deine echte Domain!
+```
+
+Damit rät Grocy nicht mehr, sondern nutzt exakt diese Basis — unabhängig von jedem Proxy-Header.
+
+> ⚠️ **Danach ist Grocy nur noch über genau diese Domain erreichbar.** Der Aufruf über `http://<ip>:9283/` wird per Redirect auf die Domain geschickt, und alle Assets verlinken dorthin. Setz das nur, wenn die Domain auch aus deinem LAN auflöst (Split-DNS oder `hosts`-Eintrag) — und trag deine echte Domain ein, nicht den Beispielwert.
+
+#### Wieder rauskommen, wenn `BASE_URL` falsch gesetzt wurde
+
+Die App läuft weiter, sie schickt den Browser nur an eine Adresse, die du nicht erreichst:
+
+```bash
+# Was ist aktiv? (zeigt das Redirect-Ziel)
+docker compose exec grocy php -r 'echo getenv("GROCY_BASE_URL") ?: "(nicht gesetzt)", PHP_EOL;'
+curl -sI http://<host>:9283/ | grep -i location
+
+# Zeile aus docker-compose.yml bzw. .env wieder entfernen, dann
+docker compose up -d
+```
+
+Wurde `BASE_URL` stattdessen in der `config.php` im Volume gesetzt:
+
+```bash
+docker compose exec grocy sed -i "s|^Setting('BASE_URL'.*|Setting('BASE_URL', '/');|" /var/www/html/data/config.php
+docker compose restart grocy
+```
 
 **Weitere Punkte, die im Nginx Proxy Manager gern schiefgehen:**
 
