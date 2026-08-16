@@ -1005,7 +1005,13 @@ small.text-muted {
 		padding-bottom: var(--g-safe-bottom);
 	}
 
-	/* Grab handle */
+	/* While the sheet is being dragged the transition must not fight the
+	   finger - grocy_sheet.js toggles this class */
+	.modal-dialog.sheet-dragging {
+		transition: none !important;
+	}
+
+	/* Grab handle - grocy_sheet.js makes it draggable */
 	.modal-content::before {
 		content: '';
 		display: block;

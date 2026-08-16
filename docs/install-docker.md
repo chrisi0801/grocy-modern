@@ -91,6 +91,36 @@ docker compose up -d
 
 > Wenn du das Package in den GitHub-Einstellungen auf *public* stellst, entfällt der `docker login` — das Repository selbst bleibt dabei privat.
 
+### Als Portainer-Stack
+
+Portainer kann aus dem Web-Editor heraus nicht bauen — es braucht ein fertiges Image, also Variante B. Vorher einmalig die Registry hinterlegen: *Registries* → *Add registry* → *Custom registry*, URL `ghcr.io`, Benutzername dein GitHub-Name, Passwort ein PAT mit `read:packages`.
+
+Dann *Stacks* → *Add stack* → *Web editor*, als Namen `grocy` vergeben und einfügen:
+
+```yaml
+services:
+  grocy:
+    image: ghcr.io/chrisi0801/grocy-modern:latest
+    container_name: grocy
+    restart: unless-stopped
+    ports:
+      - "9283:80"
+    volumes:
+      - grocy-data:/var/www/html/data
+    environment:
+      TZ: Europe/Vienna
+      GROCY_DEFAULT_LOCALE: de
+      GROCY_CURRENCY: EUR
+      GROCY_CALENDAR_FIRST_DAY_OF_WEEK: "1"
+
+volumes:
+  grocy-data:
+```
+
+Zwei Unterschiede zur `docker-compose.yml` im Repository: kein `build:`-Block (Portainer kann nicht bauen) und kein `name:` — Portainer setzt den Projektnamen selbst auf den Stack-Namen. Das Volume heißt dadurch `<stackname>_grocy-data`, bei Stack-Name `grocy` also wie gehabt `grocy_grocy-data`.
+
+Updates laufen danach über *Stacks* → *grocy* → **Update the stack** mit angehaktem *Re-pull image*. Baut der GitHub-Actions-Workflow ein neues `:latest`, holt Portainer es damit und startet den Container neu — das Volume bleibt unangetastet.
+
 ---
 
 ## Variante C — Image woanders bauen und übertragen
