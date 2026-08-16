@@ -1,6 +1,6 @@
 # Grocy Modern auf einem Proxmox-LXC installieren (Apache2)
 
-Anleitung für diesen Fork (`chrisi0801/grocy-modern`) auf einem LXC-Container, auf dem Apache2 und PHP bereits laufen.
+Anleitung für diesen Fork auf einem LXC-Container, auf dem Apache2 und PHP bereits laufen.
 
 Der Fork wird aus Git installiert, nicht aus einem Release-ZIP. Das heißt: Composer- und Yarn-Abhängigkeiten müssen einmalig selbst gebaut werden, weil sie nicht im Repository liegen.
 
@@ -149,14 +149,16 @@ yarn --version    # muss 1.22.x sein
 ## 4. Fork klonen und bauen
 
 ```bash
+GH_USER=<dein-github-user>
+
 cd /opt
-git clone https://github.com/chrisi0801/grocy-modern.git grocy
+git clone https://github.com/$GH_USER/grocy-modern.git grocy
 cd /opt/grocy
 git checkout claude/grocy-modern-design-redesign-pyvd3g
 ```
 
 > Ist das Repository privat, brauchst du beim Klonen ein Personal Access Token:
-> `git clone https://<DEIN_TOKEN>@github.com/chrisi0801/grocy-modern.git grocy`
+> `git clone https://<DEIN_TOKEN>@github.com/$GH_USER/grocy-modern.git grocy`
 > Alternativ per Deploy-Key über SSH.
 
 Abhängigkeiten bauen (dauert ein paar Minuten, braucht Internetzugang):

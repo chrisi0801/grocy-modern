@@ -42,8 +42,11 @@ docker run --rm hello-world
 Kein Registry-Konto, keine Zugangsdaten, ein Befehl.
 
 ```bash
+# Einmal setzen, der Rest der Anleitung nutzt es
+GH_USER=<dein-github-user>
+
 cd /opt
-git clone https://github.com/chrisi0801/grocy-modern.git grocy
+git clone https://github.com/$GH_USER/grocy-modern.git grocy
 cd grocy
 git checkout claude/grocy-modern-design-redesign-pyvd3g
 
@@ -68,18 +71,18 @@ Grocy ist erreichbar unter `http://<host>:9283` — Login `admin` / `admin`, **P
 
 Sinnvoll, wenn mehrere Maschinen dasselbe Image ziehen sollen oder der Zielhost nichts bauen soll.
 
-Der Workflow `.github/workflows/docker-image.yml` läuft bei jedem Push und legt das Image unter `ghcr.io/chrisi0801/grocy-modern` ab. Es ist nichts einzurichten — `GITHUB_TOKEN` reicht, ein eigenes Secret brauchst du nicht.
+Der Workflow `.github/workflows/docker-image.yml` läuft bei jedem Push und legt das Image unter `ghcr.io/<dein-github-user>/grocy-modern` ab. Es ist nichts einzurichten — `GITHUB_TOKEN` reicht, ein eigenes Secret brauchst du nicht.
 
 **Weil dein Repository privat ist, ist auch das Package privat.** Zum Ziehen brauchst du auf dem Zielhost einen Personal Access Token (classic) mit dem Scope `read:packages`:
 
 ```bash
-echo '<DEIN_TOKEN>' | docker login ghcr.io -u chrisi0801 --password-stdin
+echo '<DEIN_TOKEN>' | docker login ghcr.io -u $GH_USER --password-stdin
 ```
 
 Dann in der `.env`:
 
 ```dotenv
-GROCY_IMAGE=ghcr.io/chrisi0801/grocy-modern:latest
+GROCY_IMAGE=ghcr.io/<dein-github-user>/grocy-modern:latest
 ```
 
 und in `docker-compose.yml` den `build:`-Block auskommentieren. Danach:
@@ -100,7 +103,7 @@ Dann *Stacks* → *Add stack* → *Web editor*, als Namen `grocy` vergeben und e
 ```yaml
 services:
   grocy:
-    image: ghcr.io/chrisi0801/grocy-modern:latest
+    image: ghcr.io/<dein-github-user>/grocy-modern:latest
     container_name: grocy
     restart: unless-stopped
     ports:
