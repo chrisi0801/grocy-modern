@@ -1,0 +1,75 @@
+name: Build container image
+
+# Builds the image and pushes it to the GitHub Container Registry (ghcr.io),
+# so machines running it don't need Composer, Yarn or a build toolchain.
+#
+# For a private repository the resulting package is private as well - see
+# docs/install-docker.md for how to log in when pulling.
+
+on:
+  push:
+    branches:
+      - master
+      - 'claude/**'
+    tags:
+      - 'v*'
+    paths-ignore:
+      - 'docs/**'
+      - 'changelog/**'
+      - '**.md'
+  workflow_dispatch:
+
+env:
+  REGISTRY: ghcr.io
+  IMAGE_NAME: ${{ github.repository }}
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Buildx
+        uses: docker/setup-buildx-action@v3
+
+      # Only needed for multi-arch builds - see the `platforms` note below
+      # - name: Set up QEMU
+      #   uses: docker/setup-qemu-action@v3
+
+      - name: Log in to ghcr.io
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Derive tags
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
+          tags: |
+            type=ref,event=branch
+            type=semver,pattern={{version}}
+            type=semver,pattern={{major}}.{{minor}}
+            type=sha,format=short
+            type=raw,value=latest,enable={{is_default_branch}}
+
+      - name: Build and push
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          # Add linux/arm64 here (and enable the QEMU step above) if you run
+          # Grocy on a Raspberry Pi or another ARM board. Compiling the PHP
+          # extensions under emulation makes the build roughly 5x slower.
+          platforms: linux/amd64
+          cache-from: type=gha
+          cache-to: type=gha,mode=max

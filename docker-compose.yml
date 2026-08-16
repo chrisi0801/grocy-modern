@@ -1,0 +1,50 @@
+# Fixed project name, so the volume is always called `grocy_grocy-data`
+# regardless of the directory this file lives in
+name: grocy
+
+services:
+  grocy:
+    # Build the image locally from this repository.
+    # To use a pre-built image from a registry instead, comment out `build:`
+    # and set GROCY_IMAGE in .env (see docs/install-docker.md).
+    build:
+      context: .
+      args:
+        PHP_VERSION: "8.5"
+    image: ${GROCY_IMAGE:-grocy-modern:local}
+    container_name: grocy
+    restart: unless-stopped
+
+    ports:
+      - "${GROCY_PORT:-9283}:80"
+
+    volumes:
+      # Everything that must survive an update: SQLite database, uploads,
+      # config.php. A named volume avoids all uid/gid trouble; for a bind
+      # mount (e.g. ./data:/var/www/html/data) set PUID/PGID below.
+      - grocy-data:/var/www/html/data
+
+    environment:
+      TZ: ${TZ:-Europe/Vienna}
+
+      # Grocy settings: every option from config-dist.php can be set as an
+      # environment variable with a GROCY_ prefix and takes precedence over
+      # data/config.php.
+      GROCY_DEFAULT_LOCALE: ${GROCY_DEFAULT_LOCALE:-de}
+      GROCY_CURRENCY: ${GROCY_CURRENCY:-EUR}
+      GROCY_CALENDAR_FIRST_DAY_OF_WEEK: "1"
+
+      # Only needed for bind mounts - match your host user (`id -u`, `id -g`)
+      # PUID: "1000"
+      # PGID: "1000"
+
+    # The healthcheck is defined in the image itself (see Dockerfile)
+
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+volumes:
+  grocy-data:

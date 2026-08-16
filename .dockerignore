@@ -1,0 +1,28 @@
+# Build artefacts - rebuilt inside the image by the vendor/assets stages
+/packages
+/public/packages
+node_modules
+
+# Never bake a local instance into the image; the entrypoint seeds a fresh
+# data directory (config.php from config-dist.php) on first start
+/data
+
+.git
+.gitattributes
+.github
+.tx
+
+Dockerfile
+.dockerignore
+docker-compose*.yml
+.env
+.env.example
+
+# Not needed at runtime.
+# NOTE: /changelog must stay in the image - the about page and
+# ApplicationService::GetSystemInfo() read changelog/*.md at runtime.
+/docs
+update.sh
+grocy.iml
+.vscode
+.idea
