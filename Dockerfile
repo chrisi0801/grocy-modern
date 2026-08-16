@@ -28,7 +28,13 @@ WORKDIR /app
 # Install first with only the manifests present, so this layer stays cached
 # as long as the dependencies themselves don't change
 COPY composer.json composer.lock ./
-RUN composer install --no-dev --no-interaction --no-progress --no-scripts --no-autoloader
+# The lock file requires ext-gd and ext-intl, which the CLI image doesn't ship.
+# Both are only needed to *run* Grocy, not to download and unpack the
+# dependencies - compiling them here just to throw the stage away would be
+# wasted build time. The runtime stage installs and verifies them for real.
+RUN composer install --no-dev --no-interaction --no-progress --no-scripts --no-autoloader \
+	--ignore-platform-req=ext-gd \
+	--ignore-platform-req=ext-intl
 
 # The autoloader needs the actual source to build its classmap
 COPY helpers/ ./helpers/
@@ -114,7 +120,14 @@ RUN chmod +x /usr/local/bin/grocy-entrypoint
 RUN set -eux; \
 	php -r ' \
 		require "/var/www/html/helpers/PrerequisiteChecker.php"; \
-		$missing = array_diff(\Grocy\Helpers\REQUIRED_PHP_EXTENSIONS, get_loaded_extensions()); \
+		$required = array_unique(array_merge( \
+			\Grocy\Helpers\REQUIRED_PHP_EXTENSIONS, \
+			["libxml", "simplexml"] \
+		)); \
+		/* get_loaded_extensions() reports e.g. "SimpleXML", so compare lowercased */ \
+		$loaded = array_map("strtolower", get_loaded_extensions()); \
+		$missing = []; \
+		foreach ($required as $ext) { if (!in_array(strtolower($ext), $loaded, true)) { $missing[] = $ext; } } \
 		if ($missing) { fwrite(STDERR, "Missing PHP extension(s): " . implode(", ", $missing) . "\n"); exit(1); } \
 		$sqlite = (new PDO("sqlite::memory:"))->query("select sqlite_version()")->fetch()[0]; \
 		if (version_compare($sqlite, \Grocy\Helpers\REQUIRED_SQLITE_VERSION, "<")) { \
