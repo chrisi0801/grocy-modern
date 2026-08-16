@@ -217,9 +217,66 @@ Der Container spricht nur HTTP auf Port 80 — TLS gehört davor. Beispiel für 
 
 Dafür `a2enmod proxy proxy_http ssl`. Mit Nginx Proxy Manager, Traefik oder Caddy ist es entsprechend ein normaler HTTP-Backend-Eintrag auf Port 9283.
 
-Läuft Grocy hinter dem Proxy nicht auf einer eigenen (Sub-)Domain, sondern in einem Unterpfad, zusätzlich `GROCY_BASE_URL=/grocy/` setzen.
-
 HTTPS lohnt sich nicht nur aus Prinzip: Der Kamera-Barcodescanner und die Installation als App aufs Handy funktionieren in Browsern nur in einem „secure context".
+
+### ⚠️ „Keine sichere Verbindung" hinter dem Reverse Proxy
+
+Das ist die mit Abstand häufigste Stolperfalle — und der Grund, warum eine ganz normale Webseite hinter demselben Proxy problemlos läuft, Grocy aber nicht.
+
+**Warum:** Grocy erzeugt **absolute** URLs. Steht `BASE_URL` auf dem Standardwert `/`, baut sich Grocy die Basis-URL bei jedem Request selbst zusammen — und das Schema (`http` oder `https`) leitet es aus `$_SERVER['HTTPS']` bzw. dem Header `X-Forwarded-Proto` ab (siehe `helpers/UrlManager.php`). Terminiert der Proxy TLS und spricht dann per **HTTP** mit dem Container, sieht Grocy nur eine unverschlüsselte Anfrage. Ohne den Header schreibt es folglich in jeden Link und jeden `<script>`/`<link>`-Tag `http://…`:
+
+```
+Seite:      https://grocy.deine-domain.de/stockoverview
+darin aber: http://grocy.deine-domain.de/css/grocy_theme.css
+            http://grocy.deine-domain.de/packages/jquery/dist/jquery.min.js
+```
+
+Der Browser blockt das als *Mixed Content*: das Schloss verschwindet, das Design fehlt, nichts funktioniert. Und ein Klick auf die Startseite wirft dich per `Location: http://…` komplett aus HTTPS heraus. Eine statische Apache-Seite mit relativen Links kann das gar nicht passieren.
+
+**Prüfen** (von irgendeinem Rechner aus):
+
+```bash
+curl -sI https://grocy.deine-domain.de/ | grep -i location
+```
+
+Kommt dort `Location: http://…` zurück, ist genau das der Fehler. Ebenso eindeutig: F12 → Konsole zeigt „Mixed Content"-Meldungen.
+
+**Lösung 1 — `BASE_URL` fest verdrahten (funktioniert immer):**
+
+```yaml
+environment:
+  GROCY_BASE_URL: "https://grocy.deine-domain.de"
+```
+
+Damit rät Grocy nicht mehr, sondern nutzt exakt diese Basis. Unabhängig von jedem Proxy-Header.
+
+> Nachteil: Grocy ist danach **nur noch über diese Domain** sinnvoll erreichbar. Ein direkter Aufruf über `http://<ip>:9283` liefert dann Seiten, deren Links auf die Domain zeigen.
+
+**Lösung 2 — den Proxy den Header schicken lassen (behält den IP-Zugriff):**
+
+`BASE_URL` bleibt auf `/`, der Proxy muss `X-Forwarded-Proto: https` senden. Im Nginx Proxy Manager beim Proxy Host unter *Advanced* → *Custom Nginx Configuration*:
+
+```nginx
+proxy_set_header X-Forwarded-Proto $scheme;
+proxy_set_header X-Forwarded-For   $proxy_add_x_forwarded_for;
+proxy_set_header Host              $host;
+```
+
+Bei Apache als Proxy übernimmt `ProxyPass` das nicht automatisch:
+
+```apache
+RequestHeader set X-Forwarded-Proto "https"
+```
+
+(dafür `a2enmod headers`).
+
+**Weitere Punkte, die im Nginx Proxy Manager gern schiefgehen:**
+
+- Beim Proxy Host muss **Scheme = `http`** stehen (nicht `https`) — der Container spricht selbst kein TLS. Steht dort `https`, läuft der Proxy in einen Handshake-Fehler und zeigt „keine sichere Verbindung", ohne dass Grocy überhaupt beteiligt ist.
+- *Force SSL* im Proxy Host einschalten, damit HTTP-Aufrufe auf HTTPS umgeleitet werden.
+- *Websockets Support* wird von Grocy nicht gebraucht, schadet aber nicht.
+
+Läuft Grocy nicht auf einer eigenen (Sub-)Domain, sondern in einem Unterpfad, zusätzlich `GROCY_BASE_URL=https://deine-domain.de/grocy` und `GROCY_BASE_PATH=/grocy` setzen.
 
 ---
 

@@ -48,8 +48,19 @@ RUN set -eux; \
 	apt-get install -y --no-install-recommends git; \
 	rm -rf /var/lib/apt/lists/*
 
-# `.yarnrc` uses Yarn 1 options (--modules-folder), Yarn 2+ does not support them
-RUN npm install --global --no-fund --no-audit yarn@1
+# The node image already ships Yarn 1.22 (symlinked into /usr/local/bin), so
+# installing it again via npm fails with EEXIST. Only install if it is really
+# missing, and insist on Yarn 1: `.yarnrc` uses --modules-folder, which Yarn 2+
+# no longer supports.
+RUN set -eux; \
+	if ! command -v yarn > /dev/null 2>&1; then \
+		npm install --global --force --no-fund --no-audit yarn@1.22.22; \
+	fi; \
+	yarn_version="$(yarn --version)"; \
+	case "$yarn_version" in \
+		1.*) echo "using yarn $yarn_version" ;; \
+		*) echo "yarn 1.x required, found $yarn_version" >&2; exit 1 ;; \
+	esac
 
 WORKDIR /app
 COPY package.json yarn.lock .yarnrc ./

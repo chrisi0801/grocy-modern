@@ -361,7 +361,58 @@ apt install -y certbot python3-certbot-apache
 certbot --apache -d grocy.deine-domain.de
 ```
 
-Im reinen Heimnetz bietet sich stattdessen ein vorgelagerter Reverse Proxy (Nginx Proxy Manager, Traefik, Caddy) mit einem eigenen oder DNS-validierten Let's-Encrypt-Zertifikat an. Wenn du einen Reverse Proxy nutzt, setze in `data/config.php` je nach Setup `Setting('BASE_URL', ...)` passend und leite die Header korrekt durch.
+Im reinen Heimnetz bietet sich stattdessen ein vorgelagerter Reverse Proxy (Nginx Proxy Manager, Traefik, Caddy) mit einem eigenen oder DNS-validierten Let's-Encrypt-Zertifikat an.
+
+### ⚠️ „Keine sichere Verbindung" hinter dem Reverse Proxy
+
+Die häufigste Stolperfalle — und der Grund, warum eine normale Apache-Seite hinter demselben Proxy funktioniert, Grocy aber nicht.
+
+**Warum:** Grocy erzeugt **absolute** URLs. Steht `BASE_URL` auf `/` (Standard), baut Grocy die Basis-URL pro Request selbst und leitet das Schema aus `$_SERVER['HTTPS']` bzw. dem Header `X-Forwarded-Proto` ab (siehe `helpers/UrlManager.php`). Terminiert der Proxy TLS und spricht per HTTP mit dem Apache dahinter, sieht Grocy eine unverschlüsselte Anfrage — und schreibt in jeden Link und jedes Asset `http://…`:
+
+```
+Seite:      https://grocy.deine-domain.de/stockoverview
+darin aber: http://grocy.deine-domain.de/css/grocy_theme.css
+```
+
+Der Browser blockt das als *Mixed Content*: Schloss weg, Design weg. Der Aufruf der Startseite schickt dich zusätzlich per `Location: http://…` aus HTTPS heraus.
+
+**Prüfen:**
+
+```bash
+curl -sI https://grocy.deine-domain.de/ | grep -i location
+```
+
+Steht dort `http://`, ist es genau das.
+
+**Lösung 1 — `BASE_URL` fest setzen (wirkt immer):**
+
+```php
+// data/config.php
+Setting('BASE_URL', 'https://grocy.deine-domain.de');
+```
+
+Nachteil: Grocy ist danach nur noch über diese Domain sinnvoll nutzbar, nicht mehr parallel über die interne IP.
+
+**Lösung 2 — Header durchreichen (interner IP-Zugriff bleibt möglich):**
+
+`BASE_URL` bleibt `/`, der Proxy muss `X-Forwarded-Proto: https` senden. Im Nginx Proxy Manager beim Proxy Host unter *Advanced*:
+
+```nginx
+proxy_set_header X-Forwarded-Proto $scheme;
+proxy_set_header Host              $host;
+```
+
+**Zwei weitere Punkte, die hier gern schiefgehen:**
+
+- Im Proxy Host muss **Scheme = `http`** und Port `80` stehen. Steht dort `https`, versucht der Proxy einen TLS-Handshake auf einem Klartext-Port — das endet in „keine sichere Verbindung", ohne dass Grocy beteiligt ist.
+- Der Apache-vHost aus Schritt 6 hört auf `ServerName grocy.fritz.box`. Der Proxy schickt aber den `Host`-Header seiner eigenen Domain. Passt der auf keinen vHost, landet die Anfrage beim **ersten** vHost des Servers — also womöglich auf deiner anderen Webseite. Deshalb die Proxy-Domain als `ServerAlias` ergänzen:
+
+  ```apache
+  ServerName  grocy.fritz.box
+  ServerAlias grocy.deine-domain.de
+  ```
+
+Läuft Grocy in einem Unterpfad statt auf einer eigenen (Sub-)Domain, zusätzlich `Setting('BASE_PATH', '/grocy');` setzen.
 
 ---
 
