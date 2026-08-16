@@ -148,17 +148,17 @@ yarn --version    # muss 1.22.x sein
 
 ## 4. Fork klonen und bauen
 
-```bash
-GH_USER=<dein-github-user>
+> Wenn du das Repository geforkt hast: In den Befehlen unten `chrisi0801` durch deinen eigenen GitHub-Account ersetzen.
 
+```bash
 cd /opt
-git clone https://github.com/$GH_USER/grocy-modern.git grocy
+git clone https://github.com/chrisi0801/grocy-modern.git grocy
 cd /opt/grocy
 git checkout claude/grocy-modern-design-redesign-pyvd3g
 ```
 
 > Ist das Repository privat, brauchst du beim Klonen ein Personal Access Token:
-> `git clone https://<DEIN_TOKEN>@github.com/$GH_USER/grocy-modern.git grocy`
+> `git clone https://<DEIN_TOKEN>@github.com/chrisi0801/grocy-modern.git grocy`
 > Alternativ per Deploy-Key über SSH.
 
 Abhängigkeiten bauen (dauert ein paar Minuten, braucht Internetzugang):

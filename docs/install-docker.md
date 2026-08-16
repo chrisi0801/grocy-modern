@@ -39,14 +39,13 @@ docker run --rm hello-world
 
 ## Variante A — direkt auf dem Zielhost bauen (am einfachsten)
 
+> Wenn du das Repository geforkt hast: In den Befehlen unten `chrisi0801` durch deinen eigenen GitHub-Account ersetzen.
+
 Kein Registry-Konto, keine Zugangsdaten, ein Befehl.
 
 ```bash
-# Einmal setzen, der Rest der Anleitung nutzt es
-GH_USER=<dein-github-user>
-
 cd /opt
-git clone https://github.com/$GH_USER/grocy-modern.git grocy
+git clone https://github.com/chrisi0801/grocy-modern.git grocy
 cd grocy
 git checkout claude/grocy-modern-design-redesign-pyvd3g
 
@@ -71,7 +70,7 @@ Grocy ist erreichbar unter `http://<host>:9283` — Login `admin` / `admin`, **P
 
 Sinnvoll, wenn mehrere Maschinen dasselbe Image ziehen sollen oder der Zielhost nichts bauen soll.
 
-Der Workflow `.github/workflows/docker-image.yml` läuft bei jedem Push und legt das Image unter `ghcr.io/<dein-github-user>/grocy-modern` ab. Es ist nichts einzurichten — `GITHUB_TOKEN` reicht, ein eigenes Secret brauchst du nicht.
+Der Workflow `.github/workflows/docker-image.yml` läuft bei jedem Push und legt das Image unter `ghcr.io/chrisi0801/grocy-modern` ab. Es ist nichts einzurichten — `GITHUB_TOKEN` reicht, ein eigenes Secret brauchst du nicht.
 
 Die Sichtbarkeit des Packages ist unabhängig von der des Repositories und lässt sich unter *GitHub → dein Profil → Packages → grocy-modern → Package settings* umstellen.
 
@@ -79,19 +78,19 @@ Die Sichtbarkeit des Packages ist unabhängig von der des Repositories und läss
 - **Package privat**: auf jedem ziehenden Host einmalig anmelden, mit einem Personal Access Token (classic) mit Scope `read:packages`:
 
 ```bash
-echo '<DEIN_TOKEN>' | docker login ghcr.io -u $GH_USER --password-stdin
+echo '<DEIN_TOKEN>' | docker login ghcr.io -u chrisi0801 --password-stdin
 ```
 
 Prüfen, welche Tags es gibt und ob anonym gezogen werden kann:
 
 ```bash
-docker pull ghcr.io/<dein-github-user>/grocy-modern:latest
+docker pull ghcr.io/chrisi0801/grocy-modern:latest
 ```
 
 Dann in der `.env`:
 
 ```dotenv
-GROCY_IMAGE=ghcr.io/<dein-github-user>/grocy-modern:latest
+GROCY_IMAGE=ghcr.io/chrisi0801/grocy-modern:latest
 ```
 
 und in `docker-compose.yml` den `build:`-Block auskommentieren. Danach:
@@ -112,7 +111,7 @@ Portainer kann aus dem Web-Editor heraus nicht bauen — es braucht ein fertiges
 ```yaml
 services:
   grocy:
-    image: ghcr.io/<dein-github-user>/grocy-modern:latest
+    image: ghcr.io/chrisi0801/grocy-modern:latest
     container_name: grocy
     restart: unless-stopped
     ports:
