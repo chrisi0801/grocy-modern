@@ -48,10 +48,17 @@ RUN composer dump-autoload --no-dev --optimize
 # ---------------------------------------------------------------------------
 FROM node:22-trixie-slim AS assets
 
-# git: bootstrap-combobox is pulled from a GitHub fork
+# bootstrap-combobox is pulled from a GitHub fork, so yarn shells out to git.
+#
+# ca-certificates is required as well and is NOT present in the node image:
+# it gets installed there only temporarily and the `apt-mark auto '.*'` +
+# `apt-get purge --auto-remove` cleanup drops it again (only packages providing
+# shared libraries the node binaries link against survive). npm/yarn themselves
+# use Node's built-in CA store and don't notice, but git does - without it the
+# clone fails TLS verification and yarn exits with git's code 128.
 RUN set -eux; \
 	apt-get update; \
-	apt-get install -y --no-install-recommends git; \
+	apt-get install -y --no-install-recommends git ca-certificates; \
 	rm -rf /var/lib/apt/lists/*
 
 # The node image already ships Yarn 1.22 (symlinked into /usr/local/bin), so

@@ -339,7 +339,8 @@ Die `-dev`-Pakete werden bewusst nicht wieder deinstalliert: Das `apt-get purge 
 | Symptom | Ursache / Lösung |
 |---|---|
 | Build bricht mit `Missing PHP extension(s): …` ab | Der eingebaute Prüfschritt hat angeschlagen. Die genannte Erweiterung im `Dockerfile` bei `docker-php-ext-install` ergänzen. |
-| Build bricht bei `yarn install` ab | Kein Netzzugang oder `git` fehlt — eine Abhängigkeit kommt direkt von GitHub. |
+| Build bricht bei `yarn install` mit `exit code 128` ab | 128 ist Gits Fehlercode: `bootstrap-combobox` wird per Git von GitHub geholt. Im Image sind dafür `git` **und** `ca-certificates` nötig — Letzteres wird vom node-Image beim Aufräumen wieder entfernt und im Dockerfile deshalb explizit nachinstalliert. |
+| Build bricht bei `composer install` mit `exit code 2` ab | Eine von der Lock-Datei geforderte PHP-Erweiterung fehlt in der Build-Stage. Welche, zeigt `composer check-platform-reqs`. |
 | Container startet, aber `unhealthy` | `docker compose logs grocy`. Meist Rechte im Datenverzeichnis: bei Bind-Mount `PUID`/`PGID` setzen. |
 | Startseite lädt, Unterseiten 404 | Sollte im Image nicht passieren (`mod_rewrite` und `AllowOverride All` sind gesetzt). Tritt es hinter einem Reverse Proxy auf, fehlt meist `GROCY_BASE_URL`. |
 | Alle Zeiten sind um Stunden verschoben | `TZ` nicht gesetzt — Container läuft auf UTC. |
