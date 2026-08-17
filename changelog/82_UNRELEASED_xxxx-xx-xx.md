@@ -66,6 +66,8 @@
   - Tables are rendered as cards on small screens: every cell is labelled with its column header, the row actions move into a footer, empty cells are omitted and a toolbar above the list offers sorting and the table options (both were only reachable via the table header before)
   - Dialogs are shown as bottom sheets on phones
   - Dark mode was rebuilt on top of the same design tokens, so it now covers all components consistently
+  - Toasts are collapsed to a single line and expand on tap to reveal the full text and the "Undo" button, instead of covering a good part of a phone screen for 20 seconds
+  - The stock overview row actions are down to the quick consume button plus the overflow menu: "Consume all" and "Mark as opened" moved into that menu, which also shrinks the action column on desktop
 - Fixed accent insensitive searching using the general table search field was broken
 - Fixed that it wasn't possible to log in using passwords containing special escape sequences (e.g. `<<`)
 - Fixed that the initially created location and quantity units weren't localized (only applies to new installations)

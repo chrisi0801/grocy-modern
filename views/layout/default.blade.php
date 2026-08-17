@@ -797,6 +797,7 @@
 	<script src="{{ $U('/js/grocy_nightmode.js?v=', true) }}{{ $version }}"></script>
 	<script src="{{ $U('/js/grocy_clock.js?v=', true) }}{{ $version }}"></script>
 	<script src="{{ $U('/js/grocy_sheet.js?v=', true) }}{{ $version }}"></script>
+	<script src="{{ $U('/js/grocy_toast.js?v=', true) }}{{ $version }}"></script>
 
 	@if(in_array('datatables', $GROCY_REQUIRED_FRONTEND_PACKAGES))
 	<script src="{{ $U('/js/grocy_datatables.js?v=', true) }}{{ $version }}"></script>

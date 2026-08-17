@@ -207,32 +207,6 @@
 							data-consume-amount="{{ $currentStockEntry->quick_consume_amount }}">
 							<i class="fa-solid fa-utensils"></i> <span class="locale-number locale-number-quantity-amount">{{ $currentStockEntry->quick_consume_amount_qu_consume }}</span>
 						</a>
-						<a id="product-{{ $currentStockEntry->product_id }}-consume-all-button"
-							class="permission-STOCK_CONSUME btn btn-danger btn-sm product-consume-button @if($currentStockEntry->amount_aggregated == 0) disabled @endif"
-							href="#"
-							data-toggle="tooltip"
-							data-placement="right"
-							title="{{ $__t('Consume all %s which are currently in stock', $currentStockEntry->product_name) }}"
-							data-product-id="{{ $currentStockEntry->product_id }}"
-							data-product-name="{{ $currentStockEntry->product_name }}"
-							data-product-qu-name="{{ $currentStockEntry->qu_stock_name }}"
-							data-consume-amount="@if($currentStockEntry->enable_tare_weight_handling == 1){{$currentStockEntry->tare_weight}}@else{{$currentStockEntry->amount}}@endif"
-							data-original-total-stock-amount="{{$currentStockEntry->amount}}">
-							<i class="fa-solid fa-utensils"></i> {{ $__t('All') }}
-						</a>
-						@if(GROCY_FEATURE_FLAG_STOCK_PRODUCT_OPENED_TRACKING)
-						<a class="btn btn-success btn-sm product-open-button @if($currentStockEntry->amount_aggregated < $currentStockEntry->quick_open_amount || $currentStockEntry->amount_aggregated == $currentStockEntry->amount_opened_aggregated || $currentStockEntry->enable_tare_weight_handling == 1 || $currentStockEntry->disable_open == 1) disabled @endif"
-							href="#"
-							data-toggle="tooltip"
-							data-placement="left"
-							title="{{ $__t('Mark %1$s of %2$s as open', $currentStockEntry->quick_open_amount_qu_consume . ' ' . $currentStockEntry->qu_consume_name, $currentStockEntry->product_name) }}"
-							data-product-id="{{ $currentStockEntry->product_id }}"
-							data-product-name="{{ $currentStockEntry->product_name }}"
-							data-product-qu-name="{{ $currentStockEntry->qu_stock_name }}"
-							data-open-amount="{{ $currentStockEntry->quick_open_amount }}">
-							<i class="fa-solid fa-box-open"></i> <span class="locale-number locale-number-quantity-amount">{{ $currentStockEntry->quick_open_amount_qu_consume }}</span>
-						</a>
-						@endif
 						<div class="dropdown d-inline-block">
 							<button class="btn btn-sm btn-light text-secondary"
 								type="button"
@@ -240,6 +214,29 @@
 								<i class="fa-solid fa-ellipsis-v"></i>
 							</button>
 							<div class="table-inline-menu dropdown-menu dropdown-menu-right">
+								<a id="product-{{ $currentStockEntry->product_id }}-consume-all-button"
+									class="dropdown-item permission-STOCK_CONSUME product-consume-button @if($currentStockEntry->amount_aggregated == 0) disabled @endif"
+									type="button"
+									href="#"
+									data-product-id="{{ $currentStockEntry->product_id }}"
+									data-product-name="{{ $currentStockEntry->product_name }}"
+									data-product-qu-name="{{ $currentStockEntry->qu_stock_name }}"
+									data-consume-amount="@if($currentStockEntry->enable_tare_weight_handling == 1){{$currentStockEntry->tare_weight}}@else{{$currentStockEntry->amount}}@endif"
+									data-original-total-stock-amount="{{$currentStockEntry->amount}}">
+									<span class="dropdown-item-icon"><i class="fa-solid fa-utensils"></i></span> <span class="dropdown-item-text">{{ $__t('Consume all %s which are currently in stock', $currentStockEntry->product_name) }}</span>
+								</a>
+								@if(GROCY_FEATURE_FLAG_STOCK_PRODUCT_OPENED_TRACKING)
+								<a class="dropdown-item product-open-button @if($currentStockEntry->amount_aggregated < $currentStockEntry->quick_open_amount || $currentStockEntry->amount_aggregated == $currentStockEntry->amount_opened_aggregated || $currentStockEntry->enable_tare_weight_handling == 1 || $currentStockEntry->disable_open == 1) disabled @endif"
+									type="button"
+									href="#"
+									data-product-id="{{ $currentStockEntry->product_id }}"
+									data-product-name="{{ $currentStockEntry->product_name }}"
+									data-product-qu-name="{{ $currentStockEntry->qu_stock_name }}"
+									data-open-amount="{{ $currentStockEntry->quick_open_amount }}">
+									<span class="dropdown-item-icon"><i class="fa-solid fa-box-open"></i></span> <span class="dropdown-item-text">{{ $__t('Mark %1$s of %2$s as open', $currentStockEntry->quick_open_amount_qu_consume . ' ' . $currentStockEntry->qu_consume_name, $currentStockEntry->product_name) }}</span>
+								</a>
+								@endif
+								<div class="dropdown-divider"></div>
 								@if(GROCY_FEATURE_FLAG_SHOPPINGLIST)
 								<a class="dropdown-item show-as-dialog-link permission-SHOPPINGLIST_ITEMS_ADD"
 									type="button"
