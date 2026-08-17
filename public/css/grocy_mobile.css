@@ -238,7 +238,7 @@
 
 	/* Keep the headline clear of them */
 	table.dt-cards > tbody > tr > td.dt-cell-title {
-		padding-right: 6.5rem;
+		padding-right: 2.5rem;
 	}
 
 	table.dt-cards > tbody > tr > td.dt-cell-actions::before {
@@ -277,49 +277,71 @@
 		transition: transform 180ms cubic-bezier(0.32, 0.72, 0, 1);
 	}
 
-	table.dt-cards > tbody > tr::before,
-	table.dt-cards > tbody > tr::after {
+	/* The coloured area behind the card, created by grocy_swipe.js */
+	.swipe-indicator {
 		position: absolute;
 		top: -1px;
 		bottom: -1px;
-		width: var(--swipe-offset, 0px);
+		width: 0;
 		display: flex;
 		align-items: center;
+		gap: 0.5rem;
 		overflow: hidden;
-		font-family: 'Font Awesome 6 Free';
-		font-weight: 900;
-		font-size: 1.15rem;
+		white-space: nowrap;
 		color: #fff;
+		font-size: 0.75rem;
+		font-weight: 600;
+		letter-spacing: 0.01em;
 		pointer-events: none;
 		z-index: 0;
 	}
 
-	/* Revealed when swiping right: add to the shopping list */
-	table.dt-cards > tbody > tr::before {
-		content: '\f07a';
-		left: -1px;
-		justify-content: flex-start;
-		padding-left: 1.3rem;
-		border-radius: var(--g-radius-lg) 0 0 var(--g-radius-lg);
-		background-color: var(--g-info);
-		opacity: var(--swipe-right, 0);
+	.swipe-indicator i {
+		font-size: 1.15rem;
+		transition: transform var(--g-transition);
+	}
+
+	/* Past the threshold the action fires on release - make that obvious */
+	.swipe-indicator.is-ready i {
+		transform: scale(1.25);
 	}
 
 	/* Revealed when swiping left: consume */
-	table.dt-cards > tbody > tr::after {
-		content: '\f2e7';
+	.swipe-indicator-left {
 		right: -1px;
 		justify-content: flex-end;
-		padding-right: 1.3rem;
+		padding-right: 1.1rem;
 		border-radius: 0 var(--g-radius-lg) var(--g-radius-lg) 0;
+		background-color: var(--g-success-hover);
+	}
+
+	.swipe-indicator-left.is-ready {
 		background-color: var(--g-success);
-		opacity: var(--swipe-left, 0);
+	}
+
+	/* Revealed when swiping right: add to the shopping list */
+	.swipe-indicator-right {
+		left: -1px;
+		justify-content: flex-start;
+		padding-left: 1.1rem;
+		border-radius: var(--g-radius-lg) 0 0 var(--g-radius-lg);
+		background-color: var(--g-info-hover);
+	}
+
+	.swipe-indicator-right.is-ready {
+		background-color: var(--g-info);
 	}
 
 	/* The corner buttons would float above the indicator - fade them out */
 	table.dt-cards > tbody > tr.swiping > td.dt-cell-actions {
 		opacity: 0;
 		transition: opacity 90ms linear;
+	}
+
+	/* The quick consume action is the swipe now, so the button is redundant
+	   here - it stays in the DOM because the gesture triggers it */
+	table.dt-cards > tbody > tr > td.dt-cell-actions > a.btn.product-consume-button {
+		display: none;
 	}
 
 	/* --- row group headers --------------------------------------------- */

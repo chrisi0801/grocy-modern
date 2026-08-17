@@ -29,6 +29,38 @@ GrocySwipe.IsCardMode = function ()
 	return window.innerWidth < GrocySwipe.Breakpoint;
 };
 
+// The coloured area behind the card is a real element, not a pseudo element:
+// generated content on a <tr> is not reliable across browsers, and this way it
+// can carry a label as well
+GrocySwipe.CreateIndicator = function (row, direction)
+{
+	var indicator = document.createElement("div");
+	indicator.className = "swipe-indicator " + (direction < 0 ? "swipe-indicator-left" : "swipe-indicator-right");
+
+	var icon = document.createElement("i");
+	icon.className = direction < 0 ? "fa-solid fa-utensils" : "fa-solid fa-cart-plus";
+
+	var label = document.createElement("span");
+	// Short labels - the strip is only as wide as the swipe
+	label.textContent = direction < 0 ? __t("Consume") : __t("Shopping list");
+
+	indicator.appendChild(icon);
+	indicator.appendChild(label);
+	row.appendChild(indicator);
+
+	return indicator;
+};
+
+GrocySwipe.RemoveIndicator = function (state)
+{
+	if (state.indicator && state.indicator.parentNode)
+	{
+		state.indicator.parentNode.removeChild(state.indicator);
+	}
+
+	state.indicator = null;
+};
+
 // The control a swipe in the given direction would trigger, or null
 GrocySwipe.ActionFor = function (row, direction)
 {
@@ -59,8 +91,9 @@ GrocySwipe.SetOffset = function (state, offset)
 
 	for (var i = 0; i < cells.length; i++)
 	{
-		// The action buttons sit in the corner and stay put
-		if (cells[i].classList.contains("dt-cell-actions"))
+		// Only the content moves: the action buttons stay in their corner, and
+		// the indicator is anchored to the card edge
+		if (cells[i].tagName !== "TD" || cells[i].classList.contains("dt-cell-actions"))
 		{
 			continue;
 		}
@@ -68,16 +101,24 @@ GrocySwipe.SetOffset = function (state, offset)
 		cells[i].style.transform = "translateX(" + offset + "px)";
 	}
 
-	// The indicator is exactly as wide as the strip the content uncovered,
-	// so it never sits on top of text that is still visible
-	state.row.style.setProperty("--swipe-offset", Math.abs(offset) + "px");
-	state.row.style.setProperty("--swipe-left", offset < 0 ? "1" : "0");
-	state.row.style.setProperty("--swipe-right", offset > 0 ? "1" : "0");
+	if (!state.indicator)
+	{
+		return;
+	}
+
+	// Exactly as wide as the strip the content uncovered, so it never sits on
+	// top of text that is still visible
+	state.indicator.style.width = Math.abs(offset) + "px";
+
+	// Past the threshold the action would fire - say so
+	state.indicator.classList.toggle("is-ready", Math.abs(offset) >= GrocySwipe.Threshold);
 };
 
 GrocySwipe.Reset = function (state, animate)
 {
 	var row = state.row;
+
+	GrocySwipe.SetOffset(state, 0);
 
 	if (animate)
 	{
@@ -86,14 +127,14 @@ GrocySwipe.Reset = function (state, animate)
 		{
 			row.classList.remove("swipe-returning");
 			row.classList.remove("swiping");
+			GrocySwipe.RemoveIndicator(state);
 		}, 200);
 	}
 	else
 	{
 		row.classList.remove("swiping");
+		GrocySwipe.RemoveIndicator(state);
 	}
-
-	GrocySwipe.SetOffset(state, 0);
 };
 
 GrocySwipe.Start = function (e)
@@ -136,7 +177,8 @@ GrocySwipe.Start = function (e)
 		startX: e.touches[0].clientX,
 		startY: e.touches[0].clientY,
 		offset: 0,
-		dragging: false
+		dragging: false,
+		indicator: null
 	};
 };
 
@@ -176,6 +218,7 @@ GrocySwipe.Move = function (e)
 		state.dragging = true;
 		// Only while swiping, so the row action menu can still escape the card
 		state.row.classList.add("swiping");
+		state.indicator = GrocySwipe.CreateIndicator(state.row, deltaX < 0 ? -1 : 1);
 	}
 
 	if (e.cancelable)
