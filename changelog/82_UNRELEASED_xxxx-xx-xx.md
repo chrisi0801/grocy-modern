@@ -68,6 +68,8 @@
   - Dark mode was rebuilt on top of the same design tokens, so it now covers all components consistently
   - Toasts are collapsed to a single line and expand on tap to reveal the full text and the "Undo" button, instead of covering a good part of a phone screen for 20 seconds
   - The stock overview row actions are down to the quick consume button plus the overflow menu: "Consume all" and "Mark as opened" moved into that menu, which also shrinks the action column on desktop
+  - Swipe actions on the cards: swipe left to consume the quick consume amount, swipe right to add to the shopping list. Both trigger the controls that already exist in the row, so the API call, the toast with undo and the permission handling are grocy's own
+  - The row actions no longer occupy a row of their own on phones but sit in the top right corner of the card, which brings a stock overview card down from 182px to 127px
 - Fixed accent insensitive searching using the general table search field was broken
 - Fixed that it wasn't possible to log in using passwords containing special escape sequences (e.g. `<<`)
 - Fixed that the initially created location and quantity units weren't localized (only applies to new installations)

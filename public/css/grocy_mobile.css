@@ -217,20 +217,28 @@
 		display: none !important;
 	}
 
-	/* --- the action row ------------------------------------------------ */
+	/* --- the actions --------------------------------------------------
+	   Not a row of their own any more: they sit in the top right corner of
+	   the card, which saves a full row per card. The frequent actions are
+	   gestures instead (see grocy_swipe.js). */
 	table.dt-cards > tbody > tr > td.dt-cell-actions {
-		order: 99;
+		position: absolute;
+		top: 0.4rem;
+		right: 0.5rem;
+		z-index: 2;
 		display: flex;
-		flex-wrap: wrap;
 		align-items: center;
-		justify-content: flex-start;
-		gap: 0.4rem;
-		border: 0;
-		border-top: 1px solid var(--g-border);
-		border-right: 0 !important;
-		margin-top: 0.45rem;
-		padding: 0.6rem 0 0 0;
-		white-space: normal;
+		gap: 0.25rem;
+		width: auto !important;
+		margin: 0;
+		padding: 0;
+		border: 0 !important;
+		white-space: nowrap;
+	}
+
+	/* Keep the headline clear of them */
+	table.dt-cards > tbody > tr > td.dt-cell-title {
+		padding-right: 6.5rem;
 	}
 
 	table.dt-cards > tbody > tr > td.dt-cell-actions::before {
@@ -251,6 +259,67 @@
 	/* Push the overflow menu to the far right of the action row */
 	table.dt-cards > tbody > tr > td.dt-cell-actions > .dropdown:last-child {
 		margin-left: auto;
+	}
+
+	/* --- swipe actions -------------------------------------------------
+	   grocy_swipe.js moves the cells and drives --swipe-left/--swipe-right */
+	table.dt-cards > tbody > tr > td {
+		position: relative;
+		z-index: 1;
+	}
+
+	table.dt-cards > tbody > tr.swiping {
+		/* Only while swiping - otherwise this would clip the action menu */
+		overflow: hidden;
+	}
+
+	table.dt-cards > tbody > tr.swipe-returning > td {
+		transition: transform 180ms cubic-bezier(0.32, 0.72, 0, 1);
+	}
+
+	table.dt-cards > tbody > tr::before,
+	table.dt-cards > tbody > tr::after {
+		position: absolute;
+		top: -1px;
+		bottom: -1px;
+		width: var(--swipe-offset, 0px);
+		display: flex;
+		align-items: center;
+		overflow: hidden;
+		font-family: 'Font Awesome 6 Free';
+		font-weight: 900;
+		font-size: 1.15rem;
+		color: #fff;
+		pointer-events: none;
+		z-index: 0;
+	}
+
+	/* Revealed when swiping right: add to the shopping list */
+	table.dt-cards > tbody > tr::before {
+		content: '\f07a';
+		left: -1px;
+		justify-content: flex-start;
+		padding-left: 1.3rem;
+		border-radius: var(--g-radius-lg) 0 0 var(--g-radius-lg);
+		background-color: var(--g-info);
+		opacity: var(--swipe-right, 0);
+	}
+
+	/* Revealed when swiping left: consume */
+	table.dt-cards > tbody > tr::after {
+		content: '\f2e7';
+		right: -1px;
+		justify-content: flex-end;
+		padding-right: 1.3rem;
+		border-radius: 0 var(--g-radius-lg) var(--g-radius-lg) 0;
+		background-color: var(--g-success);
+		opacity: var(--swipe-left, 0);
+	}
+
+	/* The corner buttons would float above the indicator - fade them out */
+	table.dt-cards > tbody > tr.swiping > td.dt-cell-actions {
+		opacity: 0;
+		transition: opacity 90ms linear;
 	}
 
 	/* --- row group headers --------------------------------------------- */

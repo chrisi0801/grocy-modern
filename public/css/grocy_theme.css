@@ -1328,16 +1328,25 @@ table.dataTable > tbody > tr.selected a:not(.btn) {
 	transform: rotate(180deg);
 }
 
-#toast-container > div .toast-message .btn {
+/* The button sits on a coloured toast, so every state has to stay light -
+   otherwise Bootstrap's `:active` turns it dark grey on green */
+#toast-container .toast-message .btn,
+#toast-container .toast-message .btn:hover,
+#toast-container .toast-message .btn:focus,
+#toast-container .toast-message .btn.focus,
+#toast-container .toast-message .btn:active,
+#toast-container .toast-message .btn:not(:disabled):not(.disabled):active,
+#toast-container .toast-message .btn:not(:disabled):not(.disabled):focus {
 	margin-top: 0.5rem;
 	background-color: rgba(255, 255, 255, 0.18);
-	border-color: rgba(255, 255, 255, 0.35);
+	border-color: rgba(255, 255, 255, 0.45);
 	color: #fff;
+	box-shadow: none !important;
 }
 
-#toast-container > div .toast-message .btn:hover {
-	background-color: rgba(255, 255, 255, 0.3);
-	color: #fff;
+#toast-container .toast-message .btn:hover,
+#toast-container .toast-message .btn:not(:disabled):not(.disabled):active {
+	background-color: rgba(255, 255, 255, 0.34);
 }
 
 #toast-container .toast-close-button {
