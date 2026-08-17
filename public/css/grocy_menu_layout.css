@@ -23,11 +23,20 @@ body.embedded.fixed-nav {
 }
 
 .content-wrapper {
+	/* `vh` on iOS refers to the viewport *without* the collapsed browser bars,
+	   so the document height changes while Safari collapses them at the end of
+	   a scroll - which makes the page jitter. `svh` is the stable one. */
 	min-height: calc(100vh - var(--g-topbar-h));
 	padding-top: 1rem;
 	overflow-x: hidden;
 	background: var(--g-bg);
 	transition: margin-left var(--g-transition);
+}
+
+@supports (height: 100svh) {
+	.content-wrapper {
+		min-height: calc(100svh - var(--g-topbar-h));
+	}
 }
 
 .embedded .content-wrapper {

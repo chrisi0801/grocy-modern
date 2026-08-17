@@ -275,3 +275,56 @@ if (window.self === window.top)
 		GrocySheet.ResetBackdrop();
 	});
 }
+
+// --------------------------------------------------------------------------
+// Row action menus as bottom sheets
+// --------------------------------------------------------------------------
+// The menu itself is turned into a sheet by grocy_mobile.css; this adds the
+// dimmed layer behind it. Tapping that layer closes the menu, because
+// Bootstrap closes an open dropdown on any click outside of it.
+
+GrocySheet.RemoveDropdownBackdrop = function ()
+{
+	var backdrop = document.querySelector(".dropdown-sheet-backdrop");
+
+	if (backdrop && backdrop.parentNode)
+	{
+		backdrop.parentNode.removeChild(backdrop);
+	}
+};
+
+$(document).on("show.bs.dropdown", "td.dt-cell-actions .dropdown", function ()
+{
+	// Card mode only - see the breakpoint in grocy_mobile.css
+	if (window.innerWidth >= 768 || document.querySelector(".dropdown-sheet-backdrop"))
+	{
+		return;
+	}
+
+	var backdrop = document.createElement("div");
+	backdrop.className = "dropdown-sheet-backdrop";
+	document.body.appendChild(backdrop);
+
+	// The menu lives inside `td.dt-cell-actions`, which has a z-index and
+	// therefore its own stacking context - the menu can never escape it. So
+	// the *cell* has to be lifted above the backdrop, otherwise the corner
+	// buttons of the rows below paint on top of the open menu.
+	var cell = this.closest("td.dt-cell-actions");
+
+	if (cell)
+	{
+		cell.classList.add("dropdown-sheet-open");
+	}
+});
+
+$(document).on("hidden.bs.dropdown", "td.dt-cell-actions .dropdown", function ()
+{
+	GrocySheet.RemoveDropdownBackdrop();
+
+	var cell = this.closest("td.dt-cell-actions");
+
+	if (cell)
+	{
+		cell.classList.remove("dropdown-sheet-open");
+	}
+});
