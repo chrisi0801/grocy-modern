@@ -67,6 +67,10 @@ jobs:
           push: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
+          # Ends up as the `?v=` on the asset URLs, so a new image means new
+          # URLs and no stale CSS or JS in the browser
+          build-args: |
+            GROCY_BUILD=${{ github.sha }}
           # Add linux/arm64 here (and enable the QEMU step above) if you run
           # Grocy on a Raspberry Pi or another ARM board. Compiling the PHP
           # extensions under emulation makes the build roughly 5x slower.

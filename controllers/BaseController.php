@@ -27,7 +27,10 @@ class BaseController
 		$container = $this->AppContainer;
 
 		$versionInfo = ApplicationService::GetInstance()->GetInstalledVersion();
-		$this->View->set('version', $versionInfo->Version);
+		// Only used as the `?v=` cache buster on the asset URLs, so it carries
+		// the build id as well - see GetAssetVersion(). The about page reads
+		// the plain version from $versionInfo.
+		$this->View->set('version', GetAssetVersion($versionInfo->Version));
 
 		$localizationService = LocalizationService::GetInstance();
 		$this->View->set('__t', function (string $text, ...$placeholderValues) use ($localizationService)

@@ -146,6 +146,12 @@ RUN set -eux; \
 	test -f /var/www/html/packages/autoload.php; \
 	test -d /var/www/html/public/packages/bootstrap
 
+# Feeds the `?v=` cache buster on the asset URLs (see GetAssetVersion()).
+# Without it the app falls back to the newest file modification time, which
+# works just as well - this only makes the value the commit it was built from.
+ARG GROCY_BUILD=""
+ENV GROCY_BUILD=${GROCY_BUILD}
+
 EXPOSE 80
 
 # `/login` renders a full page through PHP and Blade without touching the

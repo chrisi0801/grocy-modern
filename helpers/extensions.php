@@ -263,6 +263,69 @@ function require_frontend_packages(array $packages)
 	$GROCY_REQUIRED_FRONTEND_PACKAGES = array_unique(array_merge($GROCY_REQUIRED_FRONTEND_PACKAGES, $packages));
 }
 
+/**
+ * The `?v=` appended to every stylesheet and script is grocy's cache buster,
+ * and upstream it is simply the version number - which is fine there, because
+ * assets only ever change with a release. In this fork they change between
+ * releases, and browsers happily kept serving the CSS and JS from before the
+ * update.
+ *
+ * So the version gets a build id appended: whatever GROCY_BUILD is set to
+ * (handy for images that know their commit), otherwise the newest
+ * modification time of the files that are actually shipped.
+ */
+function GetAssetVersion(string $version): string
+{
+	static $assetVersion = null;
+
+	if ($assetVersion !== null)
+	{
+		return $assetVersion;
+	}
+
+	$build = getenv('GROCY_BUILD');
+
+	if ($build === false || trim($build) === '')
+	{
+		$build = GetNewestModificationTime([
+			__DIR__ . '/../public/css',
+			__DIR__ . '/../public/js',
+			__DIR__ . '/../public/viewjs'
+		]);
+	}
+
+	$assetVersion = $version . '-' . preg_replace('/[^A-Za-z0-9._-]/', '', (string)$build);
+
+	return $assetVersion;
+}
+
+function GetNewestModificationTime(array $folderPaths)
+{
+	$newest = 0;
+
+	foreach ($folderPaths as $folderPath)
+	{
+		if (!is_dir($folderPath))
+		{
+			continue;
+		}
+
+		$files = new RecursiveIteratorIterator(new RecursiveDirectoryIterator($folderPath, FilesystemIterator::SKIP_DOTS));
+
+		foreach ($files as $file)
+		{
+			$modificationTime = $file->getMTime();
+
+			if ($modificationTime > $newest)
+			{
+				$newest = $modificationTime;
+			}
+		}
+	}
+
+	return $newest;
+}
+
 function EmptyFolder($folderPath)
 {
 	foreach (glob("{$folderPath}/*") as $item)
