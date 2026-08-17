@@ -946,6 +946,13 @@ small.text-muted {
 	flex: 1 1 auto;
 }
 
+/* `.dropdown-item-text` is a Bootstrap component class with a hard coded dark
+   text colour, and grocy reuses it for the label inside an entry - which made
+   the menus unreadable in dark mode */
+.dropdown-item .dropdown-item-text {
+	color: inherit;
+}
+
 /* ==========================================================================
    Modals (bottom sheet on phones)
    ========================================================================== */

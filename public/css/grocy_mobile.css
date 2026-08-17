@@ -31,6 +31,12 @@
 	overflow-y: auto;
 }
 
+@supports (height: 100svh) {
+	.dt-card-toolbar .dt-sort-menu {
+		max-height: 60svh;
+	}
+}
+
 .dt-card-toolbar .dt-sort-item.active {
 	background-color: var(--g-brand-soft);
 	color: var(--g-brand-soft-text);
@@ -94,21 +100,62 @@
 	   to close it. `!important` is needed to beat Popper's inline styles. */
 	.table-inline-menu.dropdown-menu {
 		position: fixed !important;
-		transform: none !important;
 		top: auto !important;
 		right: 0 !important;
 		bottom: 0 !important;
 		left: 0 !important;
 		width: 100% !important;
 		max-width: 100% !important;
-		max-height: 72vh;
+		/* Popper positions the menu with a transform, which has to go. The
+		   drag gesture sets its own one inline (also `!important`). */
+		transform: none !important;
+		transition: transform 0.2s ease;
+		/* Fallbacks only: `vh` on iOS is the *large* viewport - the one that
+		   assumes the browser bars are collapsed - so a sheet sized in vh
+		   reaches above the visible area and its first entry ends up cut off.
+		   `svh` is the small, always visible viewport, and grocy_sheet.js
+		   additionally pins the height to the real visual viewport. */
+		max-height: 60vh;
 		overflow-y: auto;
+		-webkit-overflow-scrolling: touch;
+		overscroll-behavior: contain;
 		margin: 0;
-		padding: 0.4rem 0.4rem calc(0.4rem + var(--g-safe-bottom)) 0.4rem;
+		padding: 0 0.4rem calc(0.4rem + var(--g-safe-bottom)) 0.4rem;
 		border: 0;
 		border-radius: var(--g-radius-xl) var(--g-radius-xl) 0 0;
 		box-shadow: var(--g-shadow-lg);
 		z-index: 1050;
+	}
+
+	@supports (height: 100svh) {
+		.table-inline-menu.dropdown-menu {
+			max-height: 60svh;
+		}
+	}
+
+	/* While a finger is on it the sheet has to follow immediately */
+	.table-inline-menu.dropdown-menu.sheet-dragging {
+		transition: none;
+	}
+
+	/* Grab handle. It stays put while the entries scroll underneath, so there
+	   is always something to grab - and the top entry can never look cut off,
+	   because it scrolls out under an opaque strip instead of under the edge
+	   of the screen. */
+	.table-inline-menu.dropdown-menu::before {
+		content: '';
+		position: sticky;
+		top: 0;
+		z-index: 1;
+		display: block;
+		height: 1.4rem;
+		margin: 0 -0.4rem 0.15rem -0.4rem;
+		background-color: var(--g-surface);
+		/* The 38x4 pill, centred in the strip */
+		background-image: linear-gradient(var(--g-border-strong), var(--g-border-strong));
+		background-repeat: no-repeat;
+		background-position: center;
+		background-size: 38px 4px;
 	}
 
 	.table-inline-menu.dropdown-menu .dropdown-item {
@@ -123,6 +170,12 @@
 		z-index: 1051;
 	}
 
+	/* The trigger is lifted along with the cell, which would leave it as the
+	   only bright spot on an otherwise dimmed page */
+	table.dt-cards > tbody > tr > td.dt-cell-actions.dropdown-sheet-open > .dropdown > .btn {
+		opacity: 0;
+	}
+
 	/* Dimmed layer behind the sheet, added by grocy_sheet.js. It also covers
 	   the corner buttons of the other cards, and tapping it closes the menu
 	   because Bootstrap closes dropdowns on any click outside. */
@@ -134,6 +187,8 @@
 		left: 0;
 		z-index: 1049;
 		background-color: var(--g-overlay);
+		/* Nothing behind the sheet scrolls while it is open */
+		touch-action: none;
 	}
 
 	/* `.table-striped` zebra rules are more specific than a plain row
@@ -299,6 +354,7 @@
 		padding: 0;
 		font-size: 0.8rem;
 		border-radius: var(--g-radius-xs);
+		transition: opacity 0.15s ease;
 	}
 
 	/* Push the overflow menu to the far right of the action row */

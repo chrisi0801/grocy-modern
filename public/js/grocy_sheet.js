@@ -279,9 +279,36 @@ if (window.self === window.top)
 // --------------------------------------------------------------------------
 // Row action menus as bottom sheets
 // --------------------------------------------------------------------------
-// The menu itself is turned into a sheet by grocy_mobile.css; this adds the
-// dimmed layer behind it. Tapping that layer closes the menu, because
-// Bootstrap closes an open dropdown on any click outside of it.
+// grocy_mobile.css turns the menu into a sheet; everything that needs to know
+// the actual state of the browser happens here: the dimmed layer behind it, a
+// height that fits what is really visible on the screen, and the same
+// drag-down-to-close gesture the modal sheets have.
+
+// Card mode, same breakpoint as in grocy_mobile.css
+GrocySheet.DropdownBreakpoint = 768;
+// How much of the visible viewport the sheet may take up
+GrocySheet.DropdownHeightRatio = 0.6;
+
+GrocySheet.DropdownState = null;
+
+GrocySheet.IsDropdownSheet = function ()
+{
+	return window.innerWidth < GrocySheet.DropdownBreakpoint;
+};
+
+// iOS knows three viewport heights and `100vh` is the largest of them - the
+// one that assumes the browser bars are collapsed. A sheet sized in vh
+// therefore reaches above the visible area, which is what cut the first entry
+// off. `visualViewport` is what the user can actually see, right now.
+GrocySheet.VisibleHeight = function ()
+{
+	if (window.visualViewport && window.visualViewport.height)
+	{
+		return window.visualViewport.height;
+	}
+
+	return window.innerHeight;
+};
 
 GrocySheet.RemoveDropdownBackdrop = function ()
 {
@@ -293,10 +320,205 @@ GrocySheet.RemoveDropdownBackdrop = function ()
 	}
 };
 
+GrocySheet.SetDropdownBackdropOpacity = function (value)
+{
+	var backdrop = document.querySelector(".dropdown-sheet-backdrop");
+
+	if (backdrop)
+	{
+		backdrop.style.opacity = value === null ? '' : value.toString();
+	}
+};
+
+// The stylesheet pins the sheet down with `transform: none !important` to get
+// rid of Popper's positioning, so the drag has to be important as well
+GrocySheet.SetDropdownOffset = function (menu, offset)
+{
+	if (offset === null)
+	{
+		menu.style.removeProperty("transform");
+		return;
+	}
+
+	menu.style.setProperty("transform", "translateY(" + offset + ")", "important");
+};
+
+GrocySheet.CloseDropdown = function (dropdown)
+{
+	var toggle = dropdown.querySelector('[data-toggle="dropdown"]');
+
+	if (toggle)
+	{
+		// The menu is open, so this closes it - and firing it through
+		// Bootstrap means hidden.bs.dropdown runs and cleans everything up
+		$(toggle).dropdown("toggle");
+	}
+};
+
+GrocySheet.ResetDropdown = function (menu)
+{
+	GrocySheet.DropdownState = null;
+
+	menu.classList.remove("sheet-dragging");
+	menu.style.removeProperty("transform");
+	menu.style.removeProperty("max-height");
+};
+
+GrocySheet.DropdownStart = function (event, menu, dropdown)
+{
+	GrocySheet.DropdownState = null;
+
+	if (event.touches.length !== 1)
+	{
+		return;
+	}
+
+	// Only grab the sheet while it is scrolled to the very top, otherwise the
+	// gesture belongs to the list of entries
+	if (menu.scrollTop > 0)
+	{
+		return;
+	}
+
+	GrocySheet.DropdownState = {
+		menu: menu,
+		dropdown: dropdown,
+		startX: event.touches[0].clientX,
+		startY: event.touches[0].clientY,
+		startTime: Date.now(),
+		delta: 0,
+		dragging: false
+	};
+};
+
+GrocySheet.DropdownMove = function (event)
+{
+	var state = GrocySheet.DropdownState;
+
+	if (!state || event.touches.length !== 1)
+	{
+		return;
+	}
+
+	var deltaY = event.touches[0].clientY - state.startY;
+	var deltaX = event.touches[0].clientX - state.startX;
+
+	if (!state.dragging)
+	{
+		if (Math.abs(deltaY) < GrocySheet.StartSlop)
+		{
+			return;
+		}
+
+		// Upwards or mostly sideways: not a dismiss gesture, let it be
+		if (deltaY < 0 || Math.abs(deltaX) > Math.abs(deltaY))
+		{
+			GrocySheet.DropdownState = null;
+			return;
+		}
+
+		state.dragging = true;
+		state.menu.classList.add("sheet-dragging");
+	}
+
+	if (event.cancelable)
+	{
+		event.preventDefault();
+	}
+
+	state.delta = Math.max(0, deltaY);
+	GrocySheet.SetDropdownOffset(state.menu, state.delta + "px");
+
+	var height = state.menu.offsetHeight || GrocySheet.VisibleHeight();
+	GrocySheet.SetDropdownBackdropOpacity(Math.max(0, 1 - state.delta / height));
+};
+
+GrocySheet.DropdownEnd = function ()
+{
+	var state = GrocySheet.DropdownState;
+	GrocySheet.DropdownState = null;
+
+	if (!state || !state.dragging)
+	{
+		return;
+	}
+
+	var velocity = state.delta / Math.max(1, Date.now() - state.startTime);
+
+	if (state.delta >= GrocySheet.DismissDistance || velocity >= GrocySheet.DismissVelocity)
+	{
+		// Slide the rest of the way out before Bootstrap removes the menu,
+		// otherwise it would jump back up first
+		state.menu.classList.remove("sheet-dragging");
+		GrocySheet.SetDropdownOffset(state.menu, "100%");
+		GrocySheet.SetDropdownBackdropOpacity(0);
+
+		window.setTimeout(function ()
+		{
+			GrocySheet.CloseDropdown(state.dropdown);
+		}, 160);
+
+		return;
+	}
+
+	GrocySheet.DropdownSpringBack(state);
+};
+
+GrocySheet.DropdownCancel = function ()
+{
+	var state = GrocySheet.DropdownState;
+	GrocySheet.DropdownState = null;
+
+	if (state && state.dragging)
+	{
+		GrocySheet.DropdownSpringBack(state);
+	}
+};
+
+GrocySheet.DropdownSpringBack = function (state)
+{
+	// Dropping the class re-enables the CSS transition, so it animates back
+	state.menu.classList.remove("sheet-dragging");
+	GrocySheet.SetDropdownOffset(state.menu, null);
+	GrocySheet.SetDropdownBackdropOpacity(null);
+};
+
+// Bound to the menu itself, not to the document: a document level touchmove
+// listener is passive by default in some browsers, and then the sheet could
+// not keep the page from scrolling underneath it
+GrocySheet.AttachDropdownDrag = function (menu, dropdown)
+{
+	if (menu.grocyDropdownDragAttached)
+	{
+		return;
+	}
+
+	menu.grocyDropdownDragAttached = true;
+
+	menu.addEventListener("touchstart", function (e)
+	{
+		GrocySheet.DropdownStart(e, menu, dropdown);
+	}, { passive: true });
+
+	menu.addEventListener("touchmove", function (e)
+	{
+		GrocySheet.DropdownMove(e);
+	}, { passive: false });
+
+	menu.addEventListener("touchend", function ()
+	{
+		GrocySheet.DropdownEnd();
+	}, { passive: true });
+
+	menu.addEventListener("touchcancel", function ()
+	{
+		GrocySheet.DropdownCancel();
+	}, { passive: true });
+};
+
 $(document).on("show.bs.dropdown", "td.dt-cell-actions .dropdown", function ()
 {
-	// Card mode only - see the breakpoint in grocy_mobile.css
-	if (window.innerWidth >= 768 || document.querySelector(".dropdown-sheet-backdrop"))
+	if (!GrocySheet.IsDropdownSheet() || document.querySelector(".dropdown-sheet-backdrop"))
 	{
 		return;
 	}
@@ -315,6 +537,26 @@ $(document).on("show.bs.dropdown", "td.dt-cell-actions .dropdown", function ()
 	{
 		cell.classList.add("dropdown-sheet-open");
 	}
+
+	var menu = this.querySelector(".dropdown-menu");
+
+	if (menu)
+	{
+		menu.style.setProperty("max-height", Math.round(GrocySheet.VisibleHeight() * GrocySheet.DropdownHeightRatio) + "px");
+		GrocySheet.AttachDropdownDrag(menu, this);
+	}
+});
+
+$(document).on("shown.bs.dropdown", "td.dt-cell-actions .dropdown", function ()
+{
+	var menu = this.querySelector(".dropdown-menu");
+
+	// A menu that was scrolled down and closed again keeps its scroll
+	// position, which looks exactly like a missing first entry
+	if (menu)
+	{
+		menu.scrollTop = 0;
+	}
 });
 
 $(document).on("hidden.bs.dropdown", "td.dt-cell-actions .dropdown", function ()
@@ -326,5 +568,12 @@ $(document).on("hidden.bs.dropdown", "td.dt-cell-actions .dropdown", function ()
 	if (cell)
 	{
 		cell.classList.remove("dropdown-sheet-open");
+	}
+
+	var menu = this.querySelector(".dropdown-menu");
+
+	if (menu)
+	{
+		GrocySheet.ResetDropdown(menu);
 	}
 });
