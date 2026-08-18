@@ -20,9 +20,26 @@
 		content="light dark">
 
 	<link rel="icon"
+		type="image/svg+xml"
+		href="{{ $U('/img/icon.svg?v=', true) }}{{ $version }}">
+	<link rel="icon"
 		type="image/png"
 		sizes="32x32"
 		href="{{ $U('/img/icon-32.png?v=', true) }}{{ $version }}">
+	<link rel="icon"
+		type="image/png"
+		sizes="16x16"
+		href="{{ $U('/img/icon-16.png?v=', true) }}{{ $version }}">
+	{{-- iOS ignores the manifest icons, this is the one "Add to home screen" uses --}}
+	<link rel="apple-touch-icon"
+		sizes="180x180"
+		href="{{ $U('/img/icon-apple-touch.png?v=', true) }}{{ $version }}">
+	<meta name="apple-mobile-web-app-capable"
+		content="yes">
+	<meta name="apple-mobile-web-app-status-bar-style"
+		content="default">
+	<meta name="apple-mobile-web-app-title"
+		content="Grocy">
 
 	@if (GROCY_AUTHENTICATED)
 	<link rel="manifest"

@@ -290,7 +290,8 @@ function GetAssetVersion(string $version): string
 		$build = GetNewestModificationTime([
 			__DIR__ . '/../public/css',
 			__DIR__ . '/../public/js',
-			__DIR__ . '/../public/viewjs'
+			__DIR__ . '/../public/viewjs',
+			__DIR__ . '/../public/img'
 		]);
 	}
 

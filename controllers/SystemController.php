@@ -45,15 +45,35 @@ class SystemController extends BaseController
 
 		$manifest = [
 			'name' => 'Grocy ' . $data[0],
-			'short_name' => 'Grocy ' . $data[0],
-			'icons' => [[
-				'src' => './img/icon-1024.png',
-				'sizes'=> '1024x1024',
-				'type' => 'image/png'
-			]],
+			// The home screen only ever shows the short name, and "Grocy
+			// Bestandsübersicht" gets truncated to something unreadable
+			'short_name' => 'Grocy',
+			'icons' => [
+				[
+					'src' => './img/icon-192.png',
+					'sizes' => '192x192',
+					'type' => 'image/png',
+					'purpose' => 'any'
+				],
+				[
+					'src' => './img/icon-512.png',
+					'sizes' => '512x512',
+					'type' => 'image/png',
+					'purpose' => 'any'
+				],
+				[
+					// Android crops icons to its own shape, so this one keeps
+					// the house well inside the safe zone
+					'src' => './img/icon-maskable-512.png',
+					'sizes' => '512x512',
+					'type' => 'image/png',
+					'purpose' => 'maskable'
+				]
+			],
 			'start_url' => $data[1],
-			'background_color' => '#333131',
-			'theme_color' => '#333131',
+			// Splash screen and status bar, taken from the theme tokens
+			'background_color' => '#f3f5f7',
+			'theme_color' => '#0e7c66',
 			'display' => 'standalone'
 		];
 
