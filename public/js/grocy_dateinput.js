@@ -115,6 +115,44 @@ GrocyDateInput.Cancel = function ()
 
 // `moveFocus` is false when the field was simply left - the shorthand still
 // resolves, but the focus stays wherever the user just put it
+// The picker widget parses whatever stands in the field the moment the focus
+// leaves it, and it reads "0710" as the year 710 - the field then ends up as
+// 0710-01-01. So a pending shorthand has to be resolved *before* the focus
+// moves, not in the blur handler afterwards: the pointer press that takes the
+// focus away is the earliest reliable signal, and Tab is the same story
+// without a pointer. Both are listened for in the capture phase, so they run
+// ahead of everything the widget has bound.
+GrocyDateInput.InstallEarlyFlush = function ()
+{
+	var pointerEvents = ["pointerdown", "mousedown", "touchstart"];
+
+	for (var i = 0; i < pointerEvents.length; i++)
+	{
+		document.addEventListener(pointerEvents[i], function (e)
+		{
+			// Tapping inside the field itself is not leaving it
+			if (GrocyDateInput.Pending && e.target !== GrocyDateInput.Pending.input[0])
+			{
+				GrocyDateInput.Flush(false);
+			}
+		}, true);
+	}
+
+	document.addEventListener("keydown", function (e)
+	{
+		if (e.key === "Tab")
+		{
+			// Tab moves the focus by itself
+			GrocyDateInput.Flush(false);
+		}
+		else if (e.key === "Enter")
+		{
+			// Before a submit handler gets to read the field
+			GrocyDateInput.Flush(true);
+		}
+	}, true);
+};
+
 GrocyDateInput.Flush = function (moveFocus)
 {
 	var pending = GrocyDateInput.Pending;
@@ -126,3 +164,5 @@ GrocyDateInput.Flush = function (moveFocus)
 		pending.apply(moveFocus !== false);
 	}
 };
+
+GrocyDateInput.InstallEarlyFlush();
