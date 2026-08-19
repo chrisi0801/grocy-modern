@@ -10,8 +10,10 @@ var GrocyDateInput = {
 	// Anything outside this is a day, a month, or a typo - never a year
 	MinYear: 1900,
 	MaxYear: 2999,
-	// How long the four digit shorthand waits for more digits, see Defer()
-	DeferDelay: 600
+	// How long the four digit shorthand waits for more digits, see Defer().
+	// Long enough to type the remaining four on a phone - leaving the field or
+	// pressing Enter applies it immediately anyway.
+	DeferDelay: 1500
 };
 
 GrocyDateInput.IsPlausibleDate = function (isoDate)
@@ -46,6 +48,35 @@ GrocyDateInput.ResolveDigits = function (value)
 	if (GrocyDateInput.IsPlausibleDate(yearLast))
 	{
 		return yearLast;
+	}
+
+	return null;
+};
+
+// The four digit shorthand, same idea as the eight digit one: day first, and
+// month first only when day first cannot be a date. "0108" is the 1st of
+// August (both readings work, day first wins), "1231" is the 31st of December
+// (day 12 month 31 does not exist), "3112" is the same day the other way
+// round. The year is always the current one - a due date in the past is
+// unusual but not impossible, and silently jumping a year is worse.
+GrocyDateInput.ResolveShortDigits = function (value, year)
+{
+	if (!/^\d{4}$/.test(value))
+	{
+		return null;
+	}
+
+	var dayFirst = year + "-" + value.substring(2, 4) + "-" + value.substring(0, 2);
+	var monthFirst = year + "-" + value.substring(0, 2) + "-" + value.substring(2, 4);
+
+	if (moment(dayFirst, "YYYY-MM-DD", true).isValid())
+	{
+		return dayFirst;
+	}
+
+	if (moment(monthFirst, "YYYY-MM-DD", true).isValid())
+	{
+		return monthFirst;
 	}
 
 	return null;

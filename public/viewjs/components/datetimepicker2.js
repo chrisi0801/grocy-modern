@@ -197,16 +197,12 @@ Grocy.Components.DateTimePicker2.GetInputElement().on('keyup', function(e)
 			}
 		}
 	}
-	else if (value.length === 4 && $.isNumeric(value) && Number.parseInt(value.substring(0, 2)) >= 1 && Number.parseInt(value.substring(0, 2)) <= 12) // Shorthand for MMDD
+	else if (value.length === 4 && $.isNumeric(value) && GrocyDateInput.ResolveShortDigits(value, moment().year()) !== null) // Shorthand for DDMM or MMDD
 	{
 		// Deferred: "0105" is also the beginning of "01052027"
 		GrocyDateInput.Defer(inputElement, value, function(moveFocus)
 		{
-			var date = moment((new Date()).getFullYear().toString() + value);
-			if (date.isBefore(moment()))
-			{
-				date.add(1, "year");
-			}
+			var date = moment(GrocyDateInput.ResolveShortDigits(value, moment().year()));
 			Grocy.Components.DateTimePicker2.SetValue(date.format(format), inputElement);
 
 			if (moveFocus)
