@@ -446,18 +446,40 @@ GrocyDataTablesCardMode.VisibleColumns = function (api)
 	return columns;
 };
 
+// Buttons, dropdowns and button groups - not the tooltips and icons inside
+GrocyDataTablesCardMode.CountControls = function (cell)
+{
+	var controls = cell.querySelectorAll(":scope > .btn, :scope > .dropdown, :scope > .btn-group");
+	var count = 0;
+
+	for (var i = 0; i < controls.length; i++)
+	{
+		// Whatever the view hides stays hidden in card mode as well
+		if (!controls[i].classList.contains("d-none") && window.getComputedStyle(controls[i]).display !== "none")
+		{
+			count++;
+		}
+	}
+
+	return count;
+};
+
 GrocyDataTablesCardMode.Apply = function (api)
 {
-	var headers = GrocyDataTablesCardMode.VisibleColumns(api).map(function (column)
+	var columns = GrocyDataTablesCardMode.VisibleColumns(api);
+
+	var headers = columns.map(function (column)
 	{
 		return column.title;
 	});
 
-	// The first column carrying an actual caption is the card headline
-	// (the leading caption-less column holds the row actions)
-	var titleIndex = headers.findIndex(function (title)
+	// Several views carry columns that DataTables considers visible but that
+	// are hidden with `d-none` (e.g. "Hidden product_id" in the stock entries
+	// table). They must not become the headline - that would leave the card
+	// without one.
+	var titleIndex = columns.findIndex(function (column)
 	{
-		return title.length > 0;
+		return column.title.length > 0 && !column.header.hasClass("d-none");
 	});
 
 	var body = api.table().body();
@@ -487,6 +509,30 @@ GrocyDataTablesCardMode.Apply = function (api)
 			cell.setAttribute("data-label", label);
 			cell.classList.toggle("dt-cell-actions", label.length === 0);
 			cell.classList.toggle("dt-cell-title", c === titleIndex);
+
+			// The action cell floats in the top right corner of the card,
+			// which only works for one or two controls - more than that and
+			// they end up sitting on the card's first line. Those cells get a
+			// row of their own instead.
+			if (label.length === 0)
+			{
+				var controls = GrocyDataTablesCardMode.CountControls(cell);
+				var floating = controls <= 2;
+
+				cell.classList.toggle("dt-cell-actions-row", !floating);
+
+				// A floating corner still covers the end of the headline, so
+				// the card reserves exactly as much room as it needs - a long
+				// product name then wraps instead of running underneath it
+				if (floating)
+				{
+					rows[r].style.setProperty("--g-actions-w", (controls * 30 + (controls - 1) * 4 + 10) + "px");
+				}
+				else
+				{
+					rows[r].style.removeProperty("--g-actions-w");
+				}
+			}
 			cell.classList.toggle("dt-cell-empty", label.length !== 0
 				&& c !== titleIndex
 				&& cell.children.length === 0

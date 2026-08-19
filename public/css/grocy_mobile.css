@@ -98,6 +98,7 @@
 	   from grocy.css, so Popper flipped it into a near fullscreen panel that
 	   covered the action buttons of the other cards and left nothing to tap
 	   to close it. `!important` is needed to beat Popper's inline styles. */
+	table.dt-cards td.dt-cell-actions .dropdown-menu,
 	.table-inline-menu.dropdown-menu {
 		position: fixed !important;
 		top: auto !important;
@@ -128,12 +129,14 @@
 	}
 
 	@supports (height: 100svh) {
+		table.dt-cards td.dt-cell-actions .dropdown-menu,
 		.table-inline-menu.dropdown-menu {
 			max-height: 60svh;
 		}
 	}
 
 	/* While a finger is on it the sheet has to follow immediately */
+	table.dt-cards td.dt-cell-actions .dropdown-menu.sheet-dragging,
 	.table-inline-menu.dropdown-menu.sheet-dragging {
 		transition: none;
 	}
@@ -142,6 +145,7 @@
 	   is always something to grab - and the top entry can never look cut off,
 	   because it scrolls out under an opaque strip instead of under the edge
 	   of the screen. */
+	table.dt-cards td.dt-cell-actions .dropdown-menu::before,
 	.table-inline-menu.dropdown-menu::before {
 		content: '';
 		position: sticky;
@@ -158,11 +162,40 @@
 		background-size: 38px 4px;
 	}
 
+	table.dt-cards td.dt-cell-actions .dropdown-menu .dropdown-item,
 	.table-inline-menu.dropdown-menu .dropdown-item {
 		padding: 0.75rem 0.7rem;
 		font-size: 0.9375rem;
 		/* Bootstrap sets `nowrap`, which cuts the longer labels off */
 		white-space: normal;
+	}
+
+	/* Room for the floating action corner, so the headline wraps in front of
+	   it instead of running underneath - the width comes from
+	   grocy_datatables.js, which knows how many controls there are */
+	table.dt-cards > tbody > tr > td.dt-cell-title {
+		padding-right: var(--g-actions-w, 0px);
+	}
+
+	/* Three or more controls do not fit into the floating corner - they would
+	   cover the first line of the card - so the cell becomes the card's own
+	   action row. grocy_datatables.js decides which cells those are. */
+	table.dt-cards > tbody > tr > td.dt-cell-actions.dt-cell-actions-row {
+		position: static;
+		order: -1;
+		justify-content: flex-end;
+		gap: 0.35rem;
+		width: 100% !important;
+		margin: 0 0 0.55rem 0;
+		padding-bottom: 0.55rem;
+		border-bottom: 1px solid var(--g-border) !important;
+	}
+
+	/* These carry meaning through their colour, so they stay readable */
+	table.dt-cards > tbody > tr > td.dt-cell-actions.dt-cell-actions-row .btn {
+		min-height: 34px;
+		width: 34px;
+		font-size: 0.85rem;
 	}
 
 	/* Lifts the whole cell - and with it the open menu - above the backdrop */

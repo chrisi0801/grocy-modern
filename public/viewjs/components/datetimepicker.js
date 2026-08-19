@@ -126,6 +126,12 @@ Grocy.Components.DateTimePicker.Init = function(reInit = false)
 }
 Grocy.Components.DateTimePicker.Init();
 
+Grocy.Components.DateTimePicker.GetInputElement().on('blur', function()
+{
+	// Leaving the field is a confirmation too
+	GrocyDateInput.Flush(false);
+});
+
 Grocy.Components.DateTimePicker.GetInputElement().on('keyup', function(e)
 {
 	$('.datetimepicker').datetimepicker('hide');
@@ -133,6 +139,17 @@ Grocy.Components.DateTimePicker.GetInputElement().on('keyup', function(e)
 	var inputElement = $(e.currentTarget)
 	var value = inputElement.val();
 	var format = inputElement.data('format');
+
+	// Another key arrived, so a shorthand that was waiting for more digits is
+	// no longer what the user is typing - unless they confirmed with Enter
+	if (e.keyCode === 13)
+	{
+		GrocyDateInput.Flush();
+	}
+	else
+	{
+		GrocyDateInput.Cancel();
+	}
 	var nextInputElement = $(inputElement.data('next-input-selector'));
 
 	if (!nextInputElement.is("input"))
@@ -182,17 +199,25 @@ Grocy.Components.DateTimePicker.GetInputElement().on('keyup', function(e)
 	}
 	else if (value.length === 4 && $.isNumeric(value) && Number.parseInt(value.substring(0, 2)) >= 1 && Number.parseInt(value.substring(0, 2)) <= 12) // Shorthand for MMDD
 	{
-		var date = moment((new Date()).getFullYear().toString() + value);
-		if (date.isBefore(moment()))
+		// Deferred: "0105" is also the beginning of "01052027"
+		GrocyDateInput.Defer(inputElement, value, function(moveFocus)
 		{
-			date.add(1, "year");
-		}
-		Grocy.Components.DateTimePicker.SetValue(date.format(format), inputElement);
-		nextInputElement.focus();
+			var date = moment((new Date()).getFullYear().toString() + value);
+			if (date.isBefore(moment()))
+			{
+				date.add(1, "year");
+			}
+			Grocy.Components.DateTimePicker.SetValue(date.format(format), inputElement);
+
+			if (moveFocus)
+			{
+				nextInputElement.focus();
+			}
+		});
 	}
-	else if (value.length === 8 && $.isNumeric(value)) // Shorthand for YYYYMMDD
+	else if (value.length === 8 && $.isNumeric(value) && GrocyDateInput.ResolveDigits(value) !== null) // Shorthand for YYYYMMDD or DDMMYYYY
 	{
-		Grocy.Components.DateTimePicker.SetValue(value.replace(/(\d{4})(\d{2})(\d{2})/, '$1-$2-$3'), inputElement);
+		Grocy.Components.DateTimePicker.SetValue(moment(GrocyDateInput.ResolveDigits(value)).format(format), inputElement);
 		nextInputElement.focus();
 	}
 	else if (value.length === 7 && $.isNumeric(value.substring(0, 6)) && (value.substring(6, 7).toLowerCase() === "e" || value.substring(6, 7) === "+")) // Shorthand for YYYYMM[e/+]
