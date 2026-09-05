@@ -578,6 +578,23 @@ GrocyDataTablesCardMode.AddToolbar = function (api)
 	wrapper.prepend(toolbar);
 };
 
+// The table a toolbar or pager belongs to. DataTables clones the header into
+// the same wrapper when `scrollX` is on, and that clone carries the same
+// `dataTable` class - taking the first match in the wrapper picks the clone,
+// whose API has no context at all. So go by id, which only the real table has.
+GrocyDataTablesCardMode.TableOf = function (element)
+{
+	var wrapper = $(element).closest(".dataTables_wrapper");
+	var table = wrapper.find("table.dataTable[id]").first();
+
+	if (table.length === 0 || !$.fn.dataTable.isDataTable(table[0]))
+	{
+		return null;
+	}
+
+	return table.DataTable();
+};
+
 GrocyDataTablesCardMode.BuildSortMenu = function (api, menu)
 {
 	var order = api.order();
@@ -615,29 +632,124 @@ GrocyDataTablesCardMode.BuildSortMenu = function (api, menu)
 
 $(document).on("show.bs.dropdown", ".dt-card-toolbar .dropdown", function ()
 {
-	var menu = $(this).find(".dt-sort-menu");
-	var table = $(this).closest(".dataTables_wrapper").find("table.dataTable").first();
+	var api = GrocyDataTablesCardMode.TableOf(this);
 
-	if (table.length === 0)
+	if (api)
 	{
-		return;
+		GrocyDataTablesCardMode.BuildSortMenu(api, $(this).find(".dt-sort-menu"));
 	}
-
-	GrocyDataTablesCardMode.BuildSortMenu(table.DataTable(), menu);
 });
 
 $(document).on("click", ".dt-sort-item", function (e)
 {
 	e.preventDefault();
 
-	var table = $(this).closest(".dataTables_wrapper").find("table.dataTable").first();
+	var api = GrocyDataTablesCardMode.TableOf(this);
 
-	if (table.length === 0)
+	if (api)
+	{
+		api.order([parseInt($(this).attr("data-column-index")), $(this).attr("data-direction")]).draw();
+	}
+});
+
+// --- paging in card mode ---------------------------------------------------
+// Grocy turns paging off, so DataTables builds a node for every single row.
+// That is fine for a grid on a large screen, but as cards it means a stock
+// journal with a few thousand entries becomes a page several hundred thousand
+// pixels long: seconds to render, and a scroll container that size is where
+// mobile browsers start to stutter. On a phone such a list cannot be used
+// anyway, so card mode paginates. Nothing changes on larger screens.
+GrocyDataTablesCardMode.PageLength = 50;
+// Below this it stays one list - a pager for barely two pages is just noise
+GrocyDataTablesCardMode.PagingThreshold = 75;
+
+GrocyDataTablesCardMode.RowCount = function (settings)
+{
+	if (settings.aoData && settings.aoData.length > 0)
+	{
+		return settings.aoData.length;
+	}
+
+	// Before the data is read, the server rendered rows are still in the DOM
+	return settings.nTBody ? settings.nTBody.children.length : 0;
+};
+
+GrocyDataTablesCardMode.SetPaging = function (settings, paginate)
+{
+	settings.oFeatures.bPaginate = paginate;
+	settings._iDisplayStart = 0;
+	settings._iDisplayLength = paginate ? GrocyDataTablesCardMode.PageLength : -1;
+};
+
+// Before the first draw, so the rows beyond the first page are never built.
+// This also normalises the other direction: `stateSave` remembers the page
+// length, and a length restored from a phone would otherwise cut the table
+// short on a desktop.
+$(document).on("preInit.dt", function (e, settings)
+{
+	GrocyDataTablesCardMode.SetPaging(settings, GrocyDataTablesCardMode.IsActive()
+		&& GrocyDataTablesCardMode.RowCount(settings) > GrocyDataTablesCardMode.PagingThreshold);
+});
+
+// The pager itself - the default DataTables controls are not part of grocy's
+// layout, and on a phone prev/next with a position is easier than page numbers
+GrocyDataTablesCardMode.UpdatePager = function (api)
+{
+	var container = $(api.table().container());
+	var pager = container.find("> .dt-card-pager");
+	var info = api.page.info();
+
+	if (!GrocyDataTablesCardMode.IsActive() || !api.settings()[0].oFeatures.bPaginate || info.pages < 2)
+	{
+		pager.remove();
+		return;
+	}
+
+	if (pager.length === 0)
+	{
+		pager = $('<div class="dt-card-pager d-md-none"></div>').appendTo(container);
+	}
+
+	var from = info.recordsDisplay === 0 ? 0 : info.start + 1;
+
+	pager.html('\
+		<button type="button" class="btn btn-sm btn-outline-dark dt-card-pager-prev"' + (info.page === 0 ? " disabled" : "") + '> \
+			<i class="fa-solid fa-chevron-left"></i> \
+		</button> \
+		<span class="dt-card-pager-info">' + from + '&#8202;&ndash;&#8202;' + info.end + '&nbsp;/&nbsp;' + info.recordsDisplay + '</span> \
+		<button type="button" class="btn btn-sm btn-outline-dark dt-card-pager-next"' + (info.page >= info.pages - 1 ? " disabled" : "") + '> \
+			<i class="fa-solid fa-chevron-right"></i> \
+		</button>');
+};
+
+// A new page starts at its first entry, wherever the list is rendered - the
+// page itself, or the body of a bounded dialog
+GrocyDataTablesCardMode.ScrollToListStart = function (api)
+{
+	var container = api.table().container();
+	var sheet = container.closest(".modal-body");
+
+	if (sheet)
+	{
+		sheet.scrollTop = 0;
+		return;
+	}
+
+	var top = container.getBoundingClientRect().top + window.scrollY - 12;
+	window.scrollTo({ top: Math.max(0, top), behavior: "auto" });
+};
+
+$(document).on("click", ".dt-card-pager-prev, .dt-card-pager-next", function ()
+{
+	var api = GrocyDataTablesCardMode.TableOf(this);
+
+	if (!api)
 	{
 		return;
 	}
 
-	table.DataTable().order([parseInt($(this).attr("data-column-index")), $(this).attr("data-direction")]).draw();
+	api.page($(this).hasClass("dt-card-pager-next") ? "next" : "previous").draw("page");
+	GrocyDataTablesCardMode.ScrollToListStart(api);
 });
 
 $(document).on("init.dt", function (e, settings)
@@ -655,7 +767,9 @@ $(document).on("draw.dt", function (e, settings)
 		return;
 	}
 
-	GrocyDataTablesCardMode.Apply(new $.fn.dataTable.Api(settings));
+	var api = new $.fn.dataTable.Api(settings);
+	GrocyDataTablesCardMode.Apply(api);
+	GrocyDataTablesCardMode.UpdatePager(api);
 });
 
 (function ()
@@ -681,13 +795,27 @@ $(document).on("draw.dt", function (e, settings)
 			$("table.dt-cards").each(function ()
 			{
 				var api = $(this).DataTable();
+				var settings = api.settings()[0];
+				var wantsPaging = isCardMode
+					&& GrocyDataTablesCardMode.RowCount(settings) > GrocyDataTablesCardMode.PagingThreshold;
+
+				// Turning into a grid means all rows again, and back to cards
+				// means paging - either way the table has to be redrawn
+				if (settings.oFeatures.bPaginate !== wantsPaging)
+				{
+					GrocyDataTablesCardMode.SetPaging(settings, wantsPaging);
+					api.draw(false);
+				}
 
 				if (isCardMode)
 				{
 					GrocyDataTablesCardMode.Apply(api);
+					GrocyDataTablesCardMode.UpdatePager(api);
 				}
 				else
 				{
+					$(api.table().container()).find("> .dt-card-pager").remove();
+
 					// Column widths were calculated while the table was
 					// rendered as cards - recalculate them for the grid layout
 					api.columns.adjust();

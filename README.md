@@ -42,6 +42,8 @@ Dieser Fork ändert **ausschließlich das Frontend**. Funktionsumfang, Datenbank
 
 **Tabellen werden am Handy zu Karten.** Unter 768 px wird jede DataTable automatisch umgebaut: Produktname als Überschrift, jede Zelle mit ihrem Spaltenkopf beschriftet, Aktionen als Fußzeile, leere Zellen entfallen, Status wird zu einem farbigen Balken. Weil dabei der Tabellenkopf verschwindet, gibt es darüber eine Leiste mit **Sortieren** und **Tabellenoptionen** — beides war am Handy vorher praktisch nicht erreichbar. Das geschieht zentral in [`grocy_datatables.js`](public/js/grocy_datatables.js), keine der 70+ Views musste dafür angefasst werden.
 
+Lange Tabellen werden am Handy außerdem **seitenweise** angezeigt (50 Karten pro Seite, ab 75 Zeilen). Grocy schaltet das Paging generell ab und baut jede Zeile ins DOM — ein Bestandsjournal mit ein paar tausend Einträgen wird als Kartenliste sonst mehrere hunderttausend Pixel lang, braucht Sekunden zum Rendern und ruckelt beim Scrollen. Am Desktop bleibt es beim vollständigen Raster.
+
 **Neue App-Hülle.** Sticky Topbar, ruhigere Sidebar mit Markierung der aktiven Seite, einklappbar auf eine Icon-Leiste. Am Handy ein echter Off-Canvas-Drawer mit Abdunklung, Escape und Wisch-Geste statt eines Menüs, das den Inhalt nach unten schiebt. Dazu eine Bottom-Tab-Leiste mit den wichtigsten Ansichten und einem `+`-Button für Einkauf, Verbrauch, Umlagern und Inventur.
 
 **Wisch-Gesten auf den Karten.** Nach links wischen verbraucht die Schnellverbrauchsmenge, nach rechts setzt das Produkt auf den Einkaufszettel — mit farbigem Feedback während des Wischens. Beides löst die Bedienelemente aus, die in der Zeile ohnehin existieren, also gelten Grocys eigene Logik, Berechtigungen und der Rückgängig-Toast unverändert.

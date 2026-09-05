@@ -37,6 +37,33 @@
 	}
 }
 
+/* Pager below the cards, see grocy_datatables.js */
+.dt-card-pager {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	gap: 0.75rem;
+	margin: 0.25rem 0 0.75rem 0;
+	padding-bottom: 0.25rem;
+}
+
+.dt-card-pager .btn {
+	min-width: 44px;
+	min-height: 38px;
+	border-radius: var(--g-radius-pill);
+}
+
+.dt-card-pager .btn:disabled {
+	opacity: 0.4;
+}
+
+.dt-card-pager-info {
+	font-size: 0.875rem;
+	font-variant-numeric: tabular-nums;
+	color: var(--g-text-muted);
+	white-space: nowrap;
+}
+
 .dt-card-toolbar .dt-sort-item.active {
 	background-color: var(--g-brand-soft);
 	color: var(--g-brand-soft-text);
