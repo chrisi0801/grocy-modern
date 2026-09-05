@@ -43,7 +43,7 @@ $("#search").on("keyup", Delay(function ()
 		value = "";
 	}
 
-	shoppingListTable.search(value).draw();
+	shoppingListTable.search(value.accentNeutralise()).draw();
 }, Grocy.FormFocusDelay));
 
 $("#clear-filter-button").on("click", function ()
@@ -65,7 +65,7 @@ $("#status-filter").on("change", function ()
 	// Transfer CSS classes of selected element to dropdown element (for background)
 	$(this).attr("class", $("#" + $(this).attr("id") + " option[value='" + value + "']").attr("class") + " form-control");
 
-	shoppingListTable.column(shoppingListTable.colReorder.transpose(4)).search(value).draw();
+	shoppingListTable.column(shoppingListTable.colReorder.transpose(4)).search(value.accentNeutralise()).draw();
 });
 
 $("#selected-shopping-list").on("change", function ()
@@ -371,6 +371,18 @@ function OnListItemRemoved()
 	{
 		$("#add-all-items-to-stock-button").addClass("disabled");
 	}
+
+	Grocy.Api.Get("objects/uihelper_shopping_list?" + "?query[]=shopping_list_id=" + $("#selected-shopping-list").val(),
+		function (items)
+		{
+			$("#total-value").text(items.reduce((x, { last_price_total }) => x + last_price_total, 0));
+			RefreshLocaleNumberDisplay();
+		},
+		function (xhr)
+		{
+			console.error(xhr);
+		}
+	);
 }
 OnListItemRemoved();
 

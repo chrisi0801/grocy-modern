@@ -917,7 +917,7 @@ small.text-muted {
 	margin-left: 0.35rem;
 	border: none;
 	content: '\f107';
-	font-family: 'Font Awesome 6 Free';
+	font-family: 'Font Awesome 7 Free';
 	font-weight: 900;
 }
 
@@ -1312,7 +1312,7 @@ table.dataTable > tbody > tr.selected a:not(.btn) {
 
 #toast-container > div.toast-has-details::after {
 	content: '\f078';
-	font-family: 'Font Awesome 6 Free';
+	font-family: 'Font Awesome 7 Free';
 	font-weight: 900;
 	position: absolute;
 	right: 0.7rem;

@@ -55,6 +55,7 @@ $app->group('', function (RouteCollectorProxy $group)
 	$group->get('/users', [UsersController::class, 'UsersList']);
 	$group->get('/user/{userId}', [UsersController::class, 'UserEditForm']);
 	$group->get('/user/{userId}/permissions', [UsersController::class, 'PermissionList']);
+	$group->get('/user/{userId}/sessions', [UsersController::class, 'SessionList']);
 	$group->get('/usersettings', [UsersController::class, 'UserSettings']);
 
 	// Stock master data routes
@@ -206,6 +207,7 @@ $app->group('/api', function (RouteCollectorProxy $group)
 	$group->post('/stock/products/{productId}/inventory', [StockApiController::class, 'InventoryProduct']);
 	$group->post('/stock/products/{productId}/open', [StockApiController::class, 'OpenProduct']);
 	$group->post('/stock/products/{productIdToKeep}/merge/{productIdToRemove}', [StockApiController::class, 'MergeProducts']);
+	$group->post('/stock/products/{productId}/copy', [StockApiController::class, 'CopyProduct']);
 	$group->get('/stock/products/by-barcode/{barcode}', [StockApiController::class, 'ProductDetailsByBarcode']);
 	$group->post('/stock/products/by-barcode/{barcode}/add', [StockApiController::class, 'AddProductByBarcode']);
 	$group->post('/stock/products/by-barcode/{barcode}/consume', [StockApiController::class, 'ConsumeProductByBarcode']);
@@ -269,7 +271,7 @@ $app->group('/api', function (RouteCollectorProxy $group)
 
 
 // For CORS preflight OPTIONS requests
-$app->options('/api/{routes:.+}', function (Request $request, Response $response): Response
+$app->any('/api/{routes:.+}', function (Request $request, Response $response): Response
 {
 	return $response;
 })->add(new CorsMiddleware($container, $app->getResponseFactory()));

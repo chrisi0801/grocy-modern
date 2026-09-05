@@ -114,7 +114,7 @@ $.extend(true, $.fn.dataTable.defaults, {
 			});
 
 			return $("<tr/>")
-				.append('<td colspan="' + rows.columns()[0].length + '">' + group + ' <span class="fa fa-fw d-print-none ' + toggleClass + '"/></td>')
+				.append('<td colspan="' + rows.columns()[0].length + '">' + group + ' <span class="fa d-print-none ' + toggleClass + '"/></td>')
 				.attr("data-name", group)
 				.toggleClass("collapsed", collapsed);
 		}
@@ -607,7 +607,7 @@ GrocyDataTablesCardMode.BuildSortMenu = function (api, menu)
 
 		html += '<a class="dropdown-item dt-sort-item' + (isCurrent ? " active" : "") + '" href="#" \
 			data-column-index="' + index + '" data-direction="' + nextDirection + '"> \
-			<i class="fa-solid fa-fw ' + (isCurrent ? icon : "fa-arrow-right-arrow-left fa-rotate-90") + '"></i>&nbsp;' + title + '</a>';
+			<i class="fa-solid ' + (isCurrent ? icon : "fa-arrow-right-arrow-left fa-rotate-90") + '"></i>&nbsp;' + title + '</a>';
 	});
 
 	menu.html(html);

@@ -667,10 +667,7 @@ msgstr ""
 msgid "Are you sure you want to delete product group \"%s\"?"
 msgstr ""
 
-msgid "Stay logged in permanently"
-msgstr ""
-
-msgid "When not set, you will get logged out at latest after 30 days"
+msgid "Remember Me"
 msgstr ""
 
 msgid "Status"
@@ -1618,7 +1615,7 @@ msgstr ""
 msgid "Clear filter"
 msgstr ""
 
-msgid "Permissions for user %s"
+msgid "Permissions"
 msgstr ""
 
 msgid "Are you sure you want to remove full permissions for yourself?"
@@ -2116,9 +2113,6 @@ msgstr[1] ""
 msgid "Display product"
 msgstr ""
 
-msgid "Copy recipe"
-msgstr ""
-
 msgid "Copy of %s"
 msgstr ""
 
@@ -2483,6 +2477,29 @@ msgid "Pack"
 msgid_plural "Packs"
 msgstr[0] ""
 msgstr[1] ""
+
+msgid "Manage user sessions"
+msgstr ""
+
+msgid "Sessions"
+msgstr ""
+
+msgid "Token type"
+msgstr ""
+
+msgid "Token hash"
+msgstr ""
+
+msgid "Client"
+msgstr ""
+
+msgid "This session"
+msgstr ""
+
+msgid "Are you sure you want to delete the selected session?"
+msgstr ""
+
+msgid "Last access"
 
 msgid "Stock"
 msgstr ""

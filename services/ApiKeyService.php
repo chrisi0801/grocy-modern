@@ -9,7 +9,7 @@ class ApiKeyService extends BaseService
 
 	public function CreateApiKey(string $keyType = self::API_KEY_TYPE_DEFAULT, ?string $description = null)
 	{
-		$newApiKey = $this->GenerateApiKey();
+		$newApiKey = bin2hex(random_bytes(24));
 
 		$apiKeyRow = $this->DB->api_keys()->createRow([
 			'api_key' => $newApiKey,
@@ -96,10 +96,5 @@ class ApiKeyService extends BaseService
 	public function RemoveApiKey($apiKey)
 	{
 		$this->DB->api_keys()->where('api_key', $apiKey)->delete();
-	}
-
-	private function GenerateApiKey()
-	{
-		return RandomString(50);
 	}
 }

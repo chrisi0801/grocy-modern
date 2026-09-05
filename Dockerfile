@@ -46,7 +46,7 @@ RUN composer dump-autoload --no-dev --optimize
 # ---------------------------------------------------------------------------
 # 2) Frontend dependencies -> /app/public/packages
 # ---------------------------------------------------------------------------
-FROM node:22-trixie-slim AS assets
+FROM node:24-trixie-slim AS assets
 
 # bootstrap-combobox is pulled from a GitHub fork, so yarn shells out to git.
 #

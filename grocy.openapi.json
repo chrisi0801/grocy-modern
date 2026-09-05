@@ -301,6 +301,9 @@
 											},
 											{
 												"$ref": "#/components/schemas/ProductBarcode"
+											},
+											{
+												"$ref": "#/components/schemas/Userfield"
 											}
 										]
 									}
@@ -376,6 +379,9 @@
 									},
 									{
 										"$ref": "#/components/schemas/ProductBarcode"
+									},
+									{
+										"$ref": "#/components/schemas/Userfield"
 									}
 								]
 							}
@@ -469,6 +475,9 @@
 										},
 										{
 											"$ref": "#/components/schemas/ProductBarcode"
+										},
+										{
+											"$ref": "#/components/schemas/Userfield"
 										}
 									]
 								}
@@ -552,6 +561,9 @@
 									},
 									{
 										"$ref": "#/components/schemas/ProductBarcode"
+									},
+									{
+										"$ref": "#/components/schemas/Userfield"
 									}
 								]
 							}
@@ -2310,6 +2322,53 @@
 					},
 					"400": {
 						"description": "The operation was not successful (possible errors are: Not existing product, error on WebHook execution)",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Error400"
+								}
+							}
+						}
+					}
+				}
+			}
+		},
+		"/stock/products/{productId}/copy": {
+			"post": {
+				"summary": "Copies a product",
+				"tags": [
+					"Stock"
+				],
+				"parameters": [
+					{
+						"in": "path",
+						"name": "productId",
+						"required": true,
+						"description": "A valid product id of the product to copy",
+						"schema": {
+							"type": "integer"
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "The operation was successful",
+						"content": {
+							"application/json": {
+								"schema": {
+									"type": "object",
+									"properties": {
+										"created_object_id": {
+											"type": "integer",
+											"description": "The id of the created product"
+										}
+									}
+								}
+							}
+						}
+					},
+					"400": {
+						"description": "The operation was not successful (possible errors are: Invalid product id)",
 						"content": {
 							"application/json": {
 								"schema": {
@@ -5027,6 +5086,42 @@
 					}
 				}
 			},
+			"Userfield": {
+				"type": "object",
+				"properties": {
+					"entity": {
+						"type": "string"
+					},
+					"name": {
+						"type": "string"
+					},
+					"caption": {
+						"type": "string"
+					},
+					"type": {
+						"type": "string"
+					},
+					"show_as_column_in_tables": {
+						"type": "boolean"
+					},
+					"config": {
+						"type": "string"
+					},
+					"sort_number": {
+						"type": "integer"
+					},
+					"input_required": {
+						"type": "boolean"
+					},
+					"default_value": {
+						"type": "string"
+					},
+					"row_created_timestamp": {
+						"type": "string",
+						"format": "date-time"
+					}
+				}
+			},
 			"ExternalBarcodeLookupResponse": {
 				"type": "object",
 				"properties": {
@@ -5139,29 +5234,6 @@
 					"last_charged": "2019-03-13 18:12:28",
 					"charge_cycles_count": 4,
 					"next_estimated_charge_time": "2999-12-31 23:59:59"
-				}
-			},
-			"Session": {
-				"type": "object",
-				"properties": {
-					"id": {
-						"type": "integer"
-					},
-					"session_key": {
-						"type": "string"
-					},
-					"expires": {
-						"type": "string",
-						"format": "date-time"
-					},
-					"last_used": {
-						"type": "string",
-						"format": "date-time"
-					},
-					"row_created_timestamp": {
-						"type": "string",
-						"format": "date-time"
-					}
 				}
 			},
 			"User": {
@@ -5907,13 +5979,16 @@
 					"recipes_pos_resolved",
 					"battery_charge_cycles",
 					"product_barcodes_view",
-					"permission_hierarchy"
+					"permission_hierarchy",
+					"uihelper_shopping_list",
+					"sessions"
 				]
 			},
 			"ExposedEntityNoListing": {
 				"type": "string",
 				"enum": [
-					"api_keys"
+					"api_keys",
+					"sessions"
 				]
 			},
 			"ExposedEntityNoEdit": {
@@ -5930,7 +6005,9 @@
 					"recipes_pos_resolved",
 					"battery_charge_cycles",
 					"product_barcodes_view",
-					"permission_hierarchy"
+					"permission_hierarchy",
+					"uihelper_shopping_list",
+					"sessions"
 				]
 			},
 			"ExposedEntityNoDelete": {
@@ -5946,7 +6023,8 @@
 					"recipes_pos_resolved",
 					"battery_charge_cycles",
 					"product_barcodes_view",
-					"permission_hierarchy"
+					"permission_hierarchy",
+					"uihelper_shopping_list"
 				]
 			},
 			"ExposedEntityEditRequiresAdmin": {

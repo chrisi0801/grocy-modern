@@ -298,7 +298,7 @@ body.sidenav-toggled .nav-item-divider {
 	flex: 0 0 auto;
 	margin-left: auto;
 	content: '\f107';
-	font-family: 'Font Awesome 6 Free';
+	font-family: 'Font Awesome 7 Free';
 	font-weight: 900;
 	font-size: 0.8rem;
 	color: var(--g-text-subtle);
