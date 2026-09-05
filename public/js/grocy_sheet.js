@@ -29,6 +29,22 @@ GrocySheet.IsSheet = function ()
 	return window.innerWidth < GrocySheet.Breakpoint;
 };
 
+// How far the document the touch happened in is scrolled - 0 for a touch in
+// this document, which has no scroll of its own while a modal is open
+GrocySheet.TouchedDocumentScrollTop = function (event)
+{
+	var doc = event.target ? event.target.ownerDocument : null;
+
+	if (!doc || doc === document)
+	{
+		return 0;
+	}
+
+	var scroller = doc.scrollingElement || doc.documentElement;
+
+	return scroller ? scroller.scrollTop : 0;
+};
+
 GrocySheet.Start = function (event, modal)
 {
 	GrocySheet.State = null;
@@ -46,8 +62,11 @@ GrocySheet.Start = function (event, modal)
 	}
 
 	// Only grab the sheet when its content is scrolled to the very top,
-	// otherwise the gesture belongs to the scroll container
-	if (modal.scrollTop > 0 || GrocySheet.Scroller(modal).scrollTop > 0)
+	// otherwise the gesture belongs to the scroll container. On a phone an
+	// embedded view fills the sheet and scrolls itself, so that document
+	// counts as well - it is the one under the finger.
+	if (modal.scrollTop > 0 || GrocySheet.Scroller(modal).scrollTop > 0
+		|| GrocySheet.TouchedDocumentScrollTop(event) > 0)
 	{
 		return;
 	}

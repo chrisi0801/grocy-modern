@@ -37,11 +37,25 @@ body.embedded.fixed-nav {
 	.content-wrapper {
 		min-height: calc(100svh - var(--g-topbar-h));
 	}
+
+	.embedded .content-wrapper {
+		min-height: 0;
+	}
 }
 
+/* An embedded view is measured by its parent: grocy.js sets the iframe height
+   from this document's height. So nothing in here may depend on the viewport -
+   inside an iframe `100svh` *is* that iframe's height, which means a viewport
+   relative minimum feeds the measurement back into itself. Measured: set the
+   iframe to 3000px and the height walks 3000 -> 2160 -> 1380 -> 1004 over the
+   following resizes. That settles in a desktop browser, but on iOS the
+   viewport keeps changing while the toolbar collapses, so the loop is fed
+   again on every scroll - which is what makes such a list grow endlessly and
+   the page shake at its end. */
 .embedded .content-wrapper {
 	margin-left: 0;
 	padding-top: 0.25rem;
+	min-height: 0;
 }
 
 /* ==========================================================================

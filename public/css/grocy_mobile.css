@@ -145,7 +145,6 @@
 		   additionally pins the height to the real visual viewport. */
 		max-height: 60vh;
 		overflow-y: auto;
-		-webkit-overflow-scrolling: touch;
 		overscroll-behavior: contain;
 		margin: 0;
 		padding: 0 0.4rem calc(0.4rem + var(--g-safe-bottom)) 0.4rem;

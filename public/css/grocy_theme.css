@@ -1029,7 +1029,6 @@ small.text-muted {
 	flex: 1 1 auto;
 	min-height: 0;
 	overflow-y: auto;
-	-webkit-overflow-scrolling: touch;
 	overscroll-behavior: contain;
 }
 
@@ -1054,6 +1053,39 @@ small.text-muted {
 			height: calc(100svh - 1.25rem);
 			max-height: calc(100svh - 1.25rem);
 		}
+	}
+
+	/* On a phone the iframe fills the sheet and the embedded document scrolls
+	   itself, instead of the iframe growing to its content and this document
+	   scrolling that. The height grocy.js measures then stops mattering for
+	   the layout out here: no element of this page is ever taller than the
+	   screen, whatever the embedded view does or however the browser reports
+	   its viewport. */
+	/* `auto`, not `hidden`: should a browser insist on sizing the iframe to its
+	   content anyway, the sheet still scrolls it instead of clipping it */
+	.modal.modal-embedded-view .modal-body {
+		overflow: auto;
+		overscroll-behavior: contain;
+		padding: 0.4rem;
+	}
+
+	.modal.modal-embedded-view .modal-body,
+	.modal.modal-embedded-view .modal-body > .bootbox-body {
+		display: flex;
+		min-height: 0;
+	}
+
+	.modal.modal-embedded-view .modal-body > .bootbox-body {
+		flex: 1 1 auto;
+		width: 100%;
+	}
+
+	.modal.modal-embedded-view .modal-body iframe.embed-responsive {
+		flex: 1 1 auto;
+		width: 100%;
+		/* Beats the `height` attribute grocy.js sets from the content height */
+		height: 100% !important;
+		min-height: 0;
 	}
 
 	/* Bottom sheet: for everything else the `.modal` itself keeps scrolling, so
