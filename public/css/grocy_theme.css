@@ -985,6 +985,13 @@ small.text-muted {
 	margin: 0;
 }
 
+/* A modal that is taller than the screen scrolls itself - without this, the
+   page behind it scrolls on once that scroll reaches its end, which is how a
+   dialog ends up leaving the page somewhere else than it found it */
+.modal {
+	overscroll-behavior: contain;
+}
+
 .modal-backdrop {
 	background-color: #0f1a23;
 }
@@ -993,9 +1000,65 @@ small.text-muted {
 	opacity: 0.45;
 }
 
+/* An embedded view (the "show as dialog" links) is an iframe that grocy.js
+   sizes to its full content height - a stock journal with a few hundred
+   entries produced a dialog well past 100.000px tall. The sheet is bounded to
+   the screen instead and scrolls inside, which is also what keeps the page
+   behind it from being scrolled along (see `overscroll-behavior`).
+
+   Only these dialogs: everything inside them lives in the iframe, so nothing
+   in this document can be clipped by the scroll container. grocy_sheet.js
+   sets the class. */
+.modal.modal-embedded-view .modal-content {
+	max-height: calc(100vh - 3.5rem);
+}
+
+.modal.modal-embedded-view .modal-content {
+	display: flex;
+	flex-direction: column;
+}
+
+.modal.modal-embedded-view .modal-header,
+.modal.modal-embedded-view .modal-footer {
+	flex: 0 0 auto;
+}
+
+.modal.modal-embedded-view .modal-body {
+	/* `min-height: 0` - without it a flex child refuses to shrink below its
+	   content, and the cap above would do nothing */
+	flex: 1 1 auto;
+	min-height: 0;
+	overflow-y: auto;
+	-webkit-overflow-scrolling: touch;
+	overscroll-behavior: contain;
+}
+
+@supports (height: 100svh) {
+	.modal.modal-embedded-view .modal-content {
+		max-height: calc(100svh - 3.5rem);
+	}
+}
+
 @media (max-width: 575.98px) {
-	/* Bottom sheet: the `.modal` itself keeps scrolling, so nothing inside the
-	   sheet needs its own overflow (which would clip dropdowns) */
+	/* A fixed height, not a cap: grocy.js only sizes the iframe once it has
+	   loaded, so the sheet would otherwise open at the iframe's default 150px
+	   and then jump to full height. Every embedded view is taller than a phone
+	   screen anyway (measured: 93-119% of it), so nothing is lost. */
+	.modal.modal-embedded-view .modal-content {
+		height: calc(100vh - 1.25rem);
+		max-height: calc(100vh - 1.25rem);
+	}
+
+	@supports (height: 100svh) {
+		.modal.modal-embedded-view .modal-content {
+			height: calc(100svh - 1.25rem);
+			max-height: calc(100svh - 1.25rem);
+		}
+	}
+
+	/* Bottom sheet: for everything else the `.modal` itself keeps scrolling, so
+	   nothing inside the sheet needs its own overflow (which would clip
+	   dropdowns) */
 	.modal-dialog {
 		display: flex;
 		align-items: flex-end;

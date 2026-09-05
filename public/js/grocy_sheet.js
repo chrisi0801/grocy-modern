@@ -47,7 +47,7 @@ GrocySheet.Start = function (event, modal)
 
 	// Only grab the sheet when its content is scrolled to the very top,
 	// otherwise the gesture belongs to the scroll container
-	if (modal.scrollTop > 0)
+	if (modal.scrollTop > 0 || GrocySheet.Scroller(modal).scrollTop > 0)
 	{
 		return;
 	}
@@ -232,6 +232,30 @@ GrocySheet.AttachToIframe = function (iframe, modal)
 	{
 		return modal;
 	});
+};
+
+// Dialogs whose body is an embedded view (an iframe grocy.js sizes to its full
+// content height) are bounded to the screen and scroll inside - see
+// grocy_theme.css. Marking them here rather than in CSS keeps it working
+// without `:has()`, and only these dialogs are affected: everything inside
+// them lives in the iframe, so no dropdown of this document can be clipped.
+$(document).on("show.bs.modal", ".modal", function ()
+{
+	// Toggled, not added: a modal element can be reused for something that is
+	// not an embedded view (the product card is the same element every time)
+	this.classList.toggle("modal-embedded-view", !!this.querySelector(".modal-body iframe.embed-responsive"));
+});
+
+// The element that actually scrolls: for a bounded dialog that is the body,
+// for every other modal the modal itself
+GrocySheet.Scroller = function (modal)
+{
+	if (modal.classList.contains("modal-embedded-view"))
+	{
+		return modal.querySelector(".modal-body") || modal;
+	}
+
+	return modal;
 };
 
 // Only the topmost window drives the gesture; embedded views get their
