@@ -322,6 +322,14 @@ systemctl stop apache2 \
 
 Danach einmal die Startseite `/` aufrufen — dort laufen fällige Datenbank-Migrationen.
 
+> **⚠️ Beim Sprung auf Grocy 4.7.x:** Die Authentifizierungs-Middleware wurde umbenannt, und seit 4.7.0 beantwortet Grocy *jede* Anfrage mit HTTP 500, wenn `AUTH_CLASS` nicht auflösbar ist. In `data/config.php` also anpassen:
+>
+> ```bash
+> sed -i 's|Grocy\\Middleware\\DefaultAuthMiddleware|Grocy\\Middleware\\Auth\\DefaultAuthMiddleware|' /opt/grocy/data/config.php
+> ```
+>
+> (Für `ReverseProxyAuthMiddleware` sinngemäß.) Node muss für den Assets-Build inzwischen mindestens Version 24 sein, sonst bricht `yarn install` mit einem Engine-Fehler ab. Alle Browser-Sitzungen sind nach dem Update ungültig — ein erneuter Login ist normal.
+
 ### Änderungen aus dem originalen Grocy übernehmen
 
 ```bash

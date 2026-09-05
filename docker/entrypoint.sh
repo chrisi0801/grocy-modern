@@ -53,6 +53,20 @@ if [ ! -f "$DATA_DIR/config.php" ]; then
 	cp "$APP_DIR/config-dist.php" "$DATA_DIR/config.php"
 fi
 
+# --- 4.7.0 renamed the authentication middleware ---------------------------
+# Grocy\Middleware\DefaultAuthMiddleware became
+# Grocy\Middleware\Auth\DefaultAuthMiddleware. A config.php written before
+# that update still names the old class, and since 4.7.0 Grocy answers *every*
+# request with HTTP 500 when AUTH_CLASS does not resolve - so migrate it here
+# instead of letting the container come up broken.
+CONFIG_FILE="$DATA_DIR/config.php"
+
+if grep -q 'Grocy\\Middleware\\\(Default\|ReverseProxy\)AuthMiddleware' "$CONFIG_FILE" 2>/dev/null; then
+	cp "$CONFIG_FILE" "$CONFIG_FILE.bak-$(date +%Y%m%d%H%M%S)"
+	sed -i 's|Grocy\\Middleware\\DefaultAuthMiddleware|Grocy\\Middleware\\Auth\\DefaultAuthMiddleware|g; s|Grocy\\Middleware\\ReverseProxyAuthMiddleware|Grocy\\Middleware\\Auth\\ReverseProxyAuthMiddleware|g' "$CONFIG_FILE"
+	log "AUTH_CLASS in config.php moved to the Grocy\\Middleware\\Auth namespace (renamed in Grocy 4.7.0), a backup of the previous file is next to it"
+fi
+
 # Settings can also come from GROCY_* environment variables, which take
 # precedence over config.php - see config-dist.php for the full list.
 

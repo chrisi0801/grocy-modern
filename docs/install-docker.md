@@ -295,6 +295,8 @@ docker compose pull && docker compose up -d   # Varianten B/C
 
 Danach einmal die Startseite aufrufen — dort laufen fällige Datenbank-Migrationen. Das Datenvolume bleibt unberührt. Vorher ein Backup zu ziehen ist trotzdem eine gute Angewohnheit, weil dieser Fork auf dem Entwicklungsstand von Grocy aufsetzt und nicht auf einem Release.
 
+> **Zum Update auf Grocy 4.7.x:** Die Authentifizierungs-Middleware wurde umbenannt (`Grocy\Middleware\DefaultAuthMiddleware` → `Grocy\Middleware\Auth\DefaultAuthMiddleware`), und seit 4.7.0 antwortet Grocy mit HTTP 500, wenn `AUTH_CLASS` nicht auflösbar ist. Der Entrypoint zieht das in `data/config.php` automatisch nach und legt eine Sicherungskopie daneben — im Container-Log steht dann eine Zeile dazu. Alle Browser-Sitzungen sind nach dem Update ungültig, ein erneuter Login ist normal.
+
 Alte Images aufräumen:
 
 ```bash
