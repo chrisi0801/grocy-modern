@@ -1,6 +1,7 @@
 <?php
 
 use Grocy\Controllers\Api\BatteriesApiController;
+use Grocy\Controllers\Api\BudgetApiController;
 use Grocy\Controllers\Api\CalendarApiController;
 use Grocy\Controllers\Api\ChoresApiController;
 use Grocy\Controllers\Api\FilesApiController;
@@ -13,6 +14,7 @@ use Grocy\Controllers\Api\SystemApiController;
 use Grocy\Controllers\Api\TasksApiController;
 use Grocy\Controllers\Api\UsersApiController;
 use Grocy\Controllers\BatteriesController;
+use Grocy\Controllers\BudgetController;
 use Grocy\Controllers\CalendarController;
 use Grocy\Controllers\ChoresController;
 use Grocy\Controllers\EquipmentController;
@@ -143,6 +145,18 @@ $app->group('', function (RouteCollectorProxy $group)
 	// Calendar routes
 	$group->get('/calendar', [CalendarController::class, 'Overview']);
 
+	// Budget routes (Grocy Modern)
+	$group->get('/budget', [BudgetController::class, 'Overview']);
+	$group->get('/budget/transactions', [BudgetController::class, 'Transactions']);
+	$group->get('/budget/transaction/{transactionId}', [BudgetController::class, 'TransactionForm']);
+	$group->get('/budget/transfer/new', [BudgetController::class, 'TransferForm']);
+	$group->get('/budget/recurring', [BudgetController::class, 'Recurring']);
+	$group->get('/budget/recurring/{recurringId}', [BudgetController::class, 'RecurringForm']);
+	$group->get('/budget/settings', [BudgetController::class, 'Settings']);
+	$group->get('/budget/category/{categoryId}', [BudgetController::class, 'CategoryForm']);
+	$group->get('/budget/budget/{budgetId}', [BudgetController::class, 'BudgetForm']);
+	$group->get('/budget/reports', [BudgetController::class, 'Reports']);
+
 	// OpenAPI routes
 	$group->get('/api', [OpenApiController::class, 'DocumentationUi']);
 	$group->get('/manageapikeys', [OpenApiController::class, 'ApiKeysList']);
@@ -263,6 +277,29 @@ $app->group('/api', function (RouteCollectorProxy $group)
 	$group->get('/tasks', [TasksApiController::class, 'Current']);
 	$group->post('/tasks/{taskId}/complete', [TasksApiController::class, 'MarkTaskAsCompleted']);
 	$group->post('/tasks/{taskId}/undo', [TasksApiController::class, 'UndoTask']);
+
+	// Budget (Grocy Modern)
+	$group->get('/budget/budgets', [BudgetApiController::class, 'GetBudgets']);
+	$group->post('/budget/budgets', [BudgetApiController::class, 'CreateBudget']);
+	$group->put('/budget/budgets/{budgetId}', [BudgetApiController::class, 'UpdateBudget']);
+	$group->delete('/budget/budgets/{budgetId}', [BudgetApiController::class, 'DeleteBudget']);
+	$group->get('/budget/budgets/{budgetId}/overview', [BudgetApiController::class, 'GetOverview']);
+	$group->get('/budget/budgets/{budgetId}/categories', [BudgetApiController::class, 'GetCategories']);
+	$group->post('/budget/budgets/{budgetId}/categories', [BudgetApiController::class, 'CreateCategory']);
+	$group->put('/budget/categories/{categoryId}', [BudgetApiController::class, 'UpdateCategory']);
+	$group->delete('/budget/categories/{categoryId}', [BudgetApiController::class, 'DeleteCategory']);
+	$group->put('/budget/categories/{categoryId}/plan', [BudgetApiController::class, 'SetPlan']);
+	$group->get('/budget/transactions', [BudgetApiController::class, 'GetTransactions']);
+	$group->post('/budget/transactions', [BudgetApiController::class, 'CreateTransaction']);
+	$group->put('/budget/transactions/{transactionId}', [BudgetApiController::class, 'UpdateTransaction']);
+	$group->delete('/budget/transactions/{transactionId}', [BudgetApiController::class, 'DeleteTransaction']);
+	$group->post('/budget/transfers', [BudgetApiController::class, 'CreateTransfer']);
+	$group->get('/budget/recurring', [BudgetApiController::class, 'GetRecurring']);
+	$group->post('/budget/recurring', [BudgetApiController::class, 'CreateRecurring']);
+	$group->put('/budget/recurring/{recurringId}', [BudgetApiController::class, 'UpdateRecurring']);
+	$group->delete('/budget/recurring/{recurringId}', [BudgetApiController::class, 'DeleteRecurring']);
+	$group->get('/budget/reports/monthly', [BudgetApiController::class, 'MonthlyReport']);
+	$group->get('/budget/reports/categories', [BudgetApiController::class, 'CategoryReport']);
 
 	// Calendar
 	$group->get('/calendar/ical', [CalendarApiController::class, 'Ical'])->setName('calendar-ical');

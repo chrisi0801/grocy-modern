@@ -144,6 +144,7 @@ Setting('FEATURE_FLAG_TASKS', true);
 Setting('FEATURE_FLAG_BATTERIES', true);
 Setting('FEATURE_FLAG_EQUIPMENT', true);
 Setting('FEATURE_FLAG_CALENDAR', true);
+Setting('FEATURE_FLAG_BUDGET', true); // Grocy Modern: household budget
 Setting('FEATURE_FLAG_LABEL_PRINTER', false);
 
 // Sub feature flags

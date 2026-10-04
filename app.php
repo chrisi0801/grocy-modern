@@ -60,7 +60,13 @@ if (!file_exists($viewcachePath))
 // Empty data/viewcache when and trigger database migrations when:
 // The version changed (so when an update was done)
 // GROCY_BASE_URL OR GROCY_BASE_PATH changed
-$hash = hash('sha256', file_get_contents(__DIR__ . '/version.json') . GROCY_BASE_URL . GROCY_BASE_PATH);
+// Grocy Modern: also when the routes or the set of migrations changed. This
+// fork is updated between releases, without version.json changing - and the
+// route cache in data/viewcache is index based, so a stale one sends new
+// routes to the wrong handlers, while a new migration would only run once
+// somebody happens to open the root URL.
+$hash = hash('sha256', file_get_contents(__DIR__ . '/version.json') . GROCY_BASE_URL . GROCY_BASE_PATH
+	. file_get_contents(__DIR__ . '/routes.php') . implode(',', scandir(__DIR__ . '/migrations')));
 if (GROCY_MODE === 'dev')
 {
 	// For dev mode use routes.php to track changes

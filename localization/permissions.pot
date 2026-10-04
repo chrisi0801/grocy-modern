@@ -131,3 +131,7 @@ msgstr ""
 # Meal plan
 msgid "RECIPES_MEALPLAN"
 msgstr ""
+
+# Household budget (Grocy Modern)
+msgid "BUDGET"
+msgstr ""

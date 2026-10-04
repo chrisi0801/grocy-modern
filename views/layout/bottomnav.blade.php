@@ -46,6 +46,11 @@
 			<a class="dropdown-item show-as-dialog-link permission-SHOPPINGLIST_ITEMS_ADD"
 				href="{{ $U('/shoppinglistitem/new?embedded') }}"><i class="fa-solid fa-fw fa-shopping-cart"></i>&nbsp;{{ $__t('Add to shopping list') }}</a>
 			@endif
+			@if(GROCY_FEATURE_FLAG_BUDGET)
+			<div class="dropdown-divider"></div>
+			<a class="dropdown-item show-as-dialog-link permission-BUDGET"
+				href="{{ $U('/budget/transaction/new?embedded') }}"><i class="fa-solid fa-fw fa-wallet"></i>&nbsp;{{ $__t('Add a budget entry') }}</a>
+			@endif
 		</div>
 	</div>
 	@endif

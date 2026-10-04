@@ -539,6 +539,21 @@
 				</a>
 			</li>
 			@endif
+			@if(GROCY_FEATURE_FLAG_BUDGET)
+			@if(!GROCY_FEATURE_FLAG_CALENDAR)
+			<div class="nav-item-divider"></div>
+			@endif
+			<li class="nav-item nav-item-sidebar permission-BUDGET @if(str_starts_with($viewName, 'budget')) active-page @endif"
+				data-toggle="tooltip"
+				data-placement="right"
+				title="{{ $__t('Budget') }}">
+				<a class="nav-link discrete-link"
+					href="{{ $U('/budget') }}">
+					<i class="fa-solid fa-wallet"></i>
+					<span class="nav-link-text">{{ $__t('Budget') }}</span>
+				</a>
+			</li>
+			@endif
 
 			@if(GROCY_FEATURE_FLAG_STOCK)
 			<div class="nav-item-divider"></div>

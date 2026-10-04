@@ -2906,3 +2906,433 @@ msgstr "Aufsteigend"
 
 msgid "Descending"
 msgstr "Absteigend"
+
+msgid "Budget"
+msgstr "Budget"
+
+msgid "Budgets"
+msgstr "Budgets"
+
+msgid "Add a budget entry"
+msgstr "Buchung erfassen"
+
+msgid "Overview"
+msgstr "Übersicht"
+
+msgid "Transactions"
+msgstr "Buchungen"
+
+msgid "Recurring"
+msgstr "Daueraufträge"
+
+msgid "Recurring transactions"
+msgstr "Daueraufträge"
+
+msgid "Budget reports"
+msgstr "Budget-Auswertungen"
+
+msgid "Budget settings"
+msgstr "Budget-Einstellungen"
+
+msgid "Budget transfer"
+msgstr "Umbuchung"
+
+msgid "Household"
+msgstr "Haushalt"
+
+msgid "Groceries"
+msgstr "Lebensmittel"
+
+msgid "Drugstore"
+msgstr "Drogerie"
+
+msgid "Housing"
+msgstr "Wohnen"
+
+msgid "Insurance"
+msgstr "Versicherungen"
+
+msgid "Mobility"
+msgstr "Mobilität"
+
+msgid "Health"
+msgstr "Gesundheit"
+
+msgid "Clothing"
+msgstr "Kleidung"
+
+msgid "Leisure"
+msgstr "Freizeit"
+
+msgid "Pocket money"
+msgstr "Taschengeld"
+
+msgid "Miscellaneous"
+msgstr "Sonstiges"
+
+msgid "Salary"
+msgstr "Gehalt"
+
+msgid "Other income"
+msgstr "Sonstige Einnahmen"
+
+msgid "Expense"
+msgstr "Ausgabe"
+
+msgid "Expenses"
+msgstr "Ausgaben"
+
+msgid "Income"
+msgstr "Einnahmen"
+
+msgid "Available"
+msgstr "Frei verfügbar"
+
+msgid "Balance"
+msgstr "Kontostand"
+
+msgid "Balance minus what the plan still needs"
+msgstr "Kontostand minus das, was der Plan noch braucht"
+
+msgid "Balance of the month"
+msgstr "Saldo des Monats"
+
+msgid "Income minus expenses"
+msgstr "Einnahmen minus Ausgaben"
+
+msgid "End of month"
+msgstr "Monatsende"
+
+msgid "of %s planned"
+msgstr "von %s geplant"
+
+msgid "%s left"
+msgstr "%s übrig"
+
+msgid "%1$s of %2$s spent"
+msgstr "%1$s von %2$s ausgegeben"
+
+msgid "incl. %s from last month"
+msgstr "inkl. %s aus dem Vormonat"
+
+msgid "Carryover"
+msgstr "Übertrag"
+
+msgid "Whatever is left moves into the next month"
+msgstr "Was übrig bleibt, wandert in den nächsten Monat"
+
+msgid "Plan"
+msgstr "Plan"
+
+msgid "Set plan"
+msgstr "Plan festlegen"
+
+msgid "Monthly plan"
+msgstr "Monatsplan"
+
+msgid "Monthly plan for %s"
+msgstr "Monatsplan für %s"
+
+msgid "Applies from %s on, earlier months keep their plan."
+msgstr "Gilt ab %s, frühere Monate behalten ihren Plan."
+
+msgid "Applies from this month on - it can be changed any time on the overview."
+msgstr "Gilt ab diesem Monat - jederzeit in der Übersicht änderbar."
+
+msgid "Without plan"
+msgstr "Ohne Plan"
+
+msgid "Without category"
+msgstr "Ohne Kategorie"
+
+msgid "Other categories"
+msgstr "Andere Kategorien"
+
+msgid "Refund of an expense"
+msgstr "Erstattung einer Ausgabe"
+
+msgid "Money back for something you bought? Pick its expense category - the refund then lowers what was spent there."
+msgstr "Geld zurück für einen Einkauf? Wähle dessen Ausgaben-Kategorie - die Erstattung senkt dann, was dort ausgegeben wurde."
+
+msgid "This budget has no expense categories yet."
+msgstr "Dieses Budget hat noch keine Ausgaben-Kategorien."
+
+msgid "This budget has no income categories yet."
+msgstr "Dieses Budget hat noch keine Einnahmen-Kategorien."
+
+msgid "Set them up"
+msgstr "Jetzt anlegen"
+
+msgid "Nothing planned or spent this month yet. Tap a category below to set its monthly plan."
+msgstr "In diesem Monat ist noch nichts geplant oder ausgegeben. Tippe unten bei einer Kategorie auf „Plan festlegen“."
+
+msgid "This is the personal budget of %s - you can look at it, but only they can change it."
+msgstr "Das ist das persönliche Budget von %s - du kannst es ansehen, ändern kann es nur die Person, der es gehört."
+
+msgid "Previous month"
+msgstr "Vorheriger Monat"
+
+msgid "Next month"
+msgstr "Nächster Monat"
+
+msgid "Back to the current month"
+msgstr "Zurück zum aktuellen Monat"
+
+msgid "Sum"
+msgstr "Betrag"
+
+msgid "Date"
+msgstr "Datum"
+
+msgid "Month"
+msgstr "Monat"
+
+msgid "Payee"
+msgstr "Empfänger / Zahler"
+
+msgid "Booked by"
+msgstr "Gebucht von"
+
+msgid "Booked as"
+msgstr "Gebucht als"
+
+msgid "Booked by a recurring transaction"
+msgstr "Von einem Dauerauftrag gebucht"
+
+msgid "Booked by a recurring transaction. Changing it here changes only this booking."
+msgstr "Von einem Dauerauftrag gebucht. Änderungen hier betreffen nur diese eine Buchung."
+
+msgid "New transaction"
+msgstr "Neue Buchung"
+
+msgid "Edit transaction"
+msgstr "Buchung bearbeiten"
+
+msgid "Edit transfer"
+msgstr "Umbuchung bearbeiten"
+
+msgid "Transfer from %1$s to %2$s"
+msgstr "Umbuchung von %1$s an %2$s"
+
+msgid "Transfer from %s"
+msgstr "Umbuchung von %s"
+
+msgid "Transfer to %s"
+msgstr "Umbuchung an %s"
+
+msgid "Amount, date and note change on both sides, the category only here."
+msgstr "Betrag, Datum und Notiz ändern sich auf beiden Seiten, die Kategorie nur hier."
+
+msgid "Moves money from one budget into another - for example pocket money from the household into a personal budget. It leaves the one as an expense and arrives in the other as income."
+msgstr "Verschiebt Geld von einem Budget in ein anderes - zum Beispiel Taschengeld vom Haushalt in ein persönliches Budget. Im einen wird es als Ausgabe gebucht, im anderen kommt es als Einnahme an."
+
+msgid "There is no budget you could move money out of."
+msgstr "Es gibt kein Budget, aus dem du Geld umbuchen könntest."
+
+msgid "From budget"
+msgstr "Von"
+
+msgid "To budget"
+msgstr "An"
+
+msgid "From %s"
+msgstr "Von %s"
+
+msgid "To %s"
+msgstr "An %s"
+
+msgid "A transfer needs two different budgets"
+msgstr "Eine Umbuchung braucht zwei verschiedene Budgets"
+
+msgid "Please enter an amount"
+msgstr "Bitte gib einen Betrag ein"
+
+msgid "Please enter a valid amount"
+msgstr "Bitte gib einen gültigen Betrag ein"
+
+msgid "The amount cannot be zero"
+msgstr "Der Betrag darf nicht null sein"
+
+msgid "A plan cannot be negative"
+msgstr "Ein Plan kann nicht negativ sein"
+
+msgid "The end cannot be before the start"
+msgstr "Das Ende kann nicht vor dem Beginn liegen"
+
+msgid "Only the owner can change a personal budget"
+msgstr "Ein persönliches Budget kann nur sein Besitzer ändern"
+
+msgid "Only an administrator can change the owner of a budget"
+msgstr "Den Besitzer eines Budgets kann nur ein Administrator ändern"
+
+msgid "Only an administrator can create a budget for somebody else"
+msgstr "Ein Budget für jemand anderen kann nur ein Administrator anlegen"
+
+msgid "Only an administrator can delete a budget"
+msgstr "Ein Budget kann nur ein Administrator löschen"
+
+msgid "Are you sure you want to delete the transaction \"%s\"?"
+msgstr "Buchung \"%s\" wirklich löschen?"
+
+msgid "Are you sure you want to delete the transfer \"%s\"? Both sides of it are removed."
+msgstr "Umbuchung \"%s\" wirklich löschen? Beide Seiten werden entfernt."
+
+msgid "Are you sure you want to delete the recurring transaction \"%s\"? What it has booked so far stays."
+msgstr "Dauerauftrag \"%s\" wirklich löschen? Was er bisher gebucht hat, bleibt erhalten."
+
+msgid "Are you sure you want to delete the budget \"%s\"? All its transactions, plans, categories and recurring transactions are deleted with it."
+msgstr "Budget \"%s\" wirklich löschen? Alle Buchungen, Pläne, Kategorien und Daueraufträge darin werden mitgelöscht."
+
+msgid "Are you sure you want to delete the category \"%s\"? Its transactions stay, they are then without category."
+msgstr "Kategorie \"%s\" wirklich löschen? Ihre Buchungen bleiben erhalten und sind dann ohne Kategorie."
+
+msgid "Rent, salary, insurance, pocket money: whatever comes back regularly is booked automatically when it is due."
+msgstr "Miete, Gehalt, Versicherungen, Taschengeld: Was regelmäßig wiederkommt, wird bei Fälligkeit automatisch gebucht."
+
+msgid "New recurring transaction"
+msgstr "Neuer Dauerauftrag"
+
+msgid "Edit recurring transaction"
+msgstr "Dauerauftrag bearbeiten"
+
+msgid "Interval"
+msgstr "Intervall"
+
+msgid "Monthly"
+msgstr "Monatlich"
+
+msgid "Quarterly"
+msgstr "Vierteljährlich"
+
+msgid "Half-yearly"
+msgstr "Halbjährlich"
+
+msgid "Yearly"
+msgstr "Jährlich"
+
+msgid "On day"
+msgstr "Am Tag"
+
+msgid "on the %s."
+msgstr "am %s."
+
+msgid "A day between 1 and 31"
+msgstr "Ein Tag zwischen 1 und 31"
+
+msgid "Months without that day use their last day - the 31st means the end of every month."
+msgstr "Monate ohne diesen Tag nehmen ihren letzten Tag - der 31. heißt also immer Monatsende."
+
+msgid "Starts"
+msgstr "Beginnt"
+
+msgid "Ends"
+msgstr "Endet"
+
+msgid "optional"
+msgstr "optional"
+
+msgid "The start lies in the past - everything due since then is booked right away when saving."
+msgstr "Der Beginn liegt in der Vergangenheit - alles, was seitdem fällig war, wird beim Speichern sofort gebucht."
+
+msgid "Next booking"
+msgstr "Nächste Buchung"
+
+msgid "Paused"
+msgstr "Pausiert"
+
+msgid "e.g. Rent"
+msgstr "z. B. Miete"
+
+msgid "New budget"
+msgstr "Neues Budget"
+
+msgid "Edit budget"
+msgstr "Budget bearbeiten"
+
+msgid "Belongs to"
+msgstr "Besitzer"
+
+msgid "Everyone (shared)"
+msgstr "Alle (gemeinsames Budget)"
+
+msgid "Personal budget of %s"
+msgstr "Persönliches Budget von %s"
+
+msgid "Shared - everyone with access to the budget can book here"
+msgstr "Gemeinsam - alle mit Zugriff auf das Budget können hier buchen"
+
+msgid "Everyone with access to the budget can look at every budget. A personal budget can only be changed by the person it belongs to."
+msgstr "Alle mit Zugriff auf das Budget können jedes Budget ansehen. Ein persönliches Budget kann nur die Person ändern, der es gehört."
+
+msgid "A new budget starts with the usual categories - rename or delete them in the settings as you like."
+msgstr "Ein neues Budget startet mit den üblichen Kategorien - in den Einstellungen kannst du sie umbenennen oder löschen."
+
+msgid "e.g. Household, Anna, Holiday"
+msgstr "z. B. Haushalt, Anna, Urlaub"
+
+msgid "Categories"
+msgstr "Kategorien"
+
+msgid "New category"
+msgstr "Neue Kategorie"
+
+msgid "Edit category"
+msgstr "Kategorie bearbeiten"
+
+msgid "No categories yet"
+msgstr "Noch keine Kategorien"
+
+msgid "Carry over what is left into the next month"
+msgstr "Was übrig bleibt, in den nächsten Monat übertragen"
+
+msgid "For things that are paid now and then - save up month by month for the car or holiday. Without it, every month starts from its plan again."
+msgstr "Für Dinge, die nur ab und zu bezahlt werden - so sparst du Monat für Monat fürs Auto oder den Urlaub an. Ohne Übertrag beginnt jeder Monat wieder bei seinem Plan."
+
+msgid "All budgets"
+msgstr "Alle Budgets"
+
+msgid "All budgets together - transfers between them are left out, they only move money around."
+msgstr "Alle Budgets zusammen - Umbuchungen dazwischen zählen nicht, sie verschieben nur Geld."
+
+msgid "Income and expenses"
+msgstr "Einnahmen und Ausgaben"
+
+msgid "Expenses by category"
+msgstr "Ausgaben nach Kategorie"
+
+msgid "Period"
+msgstr "Zeitraum"
+
+msgid "Net"
+msgstr "Saldo"
+
+msgid "Average income"
+msgstr "Ø Einnahmen"
+
+msgid "Average expenses"
+msgstr "Ø Ausgaben"
+
+msgid "Average balance"
+msgstr "Ø Saldo"
+
+msgid "Nothing booked in this period"
+msgstr "In diesem Zeitraum wurde nichts gebucht"
+
+msgid "No expenses in this period"
+msgstr "Keine Ausgaben in diesem Zeitraum"
+
+msgid "%s transaction"
+msgid_plural "%s transactions"
+msgstr[0] "%s Buchung"
+msgstr[1] "%s Buchungen"
+
+msgid "Last %s month"
+msgid_plural "Last %s months"
+msgstr[0] "Letzter %s Monat"
+msgstr[1] "Letzte %s Monate"
+
+msgid "Deposit"
+msgstr "Einnahme"
+
+msgid "Nothing planned or spent this month yet."
+msgstr "In diesem Monat ist noch nichts geplant oder ausgegeben."

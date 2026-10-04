@@ -13,7 +13,7 @@
 
 [Grocy](https://grocy.info) ist ein hervorragendes selbst gehostetes Haushalts-ERP — Bestände, Einkaufszettel, Rezepte, Speiseplan, Hausarbeiten. Nur die Oberfläche war mir zu altbacken und am Handy zu unhandlich, vor allem die breiten Tabellen.
 
-Dieser Fork ändert **ausschließlich das Frontend**. Funktionsumfang, Datenbank und REST-API sind unverändert — es ist dasselbe Grocy, nur mit neuer Oberfläche.
+Dieser Fork ändert in erster Linie **das Frontend** — es ist dasselbe Grocy, nur mit neuer Oberfläche. Einzige funktionale Erweiterung ist ein [Haushaltsbudget](#haushaltsbudget); es lebt in eigenen Tabellen und eigenen Endpunkten, alles andere aus Grocy (Datenbank, REST-API, Funktionen) bleibt unverändert.
 
 |  |  |  |
 |---|---|---|
@@ -61,6 +61,28 @@ Lange Tabellen werden am Handy außerdem **seitenweise** angezeigt (50 Karten pr
 **Dark Mode auf Token-Basis**, dadurch lückenlos über alle Komponenten hinweg.
 
 **Cache-Busting pro Build.** Grocy hängt an jedes Stylesheet die Versionsnummer aus `version.json` — die sich zwischen zwei Fork-Updates nie ändert, weshalb Browser hartnäckig altes CSS behielten. Jetzt trägt der `?v=`-Parameter zusätzlich eine Build-ID (`GROCY_BUILD`, sonst der jüngste Änderungszeitpunkt der Assets).
+
+## Haushaltsbudget
+
+Ein einfaches Budget nach dem Vorbild von [Actual Budget](https://github.com/actualbudget/actual) (dessen „Tracking Budget“): Jede Kategorie bekommt einen Monatsplan, die Übersicht zeigt, was geplant, ausgegeben und noch übrig ist — und wie viel Geld wirklich **frei verfügbar** ist, also Kontostand minus das, was der Plan in diesem Monat noch braucht.
+
+|  |  |  |
+|---|---|---|
+| <img src="docs/img/budget-overview.png" alt="Budget-Übersicht" width="240"> | <img src="docs/img/budget-entry.png" alt="Buchung erfassen" width="240"> | <img src="docs/img/budget-reports.png" alt="Auswertungen" width="240"> |
+| Monatsübersicht mit Plan pro Kategorie | Buchung erfassen — auch über den `+`-Button | Einnahmen/Ausgaben und Ausgaben nach Kategorie |
+
+- **Ein gemeinsamer Topf und persönliche Budgets.** Der „Haushalt“ ist für alle da; dazu kann jede Person ein eigenes Budget haben (z. B. Taschengeld). Alle mit Budget-Berechtigung sehen alle Budgets, ändern kann ein persönliches Budget aber **nur der Besitzer** — auch ein Administrator nicht. Budgets löschen und Besitzer ändern dürfen nur Administratoren.
+- **Umbuchungen** verschieben Geld zwischen Budgets: im einen eine Ausgabe, im anderen eine Einnahme. Wer im Quell-Budget buchen darf, darf auch umbuchen — Taschengeld vom Haushalt an Anna geht also, aus Annas Budget heraus nur durch Anna.
+- **Übertrag pro Kategorie.** Ohne Übertrag beginnt jeder Monat wieder bei seinem Plan; mit Übertrag wandert Übriges (oder Überzogenes) in den nächsten Monat — gedacht fürs Ansparen auf Urlaub oder Auto.
+- **Pläne gelten ab einem Monat**, bis sie geändert werden; frühere Monate behalten ihren Plan.
+- **Daueraufträge** (monatlich, vierteljährlich, halbjährlich, jährlich, auch als Umbuchung) werden bei Fälligkeit automatisch gebucht — beim nächsten Aufruf des Budgets, verpasste Termine werden nachgeholt. Der 31. heißt in kürzeren Monaten Monatsende.
+- **Erstattungen** sind Einnahmen in einer Ausgaben-Kategorie und senken, was dort ausgegeben wurde.
+- **Auswertungen:** Einnahmen, Ausgaben und Saldo pro Monat (6/12/24 Monate) sowie Ausgaben nach Kategorie für einen wählbaren Zeitraum — pro Budget oder über alle zusammen (dann ohne Umbuchungen, die verschieben ja nur Geld).
+- Neue Budgets starten mit vorbefüllten Kategorien, die sich in den Budget-Einstellungen umbenennen, löschen und ergänzen lassen.
+
+Zugriff steuert die neue Berechtigung **„Haushaltsbudget“** (Benutzer → Berechtigungen); Administratoren haben sie automatisch. Abschalten lässt sich das Ganze mit `Setting('FEATURE_FLAG_BUDGET', false);` in `data/config.php`. Bewusst nicht enthalten: Verknüpfung mit Grocys Einkäufen, CSV-Import, Bankanbindung, Split-Buchungen.
+
+Beträge werden als ganze Cent gespeichert. Die REST-Endpunkte liegen unter `/api/budget/…` (Budgets, Kategorien, Pläne, Buchungen, Umbuchungen, Daueraufträge, Auswertungen; Beträge dort als Dezimalzahl) — sie stehen nicht in Grocys Swagger-Beschreibung, siehe [`routes.php`](routes.php) und [`BudgetApiController.php`](controllers/Api/BudgetApiController.php).
 
 ## Installation
 
@@ -122,12 +144,16 @@ Das Redesign liegt weitgehend in eigenen Dateien (`grocy_theme.css`, `grocy_mobi
 | `views/layout/bottomnav.blade.php` | Bottom-Navigation |
 | `helpers/extensions.php`, `controllers/BaseController.php` | Build-ID für das Cache-Busting (die einzige Änderung außerhalb des Frontends) |
 | `Dockerfile`, `docker/`, `docker-compose.yml` | Container-Image |
+| `migrations/5000.sql` | Haushaltsbudget: Tabellen und Berechtigung (Fork-Migrationen beginnen bei 5000, weit weg von Grocys eigener Nummerierung) |
+| `services/BudgetService.php`, `controllers/BudgetController.php`, `controllers/Api/BudgetApiController.php` | Haushaltsbudget: Rechenlogik und Rechte, Seiten, API |
+| `views/budget*.blade.php`, `views/components/budget*.blade.php`, `public/viewjs/budget*.js`, `public/js/grocy_budget.js`, `public/css/grocy_budget.css` | Haushaltsbudget: Oberfläche |
+| `app.php` | Der Routen-Cache wird jetzt auch neu gebaut, wenn sich Routen oder Migrationen ändern — nicht nur bei einer neuen Versionsnummer |
 
 ---
 
 ## Alles zu Grocy selbst
 
-Funktionsumfang, REST-API, Barcode-Scanner, Eingabe-Kürzel, Plugins und alles Weitere sind unverändert. Die maßgebliche Dokumentation dazu ist die des originalen Projekts:
+Funktionsumfang (bis auf das Haushaltsbudget), REST-API, Barcode-Scanner, Eingabe-Kürzel, Plugins und alles Weitere sind unverändert. Die maßgebliche Dokumentation dazu ist die des originalen Projekts:
 
 - Website und Feature-Übersicht &rarr; <https://grocy.info>
 - Original-Repository und README &rarr; <https://github.com/grocy/grocy>

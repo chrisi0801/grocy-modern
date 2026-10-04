@@ -2521,3 +2521,433 @@ msgstr ""
 
 msgid "Descending"
 msgstr ""
+
+msgid "Budget"
+msgstr ""
+
+msgid "Budgets"
+msgstr ""
+
+msgid "Add a budget entry"
+msgstr ""
+
+msgid "Overview"
+msgstr ""
+
+msgid "Transactions"
+msgstr ""
+
+msgid "Recurring"
+msgstr ""
+
+msgid "Recurring transactions"
+msgstr ""
+
+msgid "Budget reports"
+msgstr ""
+
+msgid "Budget settings"
+msgstr ""
+
+msgid "Budget transfer"
+msgstr ""
+
+msgid "Household"
+msgstr ""
+
+msgid "Groceries"
+msgstr ""
+
+msgid "Drugstore"
+msgstr ""
+
+msgid "Housing"
+msgstr ""
+
+msgid "Insurance"
+msgstr ""
+
+msgid "Mobility"
+msgstr ""
+
+msgid "Health"
+msgstr ""
+
+msgid "Clothing"
+msgstr ""
+
+msgid "Leisure"
+msgstr ""
+
+msgid "Pocket money"
+msgstr ""
+
+msgid "Miscellaneous"
+msgstr ""
+
+msgid "Salary"
+msgstr ""
+
+msgid "Other income"
+msgstr ""
+
+msgid "Expense"
+msgstr ""
+
+msgid "Expenses"
+msgstr ""
+
+msgid "Income"
+msgstr ""
+
+msgid "Available"
+msgstr ""
+
+msgid "Balance"
+msgstr ""
+
+msgid "Balance minus what the plan still needs"
+msgstr ""
+
+msgid "Balance of the month"
+msgstr ""
+
+msgid "Income minus expenses"
+msgstr ""
+
+msgid "End of month"
+msgstr ""
+
+msgid "of %s planned"
+msgstr ""
+
+msgid "%s left"
+msgstr ""
+
+msgid "%1$s of %2$s spent"
+msgstr ""
+
+msgid "incl. %s from last month"
+msgstr ""
+
+msgid "Carryover"
+msgstr ""
+
+msgid "Whatever is left moves into the next month"
+msgstr ""
+
+msgid "Plan"
+msgstr ""
+
+msgid "Set plan"
+msgstr ""
+
+msgid "Monthly plan"
+msgstr ""
+
+msgid "Monthly plan for %s"
+msgstr ""
+
+msgid "Applies from %s on, earlier months keep their plan."
+msgstr ""
+
+msgid "Applies from this month on - it can be changed any time on the overview."
+msgstr ""
+
+msgid "Without plan"
+msgstr ""
+
+msgid "Without category"
+msgstr ""
+
+msgid "Other categories"
+msgstr ""
+
+msgid "Refund of an expense"
+msgstr ""
+
+msgid "Money back for something you bought? Pick its expense category - the refund then lowers what was spent there."
+msgstr ""
+
+msgid "This budget has no expense categories yet."
+msgstr ""
+
+msgid "This budget has no income categories yet."
+msgstr ""
+
+msgid "Set them up"
+msgstr ""
+
+msgid "Nothing planned or spent this month yet. Tap a category below to set its monthly plan."
+msgstr ""
+
+msgid "This is the personal budget of %s - you can look at it, but only they can change it."
+msgstr ""
+
+msgid "Previous month"
+msgstr ""
+
+msgid "Next month"
+msgstr ""
+
+msgid "Back to the current month"
+msgstr ""
+
+msgid "Sum"
+msgstr ""
+
+msgid "Date"
+msgstr ""
+
+msgid "Month"
+msgstr ""
+
+msgid "Payee"
+msgstr ""
+
+msgid "Booked by"
+msgstr ""
+
+msgid "Booked as"
+msgstr ""
+
+msgid "Booked by a recurring transaction"
+msgstr ""
+
+msgid "Booked by a recurring transaction. Changing it here changes only this booking."
+msgstr ""
+
+msgid "New transaction"
+msgstr ""
+
+msgid "Edit transaction"
+msgstr ""
+
+msgid "Edit transfer"
+msgstr ""
+
+msgid "Transfer from %1$s to %2$s"
+msgstr ""
+
+msgid "Transfer from %s"
+msgstr ""
+
+msgid "Transfer to %s"
+msgstr ""
+
+msgid "Amount, date and note change on both sides, the category only here."
+msgstr ""
+
+msgid "Moves money from one budget into another - for example pocket money from the household into a personal budget. It leaves the one as an expense and arrives in the other as income."
+msgstr ""
+
+msgid "There is no budget you could move money out of."
+msgstr ""
+
+msgid "From budget"
+msgstr ""
+
+msgid "To budget"
+msgstr ""
+
+msgid "From %s"
+msgstr ""
+
+msgid "To %s"
+msgstr ""
+
+msgid "A transfer needs two different budgets"
+msgstr ""
+
+msgid "Please enter an amount"
+msgstr ""
+
+msgid "Please enter a valid amount"
+msgstr ""
+
+msgid "The amount cannot be zero"
+msgstr ""
+
+msgid "A plan cannot be negative"
+msgstr ""
+
+msgid "The end cannot be before the start"
+msgstr ""
+
+msgid "Only the owner can change a personal budget"
+msgstr ""
+
+msgid "Only an administrator can change the owner of a budget"
+msgstr ""
+
+msgid "Only an administrator can create a budget for somebody else"
+msgstr ""
+
+msgid "Only an administrator can delete a budget"
+msgstr ""
+
+msgid "Are you sure you want to delete the transaction \"%s\"?"
+msgstr ""
+
+msgid "Are you sure you want to delete the transfer \"%s\"? Both sides of it are removed."
+msgstr ""
+
+msgid "Are you sure you want to delete the recurring transaction \"%s\"? What it has booked so far stays."
+msgstr ""
+
+msgid "Are you sure you want to delete the budget \"%s\"? All its transactions, plans, categories and recurring transactions are deleted with it."
+msgstr ""
+
+msgid "Are you sure you want to delete the category \"%s\"? Its transactions stay, they are then without category."
+msgstr ""
+
+msgid "Rent, salary, insurance, pocket money: whatever comes back regularly is booked automatically when it is due."
+msgstr ""
+
+msgid "New recurring transaction"
+msgstr ""
+
+msgid "Edit recurring transaction"
+msgstr ""
+
+msgid "Interval"
+msgstr ""
+
+msgid "Monthly"
+msgstr ""
+
+msgid "Quarterly"
+msgstr ""
+
+msgid "Half-yearly"
+msgstr ""
+
+msgid "Yearly"
+msgstr ""
+
+msgid "On day"
+msgstr ""
+
+msgid "on the %s."
+msgstr ""
+
+msgid "A day between 1 and 31"
+msgstr ""
+
+msgid "Months without that day use their last day - the 31st means the end of every month."
+msgstr ""
+
+msgid "Starts"
+msgstr ""
+
+msgid "Ends"
+msgstr ""
+
+msgid "optional"
+msgstr ""
+
+msgid "The start lies in the past - everything due since then is booked right away when saving."
+msgstr ""
+
+msgid "Next booking"
+msgstr ""
+
+msgid "Paused"
+msgstr ""
+
+msgid "e.g. Rent"
+msgstr ""
+
+msgid "New budget"
+msgstr ""
+
+msgid "Edit budget"
+msgstr ""
+
+msgid "Belongs to"
+msgstr ""
+
+msgid "Everyone (shared)"
+msgstr ""
+
+msgid "Personal budget of %s"
+msgstr ""
+
+msgid "Shared - everyone with access to the budget can book here"
+msgstr ""
+
+msgid "Everyone with access to the budget can look at every budget. A personal budget can only be changed by the person it belongs to."
+msgstr ""
+
+msgid "A new budget starts with the usual categories - rename or delete them in the settings as you like."
+msgstr ""
+
+msgid "e.g. Household, Anna, Holiday"
+msgstr ""
+
+msgid "Categories"
+msgstr ""
+
+msgid "New category"
+msgstr ""
+
+msgid "Edit category"
+msgstr ""
+
+msgid "No categories yet"
+msgstr ""
+
+msgid "Carry over what is left into the next month"
+msgstr ""
+
+msgid "For things that are paid now and then - save up month by month for the car or holiday. Without it, every month starts from its plan again."
+msgstr ""
+
+msgid "All budgets"
+msgstr ""
+
+msgid "All budgets together - transfers between them are left out, they only move money around."
+msgstr ""
+
+msgid "Income and expenses"
+msgstr ""
+
+msgid "Expenses by category"
+msgstr ""
+
+msgid "Period"
+msgstr ""
+
+msgid "Net"
+msgstr ""
+
+msgid "Average income"
+msgstr ""
+
+msgid "Average expenses"
+msgstr ""
+
+msgid "Average balance"
+msgstr ""
+
+msgid "Nothing booked in this period"
+msgstr ""
+
+msgid "No expenses in this period"
+msgstr ""
+
+msgid "%s transaction"
+msgid_plural "%s transactions"
+msgstr[0] ""
+msgstr[1] ""
+
+msgid "Last %s month"
+msgid_plural "Last %s months"
+msgstr[0] ""
+msgstr[1] ""
+
+msgid "Deposit"
+msgstr ""
+
+msgid "Nothing planned or spent this month yet."
+msgstr ""
