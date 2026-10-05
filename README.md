@@ -58,6 +58,10 @@ Lange Tabellen werden am Handy außerdem **seitenweise** angezeigt (50 Karten pr
 
 **Eigenes App-Icon und funktionierender Homescreen-Start.** Manifest mit allen Größen inklusive maskable-Variante, dazu ein `apple-touch-icon` — ohne das legte iOS bei „Zum Homescreen“ einen Screenshot der Seite ab.
 
+**Verbindungsampel.** Ein Punkt in der Topbar zeigt, ob Eingaben gerade wirklich beim Server ankommen: grün (alles gut), gelb (langsam, oder eine Anfrage wartet seit mehr als 2,5 s auf Antwort), rot (keine Verbindung, abgemeldet oder Server down). Antippen öffnet die Details samt den letzten Problemen und einem **Verbindungstest**, der auch das typische VPN-Problem erkennt: kleine Anfragen kommen durch, große Antworten nicht — dann ist die MTU des Tunnels zu groß (WireGuard: 1280 eintragen).
+
+Hintergrund: Grocy schickt seine Anfragen ohne Zeitlimit, und die meisten Ansichten schreiben einen Fehler nur in die Browser-Konsole. Bricht die Verbindung kurz weg — typisch, wenn sich das VPN nach dem Entsperren des Handys erst neu verbindet —, hängt eine Anfrage minutenlang oder scheitert lautlos: Das Antippen „tut nichts“, ein Formular bleibt gesperrt, und weil der Browser pro Server nur wenige Verbindungen öffnet, blockieren ein paar hängende Anfragen irgendwann alle weiteren. Deshalb bekommt jetzt jede API-Anfrage ein Zeitlimit von 20 s, danach greift die normale Fehlerbehandlung der Ansicht, und ein Toast sagt, was los ist — bei einem Zeitlimit ausdrücklich, dass unklar ist, ob die Eingabe gespeichert wurde. Das steckt alles in [`grocy_connection.js`](public/js/grocy_connection.js), ohne eine einzige Ansicht anzufassen.
+
 **Dark Mode auf Token-Basis**, dadurch lückenlos über alle Komponenten hinweg.
 
 **Cache-Busting pro Build.** Grocy hängt an jedes Stylesheet die Versionsnummer aus `version.json` — die sich zwischen zwei Fork-Updates nie ändert, weshalb Browser hartnäckig altes CSS behielten. Jetzt trägt der `?v=`-Parameter zusätzlich eine Build-ID (`GROCY_BUILD`, sonst der jüngste Änderungszeitpunkt der Assets).
@@ -117,6 +121,7 @@ Das Redesign liegt weitgehend in eigenen Dateien (`grocy_theme.css`, `grocy_mobi
 | `public/js/grocy_swipe.js` | Wisch-Gesten auf den Karten |
 | `public/js/grocy_toast.js` | Kompakte, aufklappbare Toasts |
 | `public/js/grocy_dateinput.js` | Kurzformen für die Datumsfelder |
+| `public/js/grocy_connection.js` | Verbindungsampel, Zeitlimit und Fehlermeldungen für API-Anfragen |
 | `public/img/icon*.png`, `icon.svg` | App-Icon, Favicon, PWA und Homescreen |
 | `views/layout/default.blade.php` | Neue App-Hülle |
 | `views/layout/bottomnav.blade.php` | Bottom-Navigation |

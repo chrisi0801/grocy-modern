@@ -654,3 +654,140 @@ body.nav-drawer-open #nav-drawer-backdrop {
 		display: none !important;
 	}
 }
+
+/* ==========================================================================
+   Connection status (grocy_connection.js)
+   ========================================================================== */
+
+.topbar-actions > .nav-item > .connection-indicator {
+	border: 0;
+	background: transparent;
+	cursor: pointer;
+}
+
+.connection-dot {
+	--g-connection-color: var(--g-success);
+	display: inline-block;
+	flex: 0 0 auto;
+	width: 12px;
+	height: 12px;
+	border-radius: 50%;
+	background-color: var(--g-connection-color);
+	box-shadow: 0 0 0 3px color-mix(in srgb, var(--g-connection-color) 22%, transparent);
+	transition: background-color var(--g-transition), box-shadow var(--g-transition);
+}
+
+[data-color="yellow"] > .connection-dot {
+	/* A real traffic-light yellow - the theme's warning tone is amber, which
+	   next to the red reads as a second red at dot size */
+	--g-connection-color: #eab308;
+	animation: connection-pulse 1.2s ease-in-out infinite;
+}
+
+[data-color="red"] > .connection-dot {
+	--g-connection-color: var(--g-danger);
+}
+
+/* Something is wrong - say it with more than a colour */
+.connection-indicator[data-color="red"] .connection-label {
+	color: var(--g-danger);
+}
+
+@keyframes connection-pulse {
+	50% {
+		box-shadow: 0 0 0 6px color-mix(in srgb, var(--g-connection-color) 10%, transparent);
+	}
+}
+
+@media (prefers-reduced-motion: reduce) {
+	[data-color="yellow"] > .connection-dot {
+		animation: none;
+	}
+}
+
+/* The details dialog */
+.connection-details-head {
+	display: flex;
+	align-items: center;
+	gap: 0.6rem;
+	font-size: 1.1rem;
+	margin-bottom: 0.4rem;
+}
+
+.connection-details-text {
+	color: var(--g-text-muted);
+	font-size: 0.9rem;
+}
+
+.connection-facts {
+	width: 100%;
+	margin-bottom: 0.75rem;
+	font-size: 0.9rem;
+	font-variant-numeric: tabular-nums;
+}
+
+.connection-facts td {
+	padding: 0.25rem 0;
+	border-bottom: 1px solid var(--g-border);
+}
+
+.connection-facts td:last-child {
+	text-align: right;
+	padding-left: 1rem;
+	white-space: nowrap;
+}
+
+.connection-section-title {
+	margin: 0.9rem 0 0.4rem 0;
+	font-size: 0.75rem;
+	font-weight: 700;
+	letter-spacing: 0.05em;
+	text-transform: uppercase;
+	color: var(--g-text-muted);
+}
+
+.connection-test,
+.connection-log {
+	list-style: none;
+	padding: 0;
+	margin: 0 0 0.5rem 0;
+	font-size: 0.875rem;
+}
+
+.connection-test li {
+	padding: 0.2rem 0;
+}
+
+.connection-test li.is-ok i {
+	color: var(--g-success);
+}
+
+.connection-test li.is-failed i {
+	color: var(--g-danger);
+}
+
+.connection-verdict {
+	padding: 0.6rem 0.75rem;
+	border-radius: var(--g-radius);
+	background-color: var(--g-surface-2);
+	font-size: 0.875rem;
+}
+
+.connection-log li {
+	padding: 0.2rem 0;
+	color: var(--g-text-muted);
+}
+
+.connection-log code {
+	font-size: 0.8125rem;
+	word-break: break-all;
+}
+
+.connection-dialog .modal-footer {
+	flex-wrap: wrap;
+	gap: 0.4rem;
+}
+
+.connection-dialog .modal-footer > * {
+	margin: 0;
+}

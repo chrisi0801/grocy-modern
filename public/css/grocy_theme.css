@@ -311,6 +311,23 @@ h2.title,
 		color var(--g-transition), box-shadow var(--g-transition), transform var(--g-transition);
 }
 
+/* Bootstrap colours every state of every variant directly
+   (`.btn-primary:hover { background-color: #0069d9 }`), which outranks the
+   plain `.btn` rule above - hovered buttons, and on a phone every button
+   right after it was tapped (it keeps the focus), turned Bootstrap blue. The
+   states read the same variables as the resting button instead; each variant
+   below sets them. */
+.btn:hover,
+.btn:focus,
+.btn.focus,
+.btn:not(:disabled):not(.disabled):active,
+.btn:not(:disabled):not(.disabled).active,
+.show > .btn.dropdown-toggle {
+	background-color: var(--g-btn-bg);
+	border-color: var(--g-btn-border);
+	color: var(--g-btn-fg);
+}
+
 .btn:hover {
 	color: var(--g-btn-fg);
 }
