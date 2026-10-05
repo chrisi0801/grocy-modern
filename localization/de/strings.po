@@ -2991,14 +2991,10 @@ msgstr "Frei verfügbar"
 msgid "Balance"
 msgstr "Kontostand"
 
-msgid "Balance minus what the plan still needs"
-msgstr "Kontostand minus das, was der Plan noch braucht"
 
 msgid "Balance of the month"
 msgstr "Saldo des Monats"
 
-msgid "Income minus expenses"
-msgstr "Einnahmen minus Ausgaben"
 
 msgid "End of month"
 msgstr "Monatsende"
@@ -3336,3 +3332,21 @@ msgstr "Einnahme"
 
 msgid "Nothing planned or spent this month yet."
 msgstr "In diesem Monat ist noch nichts geplant oder ausgegeben."
+
+msgid "How is this calculated?"
+msgstr "Wie wird das berechnet?"
+
+msgid "What was left of this month: everything that came in, minus everything that went out."
+msgstr "Was von diesem Monat übrig blieb: alles, was reinkam, minus alles, was rausging."
+
+msgid "The money that is really free: neither spent yet nor set aside by the plan for the rest of the month."
+msgstr "Das Geld, das wirklich frei ist: weder schon ausgegeben noch vom Plan für den Rest des Monats reserviert."
+
+msgid "Still planned this month"
+msgstr "Noch verplant in diesem Monat"
+
+msgid "\"Still planned\" is what is left of the monthly plan of each category, including what was carried over. An overspent category counts as zero here."
+msgstr "„Noch verplant“ ist, was vom Monatsplan jeder Kategorie noch übrig ist - inklusive Übertrag. Eine überzogene Kategorie zählt hier als null."
+
+msgid "Below zero, more is planned than there is money - lower a plan or move money into this budget."
+msgstr "Unter null ist mehr verplant, als Geld da ist - senke einen Plan oder buche Geld in dieses Budget um."

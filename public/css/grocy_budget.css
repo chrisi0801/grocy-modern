@@ -588,3 +588,66 @@ a.budget-row:focus {
 table.dt-cards > tbody > tr > td.budget-repeats-title {
 	display: none;
 }
+
+/* --- the (i) on a tile and what it opens -------------------------------- */
+.budget-tile-primary {
+	position: relative;
+	padding-right: 2.75rem;
+}
+
+.budget-tile-info {
+	position: absolute;
+	top: 0.35rem;
+	right: 0.35rem;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	width: 40px;
+	height: 40px;
+	padding: 0;
+	border: 0;
+	border-radius: var(--g-radius-pill);
+	background: transparent;
+	color: var(--g-brand-soft-text);
+	font-size: 1.05rem;
+	opacity: 0.8;
+}
+
+.budget-tile-info:hover,
+.budget-tile-info:focus-visible {
+	opacity: 1;
+	background-color: rgba(0, 0, 0, 0.06);
+}
+
+.budget-info-dialog .budget-info-title {
+	font-size: 1.1rem;
+	font-weight: 700;
+	margin-bottom: 0.5rem;
+}
+
+.budget-info-dialog p {
+	color: var(--g-text-muted);
+	font-size: 0.9rem;
+}
+
+.budget-info-sum {
+	width: 100%;
+	margin: 0.25rem 0 0.9rem 0;
+	font-variant-numeric: tabular-nums;
+}
+
+.budget-info-sum td {
+	padding: 0.3rem 0;
+}
+
+.budget-info-sum td:last-child {
+	text-align: right;
+	white-space: nowrap;
+	padding-left: 1rem;
+}
+
+.budget-info-sum .budget-info-result td {
+	border-top: 2px solid var(--g-border-strong);
+	font-weight: 700;
+	padding-top: 0.45rem;
+}

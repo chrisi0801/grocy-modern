@@ -2606,14 +2606,10 @@ msgstr ""
 msgid "Balance"
 msgstr ""
 
-msgid "Balance minus what the plan still needs"
-msgstr ""
 
 msgid "Balance of the month"
 msgstr ""
 
-msgid "Income minus expenses"
-msgstr ""
 
 msgid "End of month"
 msgstr ""
@@ -2950,4 +2946,22 @@ msgid "Deposit"
 msgstr ""
 
 msgid "Nothing planned or spent this month yet."
+msgstr ""
+
+msgid "How is this calculated?"
+msgstr ""
+
+msgid "What was left of this month: everything that came in, minus everything that went out."
+msgstr ""
+
+msgid "The money that is really free: neither spent yet nor set aside by the plan for the rest of the month."
+msgstr ""
+
+msgid "Still planned this month"
+msgstr ""
+
+msgid "\"Still planned\" is what is left of the monthly plan of each category, including what was carried over. An overspent category counts as zero here."
+msgstr ""
+
+msgid "Below zero, more is planned than there is money - lower a plan or move money into this budget."
 msgstr ""

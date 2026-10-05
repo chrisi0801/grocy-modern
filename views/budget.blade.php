@@ -54,19 +54,18 @@ $monthQuery = '&month=' . $month;
 @endif
 
 <div class="budget-tiles">
-	@if($isPastMonth)
+	{{-- The explanation lives behind the (i) - the tile only carries the number --}}
 	<div class="budget-tile budget-tile-primary">
-		<div class="budget-tile-label">{{ $__t('Balance of the month') }}</div>
-		<div class="budget-tile-value">{{ $money($totals['saldo']) }}</div>
-		<div class="budget-tile-hint">{{ $__t('Income minus expenses') }}</div>
+		<div class="budget-tile-label">{{ $isPastMonth ? $__t('Balance of the month') : $__t('Available') }}</div>
+		<div class="budget-tile-value">{{ $money($isPastMonth ? $totals['saldo'] : $totals['available']) }}</div>
+		<button type="button"
+			class="budget-tile-info"
+			data-info-template="#budget-primary-info"
+			aria-label="{{ $__t('How is this calculated?') }}"
+			title="{{ $__t('How is this calculated?') }}">
+			<i class="fa-solid fa-circle-info"></i>
+		</button>
 	</div>
-	@else
-	<div class="budget-tile budget-tile-primary">
-		<div class="budget-tile-label">{{ $__t('Available') }}</div>
-		<div class="budget-tile-value">{{ $money($totals['available']) }}</div>
-		<div class="budget-tile-hint">{{ $__t('Balance minus what the plan still needs') }}</div>
-	</div>
-	@endif
 	<div class="budget-tile">
 		<div class="budget-tile-label">{{ $__t('Balance') }}</div>
 		<div class="budget-tile-value @if($totals['balance'] < 0) budget-negative @endif">{{ $money($totals['balance']) }}</div>
@@ -206,6 +205,48 @@ $idle = array_values(array_filter($expenses, fn ($c) => !($c['plan'] !== 0 || $c
 	<div class="budget-empty">{{ $__t('This budget has no income categories yet.') }}</div>
 	@endforelse
 </div>
+
+<template id="budget-primary-info">
+	@if($isPastMonth)
+	<div class="budget-info-title">{{ $__t('Balance of the month') }}</div>
+	<p>{{ $__t('What was left of this month: everything that came in, minus everything that went out.') }}</p>
+	<table class="budget-info-sum">
+		<tr>
+			<td>{{ $__t('Income') }}</td>
+			<td>{{ $money($totals['income']) }}</td>
+		</tr>
+		<tr>
+			<td>{{ $__t('Expenses') }}</td>
+			<td>{{ $money(-$totals['expenses']) }}</td>
+		</tr>
+		<tr class="budget-info-result">
+			<td>{{ $__t('Balance of the month') }}</td>
+			<td>{{ $money($totals['saldo']) }}</td>
+		</tr>
+	</table>
+	@else
+	<div class="budget-info-title">{{ $__t('Available') }}</div>
+	<p>{{ $__t('The money that is really free: neither spent yet nor set aside by the plan for the rest of the month.') }}</p>
+	<table class="budget-info-sum">
+		<tr>
+			<td>{{ $__t('Balance') }} <span class="text-muted">({{ $isCurrentMonth ? $__t('Today') : $__t('End of month') }})</span></td>
+			<td>{{ $money($totals['balance']) }}</td>
+		</tr>
+		<tr>
+			<td>{{ $__t('Still planned this month') }}</td>
+			<td>{{ $money(-$totals['committed']) }}</td>
+		</tr>
+		<tr class="budget-info-result">
+			<td>{{ $__t('Available') }}</td>
+			<td>{{ $money($totals['available']) }}</td>
+		</tr>
+	</table>
+	<p>{{ $__t('"Still planned" is what is left of the monthly plan of each category, including what was carried over. An overspent category counts as zero here.') }}</p>
+	@if($totals['available'] < 0)
+	<p class="budget-negative">{{ $__t('Below zero, more is planned than there is money - lower a plan or move money into this budget.') }}</p>
+	@endif
+	@endif
+</template>
 
 @if($overview['uncategorized']['income'] != 0 || $overview['uncategorized']['expenses'] != 0)
 <div class="budget-section-title">

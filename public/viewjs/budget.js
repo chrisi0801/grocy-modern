@@ -51,3 +51,20 @@ $(document).on("click", ".budget-plan-button", function ()
 		$(".bootbox-input-text").attr("inputmode", "decimal").trigger("select");
 	}, 50);
 });
+
+// The explanations behind the (i) buttons - a sheet on phones, a small dialog
+// otherwise, so the tiles themselves only need to carry the numbers
+$(document).on("click", ".budget-tile-info", function ()
+{
+	bootbox.dialog({
+		message: $($(this).attr("data-info-template")).html(),
+		className: "budget-info-dialog",
+		size: "small",
+		onEscape: true,
+		backdrop: true,
+		closeButton: false,
+		buttons: {
+			ok: { label: __t("OK"), className: "btn-primary" }
+		}
+	});
+});
