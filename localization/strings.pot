@@ -2964,4 +2964,126 @@ msgid "\"Still planned\" is what is left of the monthly plan of each category, i
 msgstr ""
 
 msgid "Below zero, more is planned than there is money - lower a plan or move money into this budget."
+
+msgid "The server did not answer within %s seconds. Whether your last input was saved is unclear - please check before repeating it."
+msgstr ""
+
+msgid "You are no longer logged in - please log in again."
+msgstr ""
+
+msgid "The server is not reachable right now (HTTP %s)."
+msgstr ""
+
+msgid "No connection to the server - your last input was probably not saved."
+msgstr ""
+
+msgid "Check connection"
+msgstr ""
+
+msgid "Connected"
+msgstr ""
+
+msgid "Slow connection"
+msgstr ""
+
+msgid "Waiting for the server"
+msgstr ""
+
+msgid "Logged out"
+msgstr ""
+
+msgid "Server not reachable"
+msgstr ""
+
+msgid "No connection"
+msgstr ""
+
+msgid "Connection"
+msgstr ""
+
+msgid "Inputs are being processed normally."
+msgstr ""
+
+msgid "The server answers, but slowly. Inputs are processed, it just takes a moment."
+msgstr ""
+
+msgid "A request has been waiting for %s seconds. If nothing happens, it is cancelled after %s seconds and you get a message."
+msgstr ""
+
+msgid "Your login has expired - inputs are rejected until you log in again."
+msgstr ""
+
+msgid "The web server answers, but Grocy behind it does not. Is the container running?"
+msgstr ""
+
+msgid "This device has no network right now."
+msgstr ""
+
+msgid "Inputs cannot be saved right now. Is the VPN connected and the server switched on?"
+msgstr ""
+
+msgid "no answer after %s s"
+msgstr ""
+
+msgid "not logged in"
+msgstr ""
+
+msgid "connection failed"
+msgstr ""
+
+msgid "Log in again"
+msgstr ""
+
+msgid "Response time"
+msgstr ""
+
+msgid "Last successful contact"
+msgstr ""
+
+msgid "Waiting requests"
+msgstr ""
+
+msgid "Device network"
+msgstr ""
+
+msgid "offline"
+msgstr ""
+
+msgid "online"
+msgstr ""
+
+msgid "Connection test"
+msgstr ""
+
+msgid "Recent problems"
+msgstr ""
+
+msgid "Testing the connection..."
+msgstr ""
+
+msgid "Server reachable"
+msgstr ""
+
+msgid "Logged in"
+msgstr ""
+
+msgid "The server cannot be reached at all. Is the VPN connected, and is the server switched on? If this happens right after unlocking the phone, wait a few seconds for the VPN to reconnect."
+msgstr ""
+
+msgid "Large answer (%s KB)"
+msgstr ""
+
+msgid "Small requests get through, large answers do not. That is the typical sign of a too large MTU on the VPN tunnel - for WireGuard, set the MTU of the tunnel to 1280 (in the app: Edit tunnel, MTU) and try again."
+msgstr ""
+
+msgid "Everything gets through, but slowly - inputs work, they just take a moment."
+msgstr ""
+
+msgid "Everything works - if inputs hung before, the connection was interrupted for a moment (for example while the VPN reconnected)."
+msgstr ""
+
+msgid "Test connection"
+msgstr ""
+
+msgid "Reload page"
 msgstr ""

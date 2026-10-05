@@ -189,6 +189,19 @@
 
 		@if(GROCY_AUTHENTICATED)
 		<ul class="navbar-nav topbar-actions">
+			{{-- Connection status, see grocy_connection.js --}}
+			<li class="nav-item">
+				<button id="connection-indicator"
+					class="nav-link connection-indicator"
+					type="button"
+					data-status="ok"
+					data-color="green"
+					title="{{ $__t('Connected') }}"
+					aria-label="{{ $__t('Connection') }}: {{ $__t('Connected') }}">
+					<span class="connection-dot"></span>
+					<span class="topbar-action-label connection-label">{{ $__t('Connected') }}</span>
+				</button>
+			</li>
 			@if(GROCY_AUTHENTICATED && !GROCY_IS_EMBEDDED_INSTALL && !GROCY_DISABLE_AUTH)
 			<li class="nav-item dropdown">
 				<a class="nav-link dropdown-toggle discrete-link @if(!empty(GROCY_USER_PICTURE_FILE_NAME)) py-0 @endif"
@@ -824,6 +837,7 @@
 	<script src="{{ $U('/js/extensions.js?v=', true) }}{{ $version }}"></script>
 	<script src="{{ $U('/js/grocy_menu_layout.js?v=', true) }}{{ $version }}"></script>
 	<script src="{{ $U('/js/grocy.js?v=', true) }}{{ $version }}"></script>
+	<script src="{{ $U('/js/grocy_connection.js?v=', true) }}{{ $version }}"></script>
 	<script src="{{ $U('/js/grocy_dbchangedhandling.js?v=', true) }}{{ $version }}"></script>
 	<script src="{{ $U('/js/grocy_wakelockhandling.js?v=', true) }}{{ $version }}"></script>
 	<script src="{{ $U('/js/grocy_nightmode.js?v=', true) }}{{ $version }}"></script>
