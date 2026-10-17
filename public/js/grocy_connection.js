@@ -258,8 +258,22 @@ GrocyConnection.Track = function (xhr, method, url)
 	XMLHttpRequest.prototype.send = function (body)
 	{
 		var request = this._grocyConnection;
+		var isOwnApi = request && GrocyConnection.ApiFunction(request.url) !== null;
 
-		if (request && request.async && GrocyConnection.ApiFunction(request.url) !== null)
+		// Profiles: the request belongs to the household this page shows, not
+		// to whichever one another tab switched the browser to meanwhile
+		if (isOwnApi && typeof Grocy !== "undefined" && Grocy.ProfileId)
+		{
+			try
+			{
+				this.setRequestHeader("X-Grocy-Profile", Grocy.ProfileId);
+			}
+			catch (e)
+			{
+			}
+		}
+
+		if (isOwnApi && request.async)
 		{
 			// Uploads (product pictures and the like) may take their time
 			var isUpload = (typeof Blob !== "undefined" && body instanceof Blob)

@@ -7,6 +7,7 @@ use Grocy\Controllers\Api\ChoresApiController;
 use Grocy\Controllers\Api\FilesApiController;
 use Grocy\Controllers\Api\GenericEntityApiController;
 use Grocy\Controllers\Api\OpenApiController;
+use Grocy\Controllers\Api\ProfilesApiController;
 use Grocy\Controllers\Api\PrintApiController;
 use Grocy\Controllers\Api\RecipesApiController;
 use Grocy\Controllers\Api\StockApiController;
@@ -20,6 +21,7 @@ use Grocy\Controllers\ChoresController;
 use Grocy\Controllers\EquipmentController;
 use Grocy\Controllers\GenericEntityController;
 use Grocy\Controllers\LoginController;
+use Grocy\Controllers\ProfilesController;
 use Grocy\Controllers\RecipesController;
 use Grocy\Controllers\StockController;
 use Grocy\Controllers\StockReportsController;
@@ -144,6 +146,9 @@ $app->group('', function (RouteCollectorProxy $group)
 
 	// Calendar routes
 	$group->get('/calendar', [CalendarController::class, 'Overview']);
+
+	// Profiles (Grocy Modern)
+	$group->get('/profiles', [ProfilesController::class, 'Overview']);
 
 	// Budget routes (Grocy Modern)
 	$group->get('/budget', [BudgetController::class, 'Overview']);
@@ -277,6 +282,12 @@ $app->group('/api', function (RouteCollectorProxy $group)
 	$group->get('/tasks', [TasksApiController::class, 'Current']);
 	$group->post('/tasks/{taskId}/complete', [TasksApiController::class, 'MarkTaskAsCompleted']);
 	$group->post('/tasks/{taskId}/undo', [TasksApiController::class, 'UndoTask']);
+
+	// Profiles (Grocy Modern)
+	$group->get('/profiles', [ProfilesApiController::class, 'GetProfiles']);
+	$group->post('/profiles', [ProfilesApiController::class, 'CreateProfile']);
+	$group->put('/profiles/{profileId}', [ProfilesApiController::class, 'UpdateProfile']);
+	$group->delete('/profiles/{profileId}', [ProfilesApiController::class, 'DeleteProfile']);
 
 	// Budget (Grocy Modern)
 	$group->get('/budget/budgets', [BudgetApiController::class, 'GetBudgets']);

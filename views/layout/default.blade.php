@@ -131,6 +131,7 @@
 		Grocy.CurrentUrlRelative = "/" + window.location.href.split('?')[0].replace(Grocy.BaseUrl, "");
 		Grocy.View = '{{ $viewName }}';
 		Grocy.Currency = '{{ GROCY_CURRENCY }}';
+		Grocy.ProfileId = '{{ GROCY_PROFILE_ID }}';
 		Grocy.EnergyUnit = '{{ GROCY_ENERGY_UNIT }}';
 		Grocy.CalendarFirstDayOfWeek = '{{ GROCY_CALENDAR_FIRST_DAY_OF_WEEK }}';
 		Grocy.CalendarShowWeekNumbers = {{ BoolToString(GROCY_CALENDAR_SHOW_WEEK_OF_YEAR) }};
@@ -158,7 +159,7 @@
 	</script>
 </head>
 
-<body class="fixed-nav @if(boolval($userSettings['night_mode_enabled_internal'])) night-mode @endif @if($embedded) embedded @endif @if(GROCY_AUTHENTICATED && !$embedded) has-bottom-nav @endif">
+<body class="fixed-nav @if(\Grocy\Helpers\Profiles::IsInUse()) has-profiles @endif @if(boolval($userSettings['night_mode_enabled_internal'])) night-mode @endif @if($embedded) embedded @endif @if(GROCY_AUTHENTICATED && !$embedded) has-bottom-nav @endif">
 	@if(!$embedded)
 	<nav id="mainNav"
 		class="navbar navbar-light fixed-top app-topbar">
@@ -173,11 +174,21 @@
 		@endif
 		<a class="navbar-brand"
 			href="{{ $U('/') }}">
-			<img src="{{ $U('/img/logo.svg?v=', true) }}{{ $version }}"
+			<img class="navbar-brand-wordmark"
+				src="{{ $U('/img/logo.svg?v=', true) }}{{ $version }}"
 				width="114"
 				height="30"
 				alt="Grocy">
+			{{-- Next to the profile switcher a phone has no room for the wordmark --}}
+			<img class="navbar-brand-icon"
+				src="{{ $U('/img/icon.svg?v=', true) }}{{ $version }}"
+				width="30"
+				height="30"
+				alt="Grocy">
 		</a>
+		@if(GROCY_AUTHENTICATED && \Grocy\Helpers\Profiles::IsInUse())
+		@include('components.profileswitcher')
+		@endif
 		<span id="clock-container"
 			class="d-none">
 			<i class="fa-solid fa-clock"></i>
@@ -399,6 +410,10 @@
 					</a>
 					<a class="dropdown-item discrete-link permission-USERS_READ"
 						href="{{ $U('/users') }}"><i class="fa-solid fa-users"></i>&nbsp;{{ $__t('Manage users') }}</a>
+					@if(GROCY_PROFILE_ID === \Grocy\Helpers\Profiles::MAIN && !GROCY_IS_EMBEDDED_INSTALL)
+					<a class="dropdown-item discrete-link permission-ADMIN"
+						href="{{ $U('/profiles') }}"><i class="fa-solid fa-building"></i>&nbsp;{{ $__t('Profiles') }}</a>
+					@endif
 					<div class="dropdown-divider"></div>
 					@if(!GROCY_DISABLE_AUTH)
 					<a class="dropdown-item discrete-link"
@@ -838,6 +853,7 @@
 	<script src="{{ $U('/js/grocy_menu_layout.js?v=', true) }}{{ $version }}"></script>
 	<script src="{{ $U('/js/grocy.js?v=', true) }}{{ $version }}"></script>
 	<script src="{{ $U('/js/grocy_connection.js?v=', true) }}{{ $version }}"></script>
+	<script src="{{ $U('/js/grocy_profiles.js?v=', true) }}{{ $version }}"></script>
 	<script src="{{ $U('/js/grocy_dbchangedhandling.js?v=', true) }}{{ $version }}"></script>
 	<script src="{{ $U('/js/grocy_wakelockhandling.js?v=', true) }}{{ $version }}"></script>
 	<script src="{{ $U('/js/grocy_nightmode.js?v=', true) }}{{ $version }}"></script>

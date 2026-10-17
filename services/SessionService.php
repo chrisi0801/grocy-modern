@@ -6,8 +6,10 @@ class SessionService extends BaseService
 {
 	const int SESSION_TOKEN_TYPE_ACCESS = 1;
 	const int SESSION_TOKEN_TYPE_REMEMBER_ME = 2;
-	const string SESSION_TOKEN_COOKIE_NAME_ACCESS = 'grocy_session_access_token';
-	const string SESSION_TOKEN_COOKIE_NAME_REMEMBER_ME = 'grocy_session_remember_me_token';
+	// Grocy Modern: one login per profile - the suffix is empty for the main
+	// profile, so its cookies keep their names
+	const string SESSION_TOKEN_COOKIE_NAME_ACCESS = 'grocy_session_access_token' . GROCY_PROFILE_COOKIE_SUFFIX;
+	const string SESSION_TOKEN_COOKIE_NAME_REMEMBER_ME = 'grocy_session_remember_me_token' . GROCY_PROFILE_COOKIE_SUFFIX;
 	const int SESSION_TOKEN_EXPIRATION_SECONDS_ACCESS = 864000; // 10 Days
 	const int SESSION_TOKEN_EXPIRATION_SECONDS_REMEMBER_ME = 15552000; // 180 Days
 

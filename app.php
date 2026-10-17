@@ -14,6 +14,10 @@ require_once __DIR__ . '/packages/autoload.php';
 require_once GROCY_DATAPATH . '/config.php';
 require_once __DIR__ . '/config-dist.php'; // For not in own config defined values we use the default ones
 
+// Grocy Modern: which profile (= which separate household) this request is
+// for - before anything touches a database
+Grocy\Helpers\Profiles::Bootstrap();
+
 // Error reporting definitions
 if (GROCY_MODE === 'dev')
 {
@@ -72,6 +76,7 @@ if (GROCY_MODE === 'dev')
 	// For dev mode use routes.php to track changes
 	$hash = hash('sha256', file_get_contents(__DIR__ . '/routes.php'));
 }
+define('GROCY_CODE_HASH', $hash);
 $hashCacheFile = $viewcachePath . "/$hash.txt";
 if (!file_exists($hashCacheFile))
 {
@@ -82,11 +87,16 @@ if (!file_exists($hashCacheFile))
 	{
 		opcache_reset();
 	}
-
-	// Schema migration happens on the root route, so redirect to there
-	header('Location: ' . (new UrlManager(GROCY_BASE_URL))->ConstructUrl('/'));
-	exit();
 }
+
+// Grocy Modern: the view cache is shared, but every profile has a database of
+// its own which needs the migrations - so each profile remembers for which
+// code it was migrated last. Originally Grocy redirected to the root route
+// (which migrates) once after an update; that misses a profile that is only
+// ever used through its API key (a Home Assistant integration, say), so the
+// migrations now run on the first request of each profile instead, see below.
+$migratedMarkerFile = GROCY_PROFILE_DATAPATH . '/migrated.txt';
+define('GROCY_PROFILE_NEEDS_MIGRATION', !file_exists($migratedMarkerFile) || file_get_contents($migratedMarkerFile) !== $hash);
 
 // Setup base application
 AppFactory::setContainer(new DI\Container());
@@ -116,6 +126,33 @@ if (!empty(GROCY_BASE_PATH))
 {
 	$app->setBasePath(GROCY_BASE_PATH);
 }
+
+// Grocy Modern: migrate the database of this request's profile if it was
+// migrated for older code. Runs after the authentication (added before it -
+// Slim runs the last added middleware first), so it is a real, logged in
+// request - like the root route, where Grocy itself migrates.
+$app->add(function ($request, $handler) use ($migratedMarkerFile)
+{
+	if (GROCY_PROFILE_NEEDS_MIGRATION && defined('GROCY_USER_ID'))
+	{
+		// Several requests may arrive at once (an integration polling, a page
+		// loading its data) - only one of them migrates, the others wait
+		$lock = fopen(GROCY_PROFILE_DATAPATH . '/migrated.lock', 'c');
+		flock($lock, LOCK_EX);
+
+		clearstatcache();
+		if (!file_exists($migratedMarkerFile) || file_get_contents($migratedMarkerFile) !== GROCY_CODE_HASH)
+		{
+			Grocy\Services\DatabaseMigrationService::GetInstance()->MigrateDatabase();
+			file_put_contents($migratedMarkerFile, GROCY_CODE_HASH);
+		}
+
+		flock($lock, LOCK_UN);
+		fclose($lock);
+	}
+
+	return $handler->handle($request);
+});
 
 $app->add(new LocaleMiddleware($container, $app->getResponseFactory()));
 $authMiddlewareClass = GROCY_AUTH_CLASS;

@@ -7,6 +7,26 @@
 	<div class="col-lg-4 offset-lg-4 col-md-6 offset-md-3 col-12">
 		<h2 class="text-center">@yield('title')</h2>
 
+		{{-- Profiles (Grocy Modern): every household has its own users, so the
+		     login is for one of them - pick which --}}
+		@if(\Grocy\Helpers\Profiles::IsInUse())
+		<div class="login-profiles"
+			role="tablist"
+			aria-label="{{ $__t('Profile') }}">
+			@foreach(\Grocy\Helpers\Profiles::All() as $profile)
+			<a class="btn btn-sm @if($profile['id'] === GROCY_PROFILE_ID) btn-primary @else btn-outline-dark @endif"
+				role="tab"
+				aria-selected="{{ $profile['id'] === GROCY_PROFILE_ID ? 'true' : 'false' }}"
+				href="#"
+				data-profile-switch="{{ $profile['id'] }}"
+				style="--g-profile-color: {{ $profile['color'] }}">
+				<span class="profile-dot"></span>
+				{{ $profile['name'] ?: $__t('Main profile') }}
+			</a>
+			@endforeach
+		</div>
+		@endif
+
 		<hr class="my-2">
 
 		<form method="post"

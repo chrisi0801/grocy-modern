@@ -3087,3 +3087,108 @@ msgstr ""
 
 msgid "Reload page"
 msgstr ""
+
+msgid "Profiles"
+msgstr ""
+
+msgid "New profile"
+msgstr ""
+
+msgid "Every profile is a household of its own - for example one per building. Stock, chores, tasks, calendar, shopping lists, budget and users are completely separate; the switcher next to the logo changes between them."
+msgstr ""
+
+msgid "Profiles can only be managed by an administrator of the main profile"
+msgstr ""
+
+msgid "Main profile"
+msgstr ""
+
+msgid "Current"
+msgstr ""
+
+msgid "The data that was there before profiles existed"
+msgstr ""
+
+msgid "Created %s"
+msgstr ""
+
+msgid "Switch"
+msgstr ""
+
+msgid "As long as there is only this one profile, nothing changes - the switcher only appears once there is a second one."
+msgstr ""
+
+msgid "e.g. Main house, Holiday flat"
+msgstr ""
+
+msgid "Colour"
+msgstr ""
+
+msgid "Take over the master data of this profile"
+msgstr ""
+
+msgid "Products, quantity units, product groups, locations and stores are copied once - after that both profiles keep their own. Stock, chores, tasks, calendar and everything else start empty."
+msgstr ""
+
+msgid "You become the administrator of the new profile, with your user name and password. Further users are added there, under \"Manage users\"."
+msgstr ""
+
+msgid "Switch profile"
+msgstr ""
+
+msgid "Log in to another profile"
+msgstr ""
+
+msgid "Manage profiles"
+msgstr ""
+
+msgid "Profile"
+msgstr ""
+
+msgid "Edit profile"
+msgstr ""
+
+msgid "Create profile"
+msgstr ""
+
+msgid "Creating profile..."
+msgstr ""
+
+msgid "Profile created"
+msgstr ""
+
+msgid "The profile \"%s\" is ready, and you are already logged in there with your user name and password."
+msgstr ""
+
+msgid "Stay here"
+msgstr ""
+
+msgid "Switch to it"
+msgstr ""
+
+msgid "Delete the profile \"%s\"?"
+msgstr ""
+
+msgid "Its stock, chores, tasks, calendar, budget and users are no longer reachable. The data itself is moved to data/profiles-deleted and can be restored from there by hand."
+msgstr ""
+
+msgid "Type the name of the profile to confirm:"
+msgstr ""
+
+msgid "The name does not match - nothing was deleted."
+msgstr ""
+
+msgid "The name can be at most %s characters long"
+msgstr ""
+
+msgid "There already is a profile with this name"
+msgstr ""
+
+msgid "The folder for the new profile could not be created"
+msgstr ""
+
+msgid "The main profile cannot be deleted"
+msgstr ""
+
+msgid "The folder of the profile could not be moved"
+msgstr ""

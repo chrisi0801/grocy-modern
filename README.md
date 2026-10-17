@@ -13,7 +13,7 @@
 
 [Grocy](https://grocy.info) ist ein hervorragendes selbst gehostetes Haushalts-ERP — Bestände, Einkaufszettel, Rezepte, Speiseplan, Hausarbeiten. Nur die Oberfläche war mir zu altbacken und am Handy zu unhandlich, vor allem die breiten Tabellen.
 
-Dieser Fork ändert in erster Linie **das Frontend** — es ist dasselbe Grocy, nur mit neuer Oberfläche. Einzige funktionale Erweiterung ist ein [Haushaltsbudget](#haushaltsbudget); es lebt in eigenen Tabellen und eigenen Endpunkten, alles andere aus Grocy (Datenbank, REST-API, Funktionen) bleibt unverändert.
+Dieser Fork ändert in erster Linie **das Frontend** — es ist dasselbe Grocy, nur mit neuer Oberfläche. Dazu kommen zwei funktionale Erweiterungen: ein [Haushaltsbudget](#haushaltsbudget) und [Profile](#profile--mehrere-getrennte-haushalte) für mehrere komplett getrennte Haushalte. Beide lassen Grocys Datenmodell und REST-API unangetastet.
 
 |  |  |  |
 |---|---|---|
@@ -88,6 +88,24 @@ Zugriff steuert die neue Berechtigung **„Haushaltsbudget“** (Benutzer → Be
 
 Beträge werden als ganze Cent gespeichert. Die REST-Endpunkte liegen unter `/api/budget/…` (Budgets, Kategorien, Pläne, Buchungen, Umbuchungen, Daueraufträge, Auswertungen; Beträge dort als Dezimalzahl) — sie stehen nicht in Grocys Swagger-Beschreibung, siehe [`routes.php`](routes.php) und [`BudgetApiController.php`](controllers/Api/BudgetApiController.php).
 
+## Profile – mehrere getrennte Haushalte
+
+Wer zwei Gebäude oder zwei Haushalte verwaltet, bekommt mit Profilen eine echte Trennung: **jedes Profil ist ein eigener, vollständiger Datenbestand** — Bestand, Hausarbeiten, Aufgaben, Kalender, Einkaufszettel, Rezepte, Speiseplan, Budget und Benutzer. Grocys Standorte können das nicht: Sie sind nur ein Merkmal von Bestandseinträgen, Hausarbeiten oder der Kalender kennen sie gar nicht.
+
+|  |  |
+|---|---|
+| <img src="docs/img/profile-switcher.png" alt="Profilwechsler" width="240"> | <img src="docs/img/profile-new.png" alt="Neues Profil" width="240"> |
+| Der Profilwechsler sitzt neben dem Logo | Neues Profil, auf Wunsch mit den Stammdaten des Hauptprofils |
+
+- **Anlegen** unter Einstellungen (Schraubenschlüssel) → *Profile*, nur durch Administratoren des Hauptprofils. Die bisherigen Daten sind das Hauptprofil, es ändert sich für sie nichts. Solange es nur dieses gibt, ist von Profilen nichts zu sehen.
+- **Stammdaten** (Produkte, Mengeneinheiten samt Umrechnungen, Produktgruppen, Standorte, Einkaufsorte, Barcodes, Produktbilder) können beim Anlegen einmalig übernommen werden; danach pflegt jedes Profil seine eigenen.
+- **Benutzer gibt es pro Profil.** Wer ein Profil anlegt, wird dort Administrator, mit demselben Benutzernamen und Passwort, und ist sofort angemeldet. Weitere Benutzer kommen im jeweiligen Profil unter *Benutzer verwalten* dazu. Auf einem Gerät bleibt man in allen Profilen angemeldet, in denen man sich einmal angemeldet hat; der Wechsler zeigt nur diese — wer nur in einem Gebäude wohnt, hat das andere nicht im Weg. Auf der Anmeldeseite wählt man das Profil aus.
+- **Wechseln** bleibt auf derselben Seite (Bestandsübersicht → Bestandsübersicht des anderen Haushalts). Jede Anfrage einer Seite trägt das Profil mit, für das sie angezeigt wurde — ein zweiter Tab, der inzwischen umgeschaltet hat, kann also nie Daten im falschen Haushalt ändern.
+- **API-Keys** (Home Assistant & Co.) gehören zu genau einem Profil; Anfragen mit einem Key landen automatisch dort, ebenso der iCal-Link des Kalenders.
+- **Löschen** verschiebt den Ordner eines Profils nur nach `data/profiles-deleted/` — wiederherstellbar von Hand.
+
+Technisch ist ein Profil ein eigener Datenordner unter `data/profiles/<name>/` mit eigener Datenbank und eigenen Dateien; `config.php`, Plugins und eigenes CSS/JS gelten für alle. Die Liste der Profile steht in `data/profiles.json`. **Ein Backup von `data/` umfasst damit alle Profile.** Nach einem Update migriert jedes Profil seine Datenbank beim ersten Zugriff selbst, auch eines, das nur über einen API-Key benutzt wird.
+
 ## Installation
 
 Zwei dokumentierte Wege:
@@ -152,7 +170,10 @@ Das Redesign liegt weitgehend in eigenen Dateien (`grocy_theme.css`, `grocy_mobi
 | `migrations/5000.sql` | Haushaltsbudget: Tabellen und Berechtigung (Fork-Migrationen beginnen bei 5000, weit weg von Grocys eigener Nummerierung) |
 | `services/BudgetService.php`, `controllers/BudgetController.php`, `controllers/Api/BudgetApiController.php` | Haushaltsbudget: Rechenlogik und Rechte, Seiten, API |
 | `views/budget*.blade.php`, `views/components/budget*.blade.php`, `public/viewjs/budget*.js`, `public/js/grocy_budget.js`, `public/css/grocy_budget.css` | Haushaltsbudget: Oberfläche |
-| `app.php` | Der Routen-Cache wird jetzt auch neu gebaut, wenn sich Routen oder Migrationen ändern — nicht nur bei einer neuen Versionsnummer |
+| `app.php` | Der Routen-Cache wird jetzt auch neu gebaut, wenn sich Routen oder Migrationen ändern — nicht nur bei einer neuen Versionsnummer. Profil der Anfrage wählen, Datenbank-Migration pro Profil |
+| `helpers/Profiles.php`, `services/ProfileService.php`, `controllers/ProfilesController.php`, `controllers/Api/ProfilesApiController.php` | Profile: Auswahl pro Anfrage, Anlegen/Umbenennen/Löschen |
+| `services/DatabaseService.php`, `services/FilesService.php`, `services/SessionService.php`, `services/BaseService.php` | Profile: Datenbank, Dateien und Login-Cookies des jeweiligen Profils |
+| `views/profiles.blade.php`, `views/components/profileswitcher.blade.php`, `public/js/grocy_profiles.js`, `public/viewjs/profiles.js` | Profile: Verwaltung und Profilwechsler |
 
 ---
 

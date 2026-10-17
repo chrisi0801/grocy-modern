@@ -3473,3 +3473,108 @@ msgstr "Verbindung testen"
 
 msgid "Reload page"
 msgstr "Seite neu laden"
+
+msgid "Profiles"
+msgstr "Profile"
+
+msgid "New profile"
+msgstr "Neues Profil"
+
+msgid "Every profile is a household of its own - for example one per building. Stock, chores, tasks, calendar, shopping lists, budget and users are completely separate; the switcher next to the logo changes between them."
+msgstr "Jedes Profil ist ein eigener Haushalt - zum Beispiel eines pro Gebäude. Bestand, Hausarbeiten, Aufgaben, Kalender, Einkaufszettel, Budget und Benutzer sind komplett getrennt; gewechselt wird über den Profilwechsler neben dem Logo."
+
+msgid "Profiles can only be managed by an administrator of the main profile"
+msgstr "Profile kann nur ein Administrator des Hauptprofils verwalten"
+
+msgid "Main profile"
+msgstr "Hauptprofil"
+
+msgid "Current"
+msgstr "Aktuell"
+
+msgid "The data that was there before profiles existed"
+msgstr "Die Daten, die schon vor den Profilen da waren"
+
+msgid "Created %s"
+msgstr "Angelegt am %s"
+
+msgid "Switch"
+msgstr "Wechseln"
+
+msgid "As long as there is only this one profile, nothing changes - the switcher only appears once there is a second one."
+msgstr "Solange es nur dieses eine Profil gibt, ändert sich nichts - der Profilwechsler erscheint erst ab dem zweiten."
+
+msgid "e.g. Main house, Holiday flat"
+msgstr "z. B. Haupthaus, Ferienwohnung"
+
+msgid "Colour"
+msgstr "Farbe"
+
+msgid "Take over the master data of this profile"
+msgstr "Stammdaten dieses Profils übernehmen"
+
+msgid "Products, quantity units, product groups, locations and stores are copied once - after that both profiles keep their own. Stock, chores, tasks, calendar and everything else start empty."
+msgstr "Produkte, Mengeneinheiten, Produktgruppen, Standorte und Einkaufsorte werden einmalig kopiert - danach pflegt jedes Profil seine eigenen. Bestand, Hausarbeiten, Aufgaben, Kalender und alles andere starten leer."
+
+msgid "You become the administrator of the new profile, with your user name and password. Further users are added there, under \"Manage users\"."
+msgstr "Du wirst Administrator des neuen Profils, mit deinem Benutzernamen und Passwort. Weitere Benutzer legst du dort unter „Benutzer verwalten“ an."
+
+msgid "Switch profile"
+msgstr "Profil wechseln"
+
+msgid "Log in to another profile"
+msgstr "Bei einem anderen Profil anmelden"
+
+msgid "Manage profiles"
+msgstr "Profile verwalten"
+
+msgid "Profile"
+msgstr "Profil"
+
+msgid "Edit profile"
+msgstr "Profil bearbeiten"
+
+msgid "Create profile"
+msgstr "Profil anlegen"
+
+msgid "Creating profile..."
+msgstr "Profil wird angelegt …"
+
+msgid "Profile created"
+msgstr "Profil angelegt"
+
+msgid "The profile \"%s\" is ready, and you are already logged in there with your user name and password."
+msgstr "Das Profil „%s“ ist bereit, und du bist dort schon mit deinem Benutzernamen und Passwort angemeldet."
+
+msgid "Stay here"
+msgstr "Hier bleiben"
+
+msgid "Switch to it"
+msgstr "Dorthin wechseln"
+
+msgid "Delete the profile \"%s\"?"
+msgstr "Profil „%s“ löschen?"
+
+msgid "Its stock, chores, tasks, calendar, budget and users are no longer reachable. The data itself is moved to data/profiles-deleted and can be restored from there by hand."
+msgstr "Bestand, Hausarbeiten, Aufgaben, Kalender, Budget und Benutzer dieses Profils sind danach nicht mehr erreichbar. Die Daten selbst werden nach data/profiles-deleted verschoben und lassen sich von dort von Hand wiederherstellen."
+
+msgid "Type the name of the profile to confirm:"
+msgstr "Zur Bestätigung den Namen des Profils eintippen:"
+
+msgid "The name does not match - nothing was deleted."
+msgstr "Der Name stimmt nicht - es wurde nichts gelöscht."
+
+msgid "The name can be at most %s characters long"
+msgstr "Der Name darf höchstens %s Zeichen lang sein"
+
+msgid "There already is a profile with this name"
+msgstr "Es gibt schon ein Profil mit diesem Namen"
+
+msgid "The folder for the new profile could not be created"
+msgstr "Der Ordner für das neue Profil konnte nicht angelegt werden"
+
+msgid "The main profile cannot be deleted"
+msgstr "Das Hauptprofil kann nicht gelöscht werden"
+
+msgid "The folder of the profile could not be moved"
+msgstr "Der Ordner des Profils konnte nicht verschoben werden"

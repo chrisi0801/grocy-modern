@@ -12,7 +12,8 @@ class FilesService extends BaseService
 	{
 		parent::__construct();
 
-		$this->StoragePath = GROCY_DATAPATH . '/storage';
+		// Grocy Modern: pictures and files belong to the profile
+		$this->StoragePath = (defined('GROCY_PROFILE_DATAPATH') ? GROCY_PROFILE_DATAPATH : GROCY_DATAPATH) . '/storage';
 		if (!file_exists($this->StoragePath))
 		{
 			mkdir($this->StoragePath);

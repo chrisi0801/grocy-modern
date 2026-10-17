@@ -139,6 +139,17 @@ class DatabaseService
 
 	private function GetDbFilePath()
 	{
+		if (self::$DbFilePathOverride !== null)
+		{
+			return self::$DbFilePathOverride;
+		}
+
+		// Grocy Modern: the database of the profile this request is for
+		return self::DbFilePathFor(defined('GROCY_PROFILE_DATAPATH') ? GROCY_PROFILE_DATAPATH : GROCY_DATAPATH);
+	}
+
+	public static function DbFilePathFor(string $dataPath)
+	{
 		if (GROCY_MODE === 'demo' || GROCY_MODE === 'prerelease')
 		{
 			$dbSuffix = GROCY_DEFAULT_LOCALE;
@@ -147,9 +158,21 @@ class DatabaseService
 				$dbSuffix = GROCY_DEMO_DB_SUFFIX;
 			}
 
-			return GROCY_DATAPATH . '/grocy_' . $dbSuffix . '.db';
+			return $dataPath . '/grocy_' . $dbSuffix . '.db';
 		}
 
-		return GROCY_DATAPATH . '/grocy.db';
+		return $dataPath . '/grocy.db';
+	}
+
+	// Grocy Modern: setting up a new profile means migrating its database -
+	// for that one moment the connection points there instead. Everything
+	// that already holds a connection keeps the one it has.
+	private static $DbFilePathOverride = null;
+
+	public static function UseDatabaseFile(?string $path)
+	{
+		self::$DbFilePathOverride = $path;
+		self::$DbConnection = null;
+		self::$DbConnectionRaw = null;
 	}
 }
