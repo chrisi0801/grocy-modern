@@ -13,7 +13,7 @@
 
 [Grocy](https://grocy.info) ist ein hervorragendes selbst gehostetes Haushalts-ERP — Bestände, Einkaufszettel, Rezepte, Speiseplan, Hausarbeiten. Nur die Oberfläche war mir zu altbacken und am Handy zu unhandlich, vor allem die breiten Tabellen.
 
-Dieser Fork ändert in erster Linie **das Frontend** — es ist dasselbe Grocy, nur mit neuer Oberfläche. Dazu kommen zwei funktionale Erweiterungen: ein [Haushaltsbudget](#haushaltsbudget) und [Profile](#profile--mehrere-getrennte-haushalte) für mehrere komplett getrennte Haushalte. Beide lassen Grocys Datenmodell und REST-API unangetastet.
+Dieser Fork ändert in erster Linie **das Frontend** — es ist dasselbe Grocy, nur mit neuer Oberfläche. Dazu kommen drei funktionale Erweiterungen: ein [Haushaltsbudget](#haushaltsbudget), [Profile](#profile--mehrere-getrennte-haushalte) für mehrere komplett getrennte Haushalte und eine [klügere Barcode-Suche](#barcode-suche). Alle lassen Grocys Datenmodell und REST-API unangetastet.
 
 |  |  |  |
 |---|---|---|
@@ -106,6 +106,25 @@ Wer zwei Gebäude oder zwei Haushalte verwaltet, bekommt mit Profilen eine echte
 
 Technisch ist ein Profil ein eigener Datenordner unter `data/profiles/<name>/` mit eigener Datenbank und eigenen Dateien; `config.php`, Plugins und eigenes CSS/JS gelten für alle. Die Liste der Profile steht in `data/profiles.json`. **Ein Backup von `data/` umfasst damit alle Profile.** Nach einem Update migriert jedes Profil seine Datenbank beim ersten Zugriff selbst, auch eines, das nur über einen API-Key benutzt wird.
 
+## Barcode-Suche
+
+Grocy fragt bei einem unbekannten Barcode nur Open Food Facts — also nur Lebensmittel — und übernimmt davon nur den Namen. Toilettenpapier, Spülmittel oder Shampoo musste man komplett selbst anlegen. Die Barcode-Suche (Taste **E** im Dialog für unbekannte Produkte) fragt stattdessen der Reihe nach:
+
+1. **die anderen Profile** — kennt der andere Haushalt das Produkt schon, wird es samt Bild übernommen,
+2. **die Open-Facts-Datenbanken** — Lebensmittel, Drogerie/Kosmetik (Open Beauty Facts), Haushalt und Sonstiges (Open Products Facts), Tierfutter; kostenlos, ohne Konto,
+3. **auf Wunsch die KI-Websuche** — Claude (Opus 5.5) sucht den Barcode in Onlineshops und Produktdatenbanken. Nur auf Knopfdruck, nur wenn eingerichtet.
+
+|  |  |  |
+|---|---|---|
+| <img src="docs/img/barcode-preview.png" alt="Vorschau" width="240"> | <img src="docs/img/barcode-notfound.png" alt="Nichts gefunden" width="240"> | <img src="docs/img/barcode-ai.png" alt="KI-Websuche" width="240"> |
+| Treffer als Vorschau zum Bestätigen | Unbekannt: auf Wunsch KI-Websuche | Ergebnis der KI mit Quelle und Sicherheit |
+
+**Nichts wird ungefragt angelegt.** Jeder Treffer erscheint als Vorschau: Name (mit Marke), Packungsgröße, dazu Vorschläge für Produktgruppe, Standort und Mengeneinheit aus dem, was es im Profil schon gibt. Diese Vorschläge werden mit der Zeit besser: Die Suche merkt sich, welche Gruppe, welchen Standort und welche Einheit man für eine Open-Facts-Kategorie (z. B. „Toilettenpapier“) gewählt hat, und schlägt Standort und Einheit vor, die andere Produkte derselben Gruppe haben. Gibt es schon ein Produkt mit dem Namen, bietet die Vorschau an, den Barcode dort hinzuzufügen. Nach dem Bestätigen geht es zurück zum Einkauf, mit dem neuen Produkt ausgewählt.
+
+**KI-Websuche einrichten:** Schraubenschlüssel → *Barcode-Suche* (nur Administratoren des Hauptprofils). Dort den API-Key von [console.anthropic.com](https://console.anthropic.com) eintragen — alternativ als Umgebungsvariable `ANTHROPIC_API_KEY` im Container — und ein Monatslimit festlegen (Standard 100). Eine Suche kostet grob 5–8 Cent (10 $ je 1.000 Websuchen plus Tokens); die Seite zeigt den Verbrauch des Monats und schätzt die Kosten. An Anthropic gehen nur der Barcode und die Namen eurer Produktgruppen, Standorte und Einheiten. Lehnt die Sicherheitsprüfung des Modells eine Anfrage ab, wiederholt die API sie automatisch auf dem dafür vorgesehenen Ersatzmodell (`fallbacks: "default"`).
+
+Die Open-Facts-Datenbanken erlauben 15 Abfragen pro Minute; für einen Haushalt reicht das weit. Welche gefragt werden, lässt sich mit `Setting('BARCODE_LOOKUP_OPENFACTS_URLS', '…')` ändern.
+
 ## Installation
 
 Zwei dokumentierte Wege:
@@ -174,6 +193,9 @@ Das Redesign liegt weitgehend in eigenen Dateien (`grocy_theme.css`, `grocy_mobi
 | `helpers/Profiles.php`, `services/ProfileService.php`, `controllers/ProfilesController.php`, `controllers/Api/ProfilesApiController.php` | Profile: Auswahl pro Anfrage, Anlegen/Umbenennen/Löschen |
 | `services/DatabaseService.php`, `services/FilesService.php`, `services/SessionService.php`, `services/BaseService.php` | Profile: Datenbank, Dateien und Login-Cookies des jeweiligen Profils |
 | `views/profiles.blade.php`, `views/components/profileswitcher.blade.php`, `public/js/grocy_profiles.js`, `public/viewjs/profiles.js` | Profile: Verwaltung und Profilwechsler |
+| `services/BarcodeLookupService.php`, `controllers/Api/BarcodeLookupApiController.php`, `controllers/BarcodeLookupController.php` | Barcode-Suche: Such-Kette, KI-Websuche, Anlegen aus der Vorschau |
+| `public/js/grocy_barcodelookup.js`, `views/barcodelookupsettings.blade.php`, `public/viewjs/barcodelookupsettings.js`, `public/viewjs/components/productpicker.js` | Barcode-Suche: Dialog mit Vorschau, Einstellungen; die Taste „E“ der Produktauswahl öffnet den neuen Dialog |
+| `composer.json`, `composer.lock` | Das offizielle Anthropic-PHP-SDK für die KI-Websuche |
 
 ---
 

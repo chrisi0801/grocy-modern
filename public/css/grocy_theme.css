@@ -1705,3 +1705,104 @@ table.dataTable > tbody > tr.selected a:not(.btn) {
 		box-shadow: none;
 	}
 }
+
+/* ==========================================================================
+   Barcode lookup (grocy_barcodelookup.js)
+   ========================================================================== */
+
+.barcode-lookup-steps {
+	list-style: none;
+	padding: 0;
+	margin: 0 0 0.5rem 0;
+}
+
+.barcode-lookup-steps li {
+	padding: 0.3rem 0;
+	color: var(--g-text-muted);
+}
+
+.barcode-lookup-steps i {
+	width: 1.25rem;
+	color: var(--g-brand);
+}
+
+.barcode-lookup-note {
+	font-size: 0.875rem;
+	color: var(--g-text-muted);
+}
+
+.barcode-lookup-empty {
+	display: flex;
+	gap: 0.75rem;
+	align-items: flex-start;
+	margin-bottom: 0.75rem;
+}
+
+.barcode-lookup-empty > i {
+	font-size: 1.4rem;
+	color: var(--g-text-muted);
+	margin-top: 0.1rem;
+}
+
+.barcode-lookup-head {
+	display: flex;
+	gap: 0.85rem;
+	align-items: center;
+	margin-bottom: 0.9rem;
+}
+
+.barcode-lookup-picture {
+	flex: 0 0 auto;
+	width: 72px;
+	height: 72px;
+	object-fit: contain;
+	border: 1px solid var(--g-border);
+	border-radius: var(--g-radius);
+	background-color: #fff;
+}
+
+.barcode-lookup-head-text {
+	min-width: 0;
+	font-size: 0.875rem;
+}
+
+.barcode-lookup-source,
+.barcode-lookup-confidence {
+	display: inline-block;
+	padding: 0.1rem 0.55rem;
+	border-radius: var(--g-radius-pill);
+	font-size: 0.75rem;
+	font-weight: 600;
+	background-color: var(--g-surface-3);
+	color: var(--g-text);
+}
+
+.barcode-lookup-source.source-ai {
+	background-color: var(--g-brand-soft);
+	color: var(--g-brand-soft-text);
+}
+
+.barcode-lookup-confidence.confidence-high {
+	background-color: var(--g-success-soft, var(--g-surface-3));
+	color: var(--g-success);
+}
+
+.barcode-lookup-confidence.confidence-low {
+	background-color: var(--g-warning-soft, var(--g-surface-3));
+	color: var(--g-warning);
+}
+
+.barcode-lookup-size,
+.barcode-lookup-link {
+	margin-top: 0.3rem;
+	color: var(--g-text-muted);
+}
+
+.barcode-lookup-dialog .modal-footer {
+	flex-wrap: wrap;
+	gap: 0.4rem;
+}
+
+.barcode-lookup-dialog .modal-footer > * {
+	margin: 0;
+}

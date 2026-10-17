@@ -73,6 +73,10 @@ Setting('BASE_URL', '/');
 // Leave empty to disable external barcode lookups
 Setting('STOCK_BARCODE_LOOKUP_PLUGIN', 'OpenFoodFactsBarcodeLookupPlugin');
 
+// Grocy Modern: the barcode lookup asks these Open Facts databases (comma separated base URLs).
+// Empty = Open Food, Open Beauty, Open Products and Open Pet Food Facts
+Setting('BARCODE_LOOKUP_OPENFACTS_URLS', '');
+
 // If, however, your webserver does not support URL rewriting, set this to true
 Setting('DISABLE_URL_REWRITING', false);
 

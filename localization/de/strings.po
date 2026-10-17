@@ -3578,3 +3578,153 @@ msgstr "Das Hauptprofil kann nicht gelöscht werden"
 
 msgid "The folder of the profile could not be moved"
 msgstr "Der Ordner des Profils konnte nicht verschoben werden"
+
+msgid "Barcode lookup"
+msgstr "Barcode-Suche"
+
+msgid "When a scanned barcode is unknown, \"E\" in the product dialog looks for it - first in your other profiles, then in the free Open Facts databases (food, drugstore and household products, pet food). What it finds is shown as a proposal to confirm or correct before the product is created."
+msgstr "Ist ein gescannter Barcode unbekannt, sucht „E“ im Produktdialog danach - zuerst in deinen anderen Profilen, dann in den kostenlosen Open-Facts-Datenbanken (Lebensmittel, Drogerie- und Haushaltsartikel, Tierfutter). Was gefunden wird, erscheint als Vorschlag, den du vor dem Anlegen bestätigst oder korrigierst."
+
+msgid "Web search with AI"
+msgstr "KI-Websuche"
+
+msgid "For barcodes the free sources do not know, Claude can search online shops and product databases for them. That needs an API key from Anthropic and costs a few cents per search - only when you start it."
+msgstr "Für Barcodes, die die kostenlosen Quellen nicht kennen, kann Claude in Onlineshops und Produktdatenbanken danach suchen. Das braucht einen API-Key von Anthropic und kostet ein paar Cent pro Suche - nur wenn du sie startest."
+
+msgid "Only an administrator of the main profile can change this"
+msgstr "Das kann nur ein Administrator des Hauptprofils ändern"
+
+msgid "Offer the web search with AI"
+msgstr "KI-Websuche anbieten"
+
+msgid "Anthropic API key"
+msgstr "Anthropic-API-Key"
+
+msgid "Stored (%s) - enter a new one to replace it"
+msgstr "Hinterlegt (%s) - einen neuen eingeben, um ihn zu ersetzen"
+
+msgid "Taken from the environment (ANTHROPIC_API_KEY)"
+msgstr "Aus der Umgebung übernommen (ANTHROPIC_API_KEY)"
+
+msgid "Created at console.anthropic.com under \"API keys\". It is stored in the data folder of this installation and never shown again."
+msgstr "Anzulegen unter console.anthropic.com bei „API keys“. Er wird im Datenordner dieser Installation gespeichert und nie wieder angezeigt."
+
+msgid "Remove the stored key"
+msgstr "Hinterlegten Key entfernen"
+
+msgid "At most this many searches per month"
+msgstr "Höchstens so viele Suchen pro Monat"
+
+msgid "A guard against surprises on the bill - one search costs roughly 5 to 8 cents."
+msgstr "Schutz vor Überraschungen auf der Rechnung - eine Suche kostet grob 5 bis 8 Cent."
+
+msgid "Check the key"
+msgstr "Key prüfen"
+
+msgid "Searches with AI"
+msgstr "KI-Suchen"
+
+msgid "Web searches made by them"
+msgstr "Davon ausgeführte Websuchen"
+
+msgid "Estimated cost"
+msgstr "Geschätzte Kosten"
+
+msgid "Model: %s. The estimate uses the published prices; what counts is the bill in the Anthropic console."
+msgstr "Modell: %s. Die Schätzung nutzt die veröffentlichten Preise; maßgeblich ist die Abrechnung in der Anthropic-Konsole."
+
+msgid "The barcode lookup failed"
+msgstr "Die Barcode-Suche ist fehlgeschlagen"
+
+msgid "Your other profiles"
+msgstr "Deine anderen Profile"
+
+msgid "Open Food Facts, Open Beauty Facts, Open Products Facts"
+msgstr "Open Food Facts, Open Beauty Facts, Open Products Facts"
+
+msgid "The web search did not find a product for this barcode either."
+msgstr "Auch die Websuche hat zu diesem Barcode kein Produkt gefunden."
+
+msgid "Neither your other profiles nor the Open Facts databases know this barcode."
+msgstr "Weder deine anderen Profile noch die Open-Facts-Datenbanken kennen diesen Barcode."
+
+msgid "The web search with AI (Claude) looks for the barcode in online shops and product databases. It costs a few cents and takes up to half a minute - %s searches left this month."
+msgstr "Die KI-Websuche (Claude) sucht den Barcode in Onlineshops und Produktdatenbanken. Das kostet ein paar Cent und dauert bis zu einer halben Minute - diesen Monat noch %s Suchen übrig."
+
+msgid "The monthly limit for web searches with AI is reached"
+msgstr "Das Monatslimit für KI-Websuchen ist erreicht"
+
+msgid "Create manually"
+msgstr "Selbst anlegen"
+
+msgid "Search the web with AI"
+msgstr "Mit KI im Netz suchen"
+
+msgid "Claude is searching the web"
+msgstr "Claude sucht im Netz"
+
+msgid "This can take up to half a minute."
+msgstr "Das kann bis zu einer halben Minute dauern."
+
+msgid "certain"
+msgstr "sicher"
+
+msgid "probable"
+msgstr "wahrscheinlich"
+
+msgid "uncertain"
+msgstr "unsicher"
+
+msgid "Source"
+msgstr "Quelle"
+
+msgid "There already is a product \"%s\". Perhaps this is just another barcode for it?"
+msgstr "Es gibt schon ein Produkt „%s“. Vielleicht ist das nur ein weiterer Barcode dafür?"
+
+msgid "Add the barcode to \"%s\""
+msgstr "Barcode zu „%s“ hinzufügen"
+
+msgid "Group, location and unit as chosen last time for this kind of product."
+msgstr "Gruppe, Standort und Einheit wie beim letzten Mal für diese Art Produkt gewählt."
+
+msgid "Search with AI instead"
+msgstr "Lieber mit KI suchen"
+
+msgid "Product \"%s\" created"
+msgstr "Produkt „%s“ angelegt"
+
+msgid "No API key is stored"
+msgstr "Es ist kein API-Key hinterlegt"
+
+msgid "The key works - %s is available"
+msgstr "Der Key funktioniert - %s ist verfügbar"
+
+msgid "The key was not accepted"
+msgstr "Der Key wurde nicht akzeptiert"
+
+msgid "Profile \"%s\""
+msgstr "Profil „%s“"
+
+msgid "This is not a barcode"
+msgstr "Das ist kein Barcode"
+
+msgid "The web search with AI is not set up"
+msgstr "Die KI-Websuche ist nicht eingerichtet"
+
+msgid "The API key was not accepted - please check it in the barcode lookup settings"
+msgstr "Der API-Key wurde nicht akzeptiert - bitte in den Einstellungen der Barcode-Suche prüfen"
+
+msgid "Too many requests to the AI right now - please try again in a minute"
+msgstr "Gerade zu viele Anfragen an die KI - bitte in einer Minute noch einmal versuchen"
+
+msgid "The web search with AI failed: %s"
+msgstr "Die KI-Websuche ist fehlgeschlagen: %s"
+
+msgid "There already is a product with this name"
+msgstr "Es gibt schon ein Produkt mit diesem Namen"
+
+msgid "This barcode is already assigned to a product"
+msgstr "Dieser Barcode gehört schon zu einem Produkt"
+
+msgid "Please choose a location and a quantity unit"
+msgstr "Bitte einen Standort und eine Mengeneinheit wählen"

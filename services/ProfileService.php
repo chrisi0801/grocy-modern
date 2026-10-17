@@ -309,7 +309,7 @@ class ProfileService extends BaseService
 		return $tokens;
 	}
 
-	private static function StoragePathFor(string $dataPath): string
+	public static function StoragePathFor(string $dataPath): string
 	{
 		$path = $dataPath . '/storage';
 

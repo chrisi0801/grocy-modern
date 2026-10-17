@@ -1,5 +1,6 @@
 <?php
 
+use Grocy\Controllers\Api\BarcodeLookupApiController;
 use Grocy\Controllers\Api\BatteriesApiController;
 use Grocy\Controllers\Api\BudgetApiController;
 use Grocy\Controllers\Api\CalendarApiController;
@@ -14,6 +15,7 @@ use Grocy\Controllers\Api\StockApiController;
 use Grocy\Controllers\Api\SystemApiController;
 use Grocy\Controllers\Api\TasksApiController;
 use Grocy\Controllers\Api\UsersApiController;
+use Grocy\Controllers\BarcodeLookupController;
 use Grocy\Controllers\BatteriesController;
 use Grocy\Controllers\BudgetController;
 use Grocy\Controllers\CalendarController;
@@ -150,6 +152,9 @@ $app->group('', function (RouteCollectorProxy $group)
 	// Profiles (Grocy Modern)
 	$group->get('/profiles', [ProfilesController::class, 'Overview']);
 
+	// Barcode lookup (Grocy Modern)
+	$group->get('/barcodelookupsettings', [BarcodeLookupController::class, 'Settings']);
+
 	// Budget routes (Grocy Modern)
 	$group->get('/budget', [BudgetController::class, 'Overview']);
 	$group->get('/budget/transactions', [BudgetController::class, 'Transactions']);
@@ -282,6 +287,14 @@ $app->group('/api', function (RouteCollectorProxy $group)
 	$group->get('/tasks', [TasksApiController::class, 'Current']);
 	$group->post('/tasks/{taskId}/complete', [TasksApiController::class, 'MarkTaskAsCompleted']);
 	$group->post('/tasks/{taskId}/undo', [TasksApiController::class, 'UndoTask']);
+
+	// Barcode lookup (Grocy Modern)
+	$group->get('/barcodelookup/lookup/{barcode}', [BarcodeLookupApiController::class, 'Lookup']);
+	$group->post('/barcodelookup/lookup/{barcode}/ai', [BarcodeLookupApiController::class, 'LookupWithAi']);
+	$group->post('/barcodelookup/products', [BarcodeLookupApiController::class, 'CreateProduct']);
+	$group->get('/barcodelookup/settings', [BarcodeLookupApiController::class, 'GetSettings']);
+	$group->put('/barcodelookup/settings', [BarcodeLookupApiController::class, 'UpdateSettings']);
+	$group->post('/barcodelookup/settings/test', [BarcodeLookupApiController::class, 'TestApiKey']);
 
 	// Profiles (Grocy Modern)
 	$group->get('/profiles', [ProfilesApiController::class, 'GetProfiles']);

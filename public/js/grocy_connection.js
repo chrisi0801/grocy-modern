@@ -104,6 +104,25 @@ GrocyConnection.ApiFunction = function (url)
 	}
 };
 
+// A few requests are slow by nature - the web search of the barcode lookup
+// searches the web, that takes its time
+GrocyConnection.SlowRequests = [
+	{ pattern: /^barcodelookup\/lookup\/[^/]+\/ai$/, timeout: 180000 },
+	{ pattern: /^barcodelookup\/lookup\//, timeout: 60000 },
+	{ pattern: /^barcodelookup\/products$/, timeout: 60000 }
+];
+
+GrocyConnection.TimeoutFor = function (apiFunction)
+{
+	var path = (apiFunction || "").split("?")[0];
+	var rule = GrocyConnection.SlowRequests.find(function (candidate)
+	{
+		return candidate.pattern.test(path);
+	});
+
+	return rule ? rule.timeout : GrocyConnection.RequestTimeout;
+};
+
 // Background polling is nobody's input - it updates the dot, but a failure
 // of it is not worth a toast
 GrocyConnection.IsBackground = function (apiFunction)
@@ -282,7 +301,7 @@ GrocyConnection.Track = function (xhr, method, url)
 
 			if (this.timeout === 0 && !isUpload)
 			{
-				this.timeout = GrocyConnection.RequestTimeout;
+				this.timeout = GrocyConnection.TimeoutFor(GrocyConnection.ApiFunction(request.url));
 			}
 
 			try
@@ -401,6 +420,13 @@ GrocyConnection.LongestPending = function ()
 
 	this.Pending.forEach(function (record)
 	{
+		// Slow by nature (the web search of the barcode lookup) - waiting
+		// for it says nothing about the connection
+		if (record.timeout > GrocyConnection.RequestTimeout)
+		{
+			return;
+		}
+
 		longest = Math.max(longest, now - record.start);
 	});
 

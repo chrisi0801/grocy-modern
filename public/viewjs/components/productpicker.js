@@ -254,7 +254,29 @@ $('#product_id_text_input').on('blur', function (e)
 				}
 			};
 
-			if (Grocy.ExternalBarcodeLookupPluginName)
+			// Grocy Modern: the barcode lookup asks several sources and shows a
+			// preview first (grocy_barcodelookup.js) - Grocy's single plugin is
+			// only the fallback when that is not loaded
+			if (typeof GrocyBarcodeLookup !== "undefined")
+			{
+				buttons.barcodepluginlookup = {
+					label: '<strong>E</strong> ' + __t('Barcode lookup'),
+					className: 'btn-dark add-new-product-plugin-dialog-button responsive-button ' + addProductWorkflowsAdditionalCssClasses,
+					callback: function ()
+					{
+						Grocy.Components.ProductPicker.PopupOpen = false;
+
+						var returnFlow = embedded;
+						if (GetUriParam("list") !== undefined)
+						{
+							returnFlow += "&list=" + GetUriParam("list");
+						}
+
+						GrocyBarcodeLookup.Open(input, returnFlow);
+					}
+				};
+			}
+			else if (Grocy.ExternalBarcodeLookupPluginName)
 			{
 				buttons.barcodepluginlookup = {
 					label: '<strong>E</strong> ' + __t('External barcode lookup') + ' <span class="badge badge-pill badge-light">' + Grocy.ExternalBarcodeLookupPluginName + '</span>',

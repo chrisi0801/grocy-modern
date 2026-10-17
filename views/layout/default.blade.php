@@ -413,6 +413,8 @@
 					@if(GROCY_PROFILE_ID === \Grocy\Helpers\Profiles::MAIN && !GROCY_IS_EMBEDDED_INSTALL)
 					<a class="dropdown-item discrete-link permission-ADMIN"
 						href="{{ $U('/profiles') }}"><i class="fa-solid fa-building"></i>&nbsp;{{ $__t('Profiles') }}</a>
+					<a class="dropdown-item discrete-link permission-ADMIN"
+						href="{{ $U('/barcodelookupsettings') }}"><i class="fa-solid fa-barcode"></i>&nbsp;{{ $__t('Barcode lookup') }}</a>
 					@endif
 					<div class="dropdown-divider"></div>
 					@if(!GROCY_DISABLE_AUTH)

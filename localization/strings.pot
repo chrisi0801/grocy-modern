@@ -3192,3 +3192,153 @@ msgstr ""
 
 msgid "The folder of the profile could not be moved"
 msgstr ""
+
+msgid "Barcode lookup"
+msgstr ""
+
+msgid "When a scanned barcode is unknown, \"E\" in the product dialog looks for it - first in your other profiles, then in the free Open Facts databases (food, drugstore and household products, pet food). What it finds is shown as a proposal to confirm or correct before the product is created."
+msgstr ""
+
+msgid "Web search with AI"
+msgstr ""
+
+msgid "For barcodes the free sources do not know, Claude can search online shops and product databases for them. That needs an API key from Anthropic and costs a few cents per search - only when you start it."
+msgstr ""
+
+msgid "Only an administrator of the main profile can change this"
+msgstr ""
+
+msgid "Offer the web search with AI"
+msgstr ""
+
+msgid "Anthropic API key"
+msgstr ""
+
+msgid "Stored (%s) - enter a new one to replace it"
+msgstr ""
+
+msgid "Taken from the environment (ANTHROPIC_API_KEY)"
+msgstr ""
+
+msgid "Created at console.anthropic.com under \"API keys\". It is stored in the data folder of this installation and never shown again."
+msgstr ""
+
+msgid "Remove the stored key"
+msgstr ""
+
+msgid "At most this many searches per month"
+msgstr ""
+
+msgid "A guard against surprises on the bill - one search costs roughly 5 to 8 cents."
+msgstr ""
+
+msgid "Check the key"
+msgstr ""
+
+msgid "Searches with AI"
+msgstr ""
+
+msgid "Web searches made by them"
+msgstr ""
+
+msgid "Estimated cost"
+msgstr ""
+
+msgid "Model: %s. The estimate uses the published prices; what counts is the bill in the Anthropic console."
+msgstr ""
+
+msgid "The barcode lookup failed"
+msgstr ""
+
+msgid "Your other profiles"
+msgstr ""
+
+msgid "Open Food Facts, Open Beauty Facts, Open Products Facts"
+msgstr ""
+
+msgid "The web search did not find a product for this barcode either."
+msgstr ""
+
+msgid "Neither your other profiles nor the Open Facts databases know this barcode."
+msgstr ""
+
+msgid "The web search with AI (Claude) looks for the barcode in online shops and product databases. It costs a few cents and takes up to half a minute - %s searches left this month."
+msgstr ""
+
+msgid "The monthly limit for web searches with AI is reached"
+msgstr ""
+
+msgid "Create manually"
+msgstr ""
+
+msgid "Search the web with AI"
+msgstr ""
+
+msgid "Claude is searching the web"
+msgstr ""
+
+msgid "This can take up to half a minute."
+msgstr ""
+
+msgid "certain"
+msgstr ""
+
+msgid "probable"
+msgstr ""
+
+msgid "uncertain"
+msgstr ""
+
+msgid "Source"
+msgstr ""
+
+msgid "There already is a product \"%s\". Perhaps this is just another barcode for it?"
+msgstr ""
+
+msgid "Add the barcode to \"%s\""
+msgstr ""
+
+msgid "Group, location and unit as chosen last time for this kind of product."
+msgstr ""
+
+msgid "Search with AI instead"
+msgstr ""
+
+msgid "Product \"%s\" created"
+msgstr ""
+
+msgid "No API key is stored"
+msgstr ""
+
+msgid "The key works - %s is available"
+msgstr ""
+
+msgid "The key was not accepted"
+msgstr ""
+
+msgid "Profile \"%s\""
+msgstr ""
+
+msgid "This is not a barcode"
+msgstr ""
+
+msgid "The web search with AI is not set up"
+msgstr ""
+
+msgid "The API key was not accepted - please check it in the barcode lookup settings"
+msgstr ""
+
+msgid "Too many requests to the AI right now - please try again in a minute"
+msgstr ""
+
+msgid "The web search with AI failed: %s"
+msgstr ""
+
+msgid "There already is a product with this name"
+msgstr ""
+
+msgid "This barcode is already assigned to a product"
+msgstr ""
+
+msgid "Please choose a location and a quantity unit"
+msgstr ""

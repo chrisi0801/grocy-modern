@@ -2,6 +2,7 @@
 
 @once
 @push('componentScripts')
+<script src="{{ $U('/js/grocy_barcodelookup.js', true) }}?v={{ $version }}"></script>
 <script src="{{ $U('/viewjs/components/productpicker.js', true) }}?v={{ $version }}"></script>
 @endpush
 @push('componentScripts')
