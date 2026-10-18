@@ -3472,3 +3472,12 @@ msgstr ""
 
 msgid "Store, location, note"
 msgstr ""
+
+msgid "Scan barcode"
+msgstr ""
+
+msgid "Location & details"
+msgstr ""
+
+msgid "Consume a product"
+msgstr ""

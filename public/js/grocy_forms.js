@@ -119,7 +119,14 @@ GrocyForms.Section = function (form, options)
 		+ "</div>");
 
 	section.find(".gm-section-title").text(options.title);
-	section.insertBefore(options.before);
+
+	// A save button in grocy's floating save bar: before the bar, not into it
+	var before = $(options.before);
+	if (before.closest(".sticky-form-footer").length)
+	{
+		before = before.closest(".sticky-form-footer");
+	}
+	section.insertBefore(before);
 
 	var body = section.find(".gm-section-body");
 	groups.forEach(function (group)
@@ -164,6 +171,13 @@ GrocyForms.Section = function (form, options)
 // Errors only for fields that were edited, or after trying to save
 GrocyForms.QuietValidation = function (form, saveSelector)
 {
+	if (form.hasClass("gm-quiet-validation"))
+	{
+		return;
+	}
+
+	// Whatever saves: grocy's save buttons are green, blue or submit buttons
+	saveSelector = saveSelector || '[id^="save-"], .btn-success, .btn-primary, .btn-info, [type="submit"]';
 	form.addClass("gm-quiet-validation");
 
 	form.on("input change", ":input", function (e)
@@ -211,7 +225,9 @@ GrocyForms.QuietValidation = function (form, saveSelector)
 
 	form[0].addEventListener("click", function (e)
 	{
-		if ($(e.target).closest(saveSelector).length)
+		var button = $(e.target).closest(saveSelector);
+
+		if (button.length && !button.is("#camerabarcodescanner-start-button, .gm-scan-button, .gm-section-head"))
 		{
 			tried();
 		}
@@ -384,40 +400,26 @@ GrocyForms.ProductForm = function (form)
 		}
 	});
 
-	GrocyForms.QuietValidation(form, ".save-product-button");
 };
 
-GrocyForms.PurchaseForm = function (form)
+// "means 2.25 per pack" appears when leaving the price field - in a line of
+// its own that is always there, so the button below doesn't jump away right
+// under the finger that taps it
+GrocyForms.FixPriceHint = function ()
+{
+	$("#price-hint").removeClass("float-right mt-1").addClass("gm-price-hint").insertAfter(GrocyForms.Group("price").find(".input-group").first());
+};
+
+// Store, location, label and note - set by the product most of the time
+GrocyForms.StoreLocationNoteSection = function (form, before)
 {
 	var g = GrocyForms.Group;
-
-	// Price, and whether it is per unit or for all, in one place
-	var priceTypes = form.find('input[name="price-type"]').closest(".custom-control");
-	if (priceTypes.length)
-	{
-		var toggle = $('<div class="gm-segmented" role="radiogroup"></div>');
-		priceTypes.each(function ()
-		{
-			$(this).removeClass("custom-control custom-radio custom-control-inline mt-n2 mb-3").addClass("gm-segment");
-			$(this).find("input").removeClass("custom-control-input");
-			$(this).find("label").removeClass("custom-control-label");
-			toggle.append(this);
-		});
-		g("price").removeClass("mb-1").find("label[for=price]").first().after(toggle);
-	}
-
-	// "means 2.25 per pack" appears when leaving the price field - in a line
-	// of its own that is always there, so the OK button doesn't jump away
-	// right under the finger that taps it
-	$("#price-hint").removeClass("float-right mt-1").addClass("gm-price-hint").insertAfter(g("price").find(".input-group").first());
-
-	var save = $("#save-purchase-button");
 
 	GrocyForms.Section(form, {
 		key: "more",
 		title: __t("Store, location, note"),
 		icon: "fa-ellipsis",
-		before: save,
+		before: before,
 		groups: [g("shopping_location_id"), g("location_id"), g("stock_label_type"), g("note"), form.find("#userfields-form")],
 		summary: function ()
 		{
@@ -439,9 +441,190 @@ GrocyForms.PurchaseForm = function (form)
 			form.trigger("gm-refresh");
 		}, 800);
 	});
-
-	GrocyForms.QuietValidation(form, "#save-purchase-button");
 };
+
+GrocyForms.PurchaseForm = function (form)
+{
+	var g = GrocyForms.Group;
+
+	// Price, and whether it is per unit or for all, in one place
+	var priceTypes = form.find('input[name="price-type"]').closest(".custom-control");
+	if (priceTypes.length)
+	{
+		var toggle = $('<div class="gm-segmented" role="radiogroup"></div>');
+		priceTypes.each(function ()
+		{
+			$(this).removeClass("custom-control custom-radio custom-control-inline mt-n2 mb-3").addClass("gm-segment");
+			$(this).find("input").removeClass("custom-control-input");
+			$(this).find("label").removeClass("custom-control-label");
+			toggle.append(this);
+		});
+		g("price").removeClass("mb-1").find("label[for=price]").first().after(toggle);
+	}
+
+	GrocyForms.FixPriceHint();
+	GrocyForms.StoreLocationNoteSection(form, $("#save-purchase-button"));
+};
+
+GrocyForms.InventoryForm = function (form)
+{
+	GrocyForms.FixPriceHint();
+	GrocyForms.StoreLocationNoteSection(form, $("#save-inventory-button"));
+};
+
+GrocyForms.ConsumeForm = function (form)
+{
+	var g = GrocyForms.Group;
+
+	GrocyForms.Section(form, {
+		key: "details",
+		title: __t("Location & details"),
+		icon: "fa-ellipsis",
+		before: $("#save-consume-button"),
+		groups: [g("location_id"), g("spoiled"), g("use_specific_stock_entry"), g("recipe_id")],
+		summary: function ()
+		{
+			var recipe = $("#recipe_id").val() ? $("#recipe_id option:selected").text().trim() : "";
+			return [
+				$("#location_id option:selected").text().trim(),
+				GrocyForms.Checked("spoiled") ? GrocyForms.LabelText("spoiled") : "",
+				GrocyForms.Checked("use_specific_stock_entry") ? $("#specific_stock_entry option:selected").text().trim() || GrocyForms.LabelText("use_specific_stock_entry") : "",
+				recipe
+			];
+		}
+	});
+
+	// Which locations have stock is known only after choosing the product
+	form.on("change", "#product_id", function ()
+	{
+		setTimeout(function ()
+		{
+			form.trigger("gm-refresh");
+		}, 800);
+	});
+};
+
+GrocyForms.TransferForm = function (form)
+{
+	var g = GrocyForms.Group;
+	var amount = $("#display_amount").closest(".form-group.row");
+
+	// Product, amount, then from -> to side by side
+	if (amount.length)
+	{
+		var anchor = $('<div class="gm-anchor"></div>').insertAfter(amount);
+		GrocyForms.Row(anchor, [g("location_id_from"), g("location_id_to")]);
+	}
+};
+
+GrocyForms.ChoreForm = function (form)
+{
+	var g = GrocyForms.Group;
+	var save = $("#save-chore-button");
+
+	GrocyForms.Section(form, {
+		key: "assignment",
+		title: __t("Assignment"),
+		icon: "fa-users",
+		before: save,
+		groups: [g("assignment_type"), g("assignment_config"), $("#chore-assignment-type-info")],
+		summary: function ()
+		{
+			var people = $("#assignment_config option:selected").map(function ()
+			{
+				return $(this).text().trim();
+			}).get();
+			return [
+				$("#assignment_type").val() && $("#assignment_type").val() !== "no-assignment" ? $("#assignment_type option:selected").text().trim() : "",
+				people.join(", ")
+			];
+		}
+	});
+
+	GrocyForms.Section(form, {
+		key: "consume",
+		title: __t("Consume a product"),
+		icon: "fa-box-open",
+		before: save,
+		groups: [g("consume_product_on_execution"), form.find("#product_id").closest(".form-group"), g("product_amount")],
+		summary: function ()
+		{
+			return [
+				GrocyForms.Checked("consume_product_on_execution") && $("#product_id").val() ? GrocyForms.Number("product_amount") + " × " + $("#product_id option:selected").text().trim() : ""
+			];
+		}
+	});
+
+	GrocyForms.Section(form, {
+		key: "more",
+		title: __t("More settings"),
+		icon: "fa-sliders",
+		before: save,
+		groups: [g("active"), g("description"), g("track_date_only"), g("rollover"), form.find("#userfields-form")],
+		summary: function ()
+		{
+			return [
+				GrocyForms.Checked("active") ? "" : __t("Not active"),
+				GrocyForms.Checked("track_date_only") ? GrocyForms.LabelText("track_date_only") : "",
+				GrocyForms.Checked("rollover") ? GrocyForms.LabelText("rollover") : ""
+			];
+		}
+	});
+};
+
+// Small master data forms: the description editor - toolbar and all - is the
+// tallest thing there and rarely needed
+GrocyForms.DescriptionSection = function (form)
+{
+	GrocyForms.Section(form, {
+		key: "description",
+		title: __t("Description"),
+		icon: "fa-align-left",
+		before: GrocyForms.Group("description"),
+		groups: [GrocyForms.Group("description")],
+		summary: function ()
+		{
+			var text = $("<div></div>").html($("#description").val() || "").text().trim();
+			return [text.length > 60 ? text.substring(0, 60) + "…" : text];
+		}
+	});
+};
+
+// A big scan button on the booking pages - the small camera inside the
+// product field is hard to hit on a phone. It starts grocy's own camera
+// scanner (the small button, hidden then on small screens).
+GrocyForms.ScanButton = function (form)
+{
+	if (form.find(".barcodescanner-input").length === 0
+		|| GetUriParam("embedded") !== undefined
+		|| BoolVal(Grocy.FeatureFlags.GROCY_FEATURE_FLAG_DISABLE_BROWSER_BARCODE_CAMERA_SCANNING))
+	{
+		return;
+	}
+
+	var button = $('<button type="button" class="btn gm-scan-button"><i class="fa-solid fa-barcode"></i><span></span></button>');
+	button.find("span").text(__t("Scan barcode"));
+	button.insertBefore(form.find(".barcodescanner-input").first().closest(".form-group"));
+	form.addClass("gm-has-scan-button");
+
+	button.on("click", function ()
+	{
+		var start = form.find("#camerabarcodescanner-start-button").first();
+
+		if (start.length && !start.hasClass("disabled"))
+		{
+			start.trigger("click");
+		}
+	});
+};
+
+["#purchase-form", "#consume-form", "#transfer-form", "#inventory-form"].forEach(function (selector)
+{
+	if ($(selector).length)
+	{
+		GrocyForms.ScanButton($(selector));
+	}
+});
 
 // An empty product card is just a column of labels - it shows up once a
 // product is chosen (purchase, consume, inventory, transfer)
@@ -461,12 +644,31 @@ if (productCard.length && $("#product_id").length)
 // Amount and unit side by side wherever grocy asks for both
 $("#display_amount").closest(".form-group.row").find("> .col > .row").addClass("gm-amount-row");
 
-if ($("#product-form").length)
-{
-	GrocyForms.ProductForm($("#product-form"));
-}
+var forms = {
+	"#product-form": GrocyForms.ProductForm,
+	"#purchase-form": GrocyForms.PurchaseForm,
+	"#inventory-form": GrocyForms.InventoryForm,
+	"#consume-form": GrocyForms.ConsumeForm,
+	"#transfer-form": GrocyForms.TransferForm,
+	"#chore-form": GrocyForms.ChoreForm,
+	"#battery-form": GrocyForms.DescriptionSection,
+	"#location-form": GrocyForms.DescriptionSection,
+	"#quantityunit-form": GrocyForms.DescriptionSection,
+	"#product-group-form": GrocyForms.DescriptionSection,
+	"#shoppinglocation-form": GrocyForms.DescriptionSection,
+	"#task-form": GrocyForms.DescriptionSection
+};
 
-if ($("#purchase-form").length)
+Object.keys(forms).forEach(function (selector)
 {
-	GrocyForms.PurchaseForm($("#purchase-form"));
-}
+	if ($(selector).length)
+	{
+		forms[selector]($(selector));
+	}
+});
+
+// Calm errors in every form of a page, not only the regrouped ones
+$(".content-wrapper form").each(function ()
+{
+	GrocyForms.QuietValidation($(this));
+});

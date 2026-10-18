@@ -1798,13 +1798,71 @@ table.dataTable > tbody > tr.selected a:not(.btn) {
 	color: var(--g-text-muted);
 }
 
+/* bootbox makes the footer `d-block d-sm-flex` - stacked full-width buttons
+   on a phone; here they share rows instead */
 .barcode-lookup-dialog .modal-footer {
+	display: flex !important;
 	flex-wrap: wrap;
 	gap: 0.4rem;
 }
 
 .barcode-lookup-dialog .modal-footer > * {
-	margin: 0;
+	margin: 0 !important;
+}
+
+/* On a phone: the secondary buttons share a row, the main action gets the
+   full width below, where the thumb is */
+@media (max-width: 575.98px) {
+	.barcode-lookup-dialog .modal-footer > .btn {
+		flex: 1 1 auto;
+	}
+
+	.barcode-lookup-dialog .modal-footer > .btn-success,
+	.barcode-lookup-dialog .modal-footer > .btn-primary {
+		flex-basis: 100%;
+	}
+}
+
+/* Dialogs with a form of the fork's own (barcode lookup, unit change) are
+   never taller than the screen: the body scrolls, title and buttons stay in
+   view. A sheet taller than the screen relied on the overlay scrolling, which
+   a phone did not always do - the main button ended up below the screen edge
+   for good. Only for dialogs without Bootstrap dropdowns, which a scrolling
+   body would clip. grocy_sheet.js knows the body is the scroller here. */
+.modal.gm-bounded-dialog .modal-content {
+	display: flex;
+	flex-direction: column;
+	max-height: calc(100vh - 3.5rem);
+}
+
+.modal.gm-bounded-dialog .modal-header,
+.modal.gm-bounded-dialog .modal-footer {
+	flex: 0 0 auto;
+}
+
+.modal.gm-bounded-dialog .modal-body {
+	flex: 1 1 auto;
+	min-height: 0;
+	overflow-y: auto;
+	overscroll-behavior: contain;
+}
+
+@supports (height: 100svh) {
+	.modal.gm-bounded-dialog .modal-content {
+		max-height: calc(100svh - 3.5rem);
+	}
+}
+
+@media (max-width: 575.98px) {
+	.modal.gm-bounded-dialog .modal-content {
+		max-height: calc(100vh - env(safe-area-inset-top, 0px) - 1.25rem);
+	}
+
+	@supports (height: 100svh) {
+		.modal.gm-bounded-dialog .modal-content {
+			max-height: calc(100svh - env(safe-area-inset-top, 0px) - 1.25rem);
+		}
+	}
 }
 
 /* ==========================================================================
@@ -1934,7 +1992,10 @@ table.dataTable > tbody > tr.selected a:not(.btn) {
 	padding-left: 0;
 }
 
-#save-purchase-button {
+/* The booking pages' main buttons: full width, easy to hit */
+form.gm-has-scan-button > .btn {
+	margin-bottom: 0.5rem;
+	min-height: 48px;
 	width: 100%;
 }
 
@@ -2003,6 +2064,25 @@ form.gm-quiet-validation:not(.gm-tried) .form-group:not(.gm-touched) .input-grou
 	border-color: var(--g-border-strong);
 }
 
+/* A multi-select (bootstrap-select, e.g. who a chore is assigned to) wraps
+   its select, so Bootstrap's "invalid ~ feedback" rule never matched and
+   saving failed without saying why */
+form.was-validated .bootstrap-select:has(select:invalid) ~ .invalid-feedback {
+	display: block;
+}
+
+form.gm-quiet-validation:not(.gm-tried) .form-group:not(.gm-touched) .bootstrap-select:has(select:invalid) ~ .invalid-feedback {
+	display: none;
+}
+
+form.was-validated .bootstrap-select:has(select:invalid) > .dropdown-toggle {
+	border-color: var(--g-danger);
+}
+
+form.gm-quiet-validation:not(.gm-tried) .form-group:not(.gm-touched) .bootstrap-select:has(select:invalid) > .dropdown-toggle {
+	border-color: var(--g-border-strong);
+}
+
 /* The save bar of long forms: both buttons in one row on a phone */
 @media (max-width: 575.98px) {
 	.sticky-form-footer {
@@ -2022,6 +2102,50 @@ form.gm-quiet-validation:not(.gm-tried) .form-group:not(.gm-touched) .input-grou
 	}
 
 	.sticky-form-footer > small {
+		display: none !important;
+	}
+}
+
+/* The big scan button of the booking pages (grocy_forms.js) - phones and
+   tablets; with it, the small camera inside the product field goes */
+.gm-scan-button {
+	align-items: center;
+	background-color: var(--g-brand);
+	border: 0;
+	border-radius: var(--g-radius);
+	color: var(--g-brand-contrast);
+	display: flex;
+	font-size: 1.0625rem;
+	font-weight: 600;
+	gap: 0.75rem;
+	justify-content: center;
+	margin-bottom: 1rem;
+	min-height: 56px;
+	width: 100%;
+}
+
+.gm-scan-button:hover,
+.gm-scan-button:focus {
+	background-color: var(--g-brand-hover);
+	color: var(--g-brand-contrast);
+}
+
+.gm-scan-button:active {
+	background-color: var(--g-brand-active);
+}
+
+.gm-scan-button i {
+	font-size: 1.375rem;
+}
+
+@media (min-width: 992px) {
+	.gm-scan-button {
+		display: none;
+	}
+}
+
+@media (max-width: 991.98px) {
+	.gm-has-scan-button #camerabarcodescanner-start-button {
 		display: none !important;
 	}
 }

@@ -3858,3 +3858,12 @@ msgstr "gehört zu %s"
 
 msgid "Store, location, note"
 msgstr "Geschäft, Standort, Notiz"
+
+msgid "Scan barcode"
+msgstr "Barcode scannen"
+
+msgid "Location & details"
+msgstr "Standort & Details"
+
+msgid "Consume a product"
+msgstr "Produkt verbrauchen"

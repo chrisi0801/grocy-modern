@@ -49,6 +49,7 @@ $("#qu-stock-change-button").on("click", function ()
 			+ '<div class="invalid-feedback">' + __t("Please enter a number greater than 0") + "</div></div></div>"
 			+ '<p class="small text-muted mb-0" id="qu-change-preview"></p>'
 			+ "</form>",
+		className: "gm-bounded-dialog",
 		onEscape: true,
 		backdrop: true,
 		closeButton: true,

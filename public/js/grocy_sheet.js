@@ -265,11 +265,12 @@ $(document).on("show.bs.modal", ".modal", function ()
 	this.classList.toggle("modal-embedded-view", !!this.querySelector(".modal-body iframe.embed-responsive"));
 });
 
-// The element that actually scrolls: for a bounded dialog that is the body,
-// for every other modal the modal itself
+// The element that actually scrolls: for a bounded dialog (embedded views,
+// the fork's own form dialogs) that is the body, for every other modal the
+// modal itself
 GrocySheet.Scroller = function (modal)
 {
-	if (modal.classList.contains("modal-embedded-view"))
+	if (modal.classList.contains("modal-embedded-view") || modal.classList.contains("gm-bounded-dialog"))
 	{
 		return modal.querySelector(".modal-body") || modal;
 	}

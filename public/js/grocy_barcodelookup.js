@@ -40,11 +40,17 @@ GrocyBarcodeLookup.Open = function (barcode, returnFlow)
 	GrocyBarcodeLookup.Dialog = bootbox.dialog({
 		title: '<i class="fa-solid fa-barcode"></i> ' + GrocyBarcodeLookup.Escape(barcode),
 		message: '<div id="barcode-lookup-body"></div>',
-		className: "barcode-lookup-dialog",
+		className: "barcode-lookup-dialog gm-bounded-dialog",
 		onEscape: true,
 		backdrop: true,
 		closeButton: true,
 		buttons: {}
+	});
+
+	GrocyBarcodeLookup.Dialog.on("hide.bs.modal", function ()
+	{
+		// They live in the body, not in the dialog
+		$(this).find('[data-toggle="tooltip"]').tooltip("dispose");
 	});
 
 	GrocyBarcodeLookup.Dialog.on("hidden.bs.modal", function ()
@@ -250,9 +256,16 @@ GrocyBarcodeLookup.SearchWithAi = function ()
 	);
 };
 
-GrocyBarcodeLookup.Select = function (id, label, rows, selectedId, allowEmpty)
+// A small (i) next to a label - the explanation on a tap instead of a line
+// of text under the field
+GrocyBarcodeLookup.Info = function (text)
 {
-	var html = '<div class="form-group"><label for="' + id + '">' + GrocyBarcodeLookup.Escape(label) + "</label>"
+	return ' <i class="fa-solid fa-circle-info text-muted barcode-lookup-info" tabindex="0" role="button" data-toggle="tooltip" data-trigger="hover click" title="' + GrocyBarcodeLookup.Escape(text) + '"></i>';
+};
+
+GrocyBarcodeLookup.Select = function (id, label, rows, selectedId, allowEmpty, info)
+{
+	var html = '<div class="form-group"><label for="' + id + '">' + GrocyBarcodeLookup.Escape(label) + "</label>" + (info ? GrocyBarcodeLookup.Info(info) : "")
 		+ '<select class="custom-control custom-select" id="' + id + '">';
 
 	if (allowEmpty)
@@ -332,19 +345,17 @@ GrocyBarcodeLookup.Show = function (data, afterAi)
 		+ '<div class="invalid-feedback">' + __t("A name is required") + "</div></div>"
 		+ GrocyBarcodeLookup.Select("barcode-lookup-group", __t("Product group"), data.options.product_groups, result.product_group_id, true)
 		+ '<div class="form-row"><div class="col-6">' + GrocyBarcodeLookup.Select("barcode-lookup-location", __t("Default location"), data.options.locations, result.location_id, false) + "</div>"
-		+ '<div class="col-6">' + GrocyBarcodeLookup.Select("barcode-lookup-qu", __t("Quantity unit"), data.options.quantity_units, result.qu_id, false) + "</div></div>"
-		+ '<small class="form-text text-muted barcode-lookup-qu-hint">' + __t('Stock is counted in this unit. To change it after the first purchase, use "Count stock in another unit" on the product.') + "</small>"
+		+ '<div class="col-6">' + GrocyBarcodeLookup.Select("barcode-lookup-qu", __t("Quantity unit"), data.options.quantity_units, result.qu_id, false, __t('Stock is counted in this unit. To change it after the first purchase, use "Count stock in another unit" on the product.')) + "</div></div>"
 		+ '<div class="form-row mt-3"><div class="col-6"><div class="form-group">'
 		+ '<label for="barcode-lookup-min-stock">' + __t("Minimum stock amount") + "</label>"
 		+ '<input type="number" class="form-control" id="barcode-lookup-min-stock" inputmode="decimal" min="0" step="any" value="' + GrocyBarcodeLookup.Escape(result.min_stock_amount || 0) + '">'
 		+ '<div class="invalid-feedback">' + __t("This cannot be negative") + "</div></div></div>"
 		+ '<div class="col-6"><div class="form-group">'
-		+ '<label for="barcode-lookup-due-days">' + __t("Keeps for (days)") + "</label>"
+		+ '<label for="barcode-lookup-due-days">' + __t("Keeps for (days)") + "</label>" + GrocyBarcodeLookup.Info(__t("With 0 days the due date is asked for on every purchase."))
 		+ '<input type="number" class="form-control" id="barcode-lookup-due-days" inputmode="numeric" min="0" step="1">'
 		+ '<div class="custom-control custom-checkbox mt-1"><input type="checkbox" class="custom-control-input" id="barcode-lookup-never-overdue">'
 		+ '<label class="custom-control-label" for="barcode-lookup-never-overdue">' + __t("Never overdue") + "</label></div>"
 		+ "</div></div></div>"
-		+ '<small class="form-text text-muted barcode-lookup-due-hint">' + __t("With 0 days the due date is asked for on every purchase.") + "</small>"
 		+ "</form>";
 
 	if (result.learned)
@@ -353,6 +364,7 @@ GrocyBarcodeLookup.Show = function (data, afterAi)
 	}
 
 	GrocyBarcodeLookup.Body().html(html);
+	GrocyBarcodeLookup.Body().find('[data-toggle="tooltip"]').tooltip({ container: "body" });
 	GrocyBarcodeLookup.SetDueDays(result.default_best_before_days);
 	GrocyBarcodeLookup.FollowGroup(data.group_defaults || {});
 
