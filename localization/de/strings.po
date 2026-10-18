@@ -3810,3 +3810,51 @@ msgstr "Umstellen und speichern"
 
 msgid "In stock now: %1$s - afterwards: %2$s"
 msgstr "Jetzt im Bestand: %1$s - danach: %2$s"
+
+msgid "Keeping"
+msgstr "Haltbarkeit"
+
+msgid "never overdue"
+msgstr "nie überfällig"
+
+msgid "%s days"
+msgstr "%s Tage"
+
+msgid "opened: %s"
+msgstr "geöffnet: %s"
+
+msgid "frozen: %s"
+msgstr "eingefroren: %s"
+
+msgid "thawed: %s"
+msgstr "aufgetaut: %s"
+
+msgid "Consuming & opening"
+msgstr "Verbrauch & Öffnen"
+
+msgid "from %s"
+msgstr "aus %s"
+
+msgid "consumed in %s"
+msgstr "verbraucht in %s"
+
+msgid "Purchasing"
+msgstr "Einkauf"
+
+msgid "bought in %s"
+msgstr "gekauft in %s"
+
+msgid "prices per %s"
+msgstr "Preise pro %s"
+
+msgid "More settings"
+msgstr "Weitere Einstellungen"
+
+msgid "Not active"
+msgstr "Nicht aktiv"
+
+msgid "part of %s"
+msgstr "gehört zu %s"
+
+msgid "Store, location, note"
+msgstr "Geschäft, Standort, Notiz"

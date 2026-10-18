@@ -3424,3 +3424,51 @@ msgstr ""
 
 msgid "In stock now: %1$s - afterwards: %2$s"
 msgstr ""
+
+msgid "Keeping"
+msgstr ""
+
+msgid "never overdue"
+msgstr ""
+
+msgid "%s days"
+msgstr ""
+
+msgid "opened: %s"
+msgstr ""
+
+msgid "frozen: %s"
+msgstr ""
+
+msgid "thawed: %s"
+msgstr ""
+
+msgid "Consuming & opening"
+msgstr ""
+
+msgid "from %s"
+msgstr ""
+
+msgid "consumed in %s"
+msgstr ""
+
+msgid "Purchasing"
+msgstr ""
+
+msgid "bought in %s"
+msgstr ""
+
+msgid "prices per %s"
+msgstr ""
+
+msgid "More settings"
+msgstr ""
+
+msgid "Not active"
+msgstr ""
+
+msgid "part of %s"
+msgstr ""
+
+msgid "Store, location, note"
+msgstr ""

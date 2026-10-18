@@ -872,6 +872,8 @@
 	<script src="{{ $U('/js/grocy_summernote.js?v=', true) }}{{ $version }}"></script>
 	@endif
 
+	{{-- Regroups the product and purchase forms, see there --}}
+	<script src="{{ $U('/js/grocy_forms.js?v=', true) }}{{ $version }}"></script>
 	@stack('pageScripts')
 	@stack('componentScripts')
 	<script src="{{ $U('/viewjs/' . $viewName . '.js?v=', true) }}{{ $version }}"></script>

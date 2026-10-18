@@ -1806,3 +1806,222 @@ table.dataTable > tbody > tr.selected a:not(.btn) {
 .barcode-lookup-dialog .modal-footer > * {
 	margin: 0;
 }
+
+/* ==========================================================================
+   Shorter forms (grocy_forms.js): sections that open on a tap, fields side
+   by side, errors only after editing or trying to save
+   ========================================================================== */
+
+.gm-section {
+	background: var(--g-surface);
+	border: 1px solid var(--g-border);
+	border-radius: var(--g-radius);
+	margin-bottom: 0.75rem;
+}
+
+.gm-section-head {
+	align-items: center;
+	background: none;
+	border: 0;
+	border-radius: var(--g-radius);
+	color: var(--g-text);
+	display: flex;
+	gap: 0.75rem;
+	min-height: 52px;
+	padding: 0.625rem 1rem;
+	text-align: left;
+	width: 100%;
+}
+
+.gm-section-head:focus-visible {
+	box-shadow: 0 0 0 3px var(--g-brand-ring);
+	outline: none;
+}
+
+.gm-section-icon {
+	color: var(--g-brand);
+	flex: 0 0 1.25rem;
+	text-align: center;
+}
+
+.gm-section-text {
+	display: flex;
+	flex: 1;
+	flex-direction: column;
+	min-width: 0;
+}
+
+.gm-section-title {
+	font-weight: 600;
+}
+
+.gm-section-summary {
+	color: var(--g-text-muted);
+	font-size: 0.8125rem;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
+
+.gm-section-summary:empty {
+	display: none;
+}
+
+.gm-section-chevron {
+	color: var(--g-text-subtle);
+	transition: transform 0.2s ease;
+}
+
+.gm-section-open .gm-section-chevron {
+	transform: rotate(180deg);
+}
+
+.gm-section-open .gm-section-summary {
+	display: none;
+}
+
+.gm-section-body {
+	border-top: 1px solid var(--g-border);
+	padding: 1rem 1rem 0.25rem;
+}
+
+.gm-section-invalid {
+	border-color: var(--g-danger);
+}
+
+.gm-section-invalid .gm-section-icon {
+	color: var(--g-danger);
+}
+
+/* Two fields in a row, also on a phone */
+.gm-form-row > .col-6 > .form-group {
+	margin-bottom: 1rem;
+}
+
+.gm-form-row label:not(.custom-control-label) {
+	display: inline-block;
+	max-width: calc(100% - 1.5rem);
+	overflow: hidden;
+	text-overflow: ellipsis;
+	vertical-align: bottom;
+	white-space: nowrap;
+}
+
+/* Labels with their help icon inside (number fields) keep the full width */
+.gm-form-row label.w-100 {
+	max-width: 100%;
+}
+
+.gm-never-overdue {
+	margin-top: 0.375rem;
+}
+
+/* "-1" is grocy's way to say "never overdue" - the checkbox says it */
+.gm-value-hidden {
+	color: transparent !important;
+}
+
+/* grocy's 5/7 split leaves the amount too narrow for its two arrow buttons
+   in the narrow form column - 55/45, and side by side also on a phone */
+.gm-amount-row > .col-sm-5 {
+	flex: 0 0 55%;
+	max-width: 55%;
+}
+
+.gm-amount-row > .col-sm-7 {
+	flex: 0 0 45%;
+	max-width: 45%;
+	padding-left: 0;
+}
+
+#save-purchase-button {
+	width: 100%;
+}
+
+/* Unit price / total price as one switch next to the price label */
+label[for="price"] {
+	display: inline-block;
+	width: auto !important;
+}
+
+.gm-segmented {
+	background: var(--g-surface-3);
+	border-radius: var(--g-radius-pill);
+	display: inline-flex;
+	float: right;
+	margin-bottom: 0.375rem;
+	padding: 2px;
+}
+
+.gm-segment {
+	position: relative;
+}
+
+.gm-price-hint {
+	display: block;
+	margin-top: 0.25rem;
+	min-height: 1.25rem;
+}
+
+.gm-segment input {
+	opacity: 0;
+	pointer-events: none;
+	position: absolute;
+}
+
+.gm-segment label {
+	border-radius: var(--g-radius-pill);
+	color: var(--g-text-muted);
+	cursor: pointer;
+	font-size: 0.8125rem;
+	margin: 0;
+	padding: 0.125rem 0.75rem;
+}
+
+.gm-segment input:checked + label {
+	background: var(--g-surface);
+	box-shadow: var(--g-shadow-xs);
+	color: var(--g-text);
+	font-weight: 600;
+}
+
+.gm-segment input:focus-visible + label {
+	box-shadow: 0 0 0 3px var(--g-brand-ring);
+}
+
+/* Quiet validation: no red on fields nobody touched yet */
+form.gm-quiet-validation:not(.gm-tried) .form-group:not(.gm-touched) .invalid-feedback {
+	display: none !important;
+}
+
+form.gm-quiet-validation:not(.gm-tried) .form-group:not(.gm-touched) .form-control:invalid,
+form.gm-quiet-validation:not(.gm-tried) .form-group:not(.gm-touched) .custom-select:invalid {
+	border-color: var(--g-border-strong);
+}
+
+form.gm-quiet-validation:not(.gm-tried) .form-group:not(.gm-touched) .input-group .btn {
+	border-color: var(--g-border-strong);
+}
+
+/* The save bar of long forms: both buttons in one row on a phone */
+@media (max-width: 575.98px) {
+	.sticky-form-footer {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 0.5rem;
+		padding: 0.5rem 1rem;
+	}
+
+	.sticky-form-footer > .btn {
+		flex: 1 1 0;
+		font-size: 0.875rem;
+		line-height: 1.2;
+		margin: 0 !important;
+		min-height: 44px;
+		white-space: normal;
+	}
+
+	.sticky-form-footer > small {
+		display: none !important;
+	}
+}

@@ -54,6 +54,15 @@ Lange Tabellen werden am Handy außerdem **seitenweise** angezeigt (50 Karten pr
 
 **Kompakte Toasts.** Eine Zeile statt eines halben Bildschirms; Antippen klappt den vollen Text samt „Rückgängig“ aus.
 
+**Kürzere Formulare.** Das Produktformular zeigte am Handy rund 35 Felder in einer 3.300 px langen Spalte — vier Mengeneinheiten, vier Fälligkeitstage und ein Dutzend Spezialschalter gleichrangig neben Name und Standort. Jetzt steht oben nur, was jedes Produkt braucht: Name, Produktgruppe, Standort, Bestandseinheit, Mindestbestand und Haltbarkeit (mit „Nie überfällig“ statt „-1 bedeutet …“). Der Rest liegt in aufklappbaren Bereichen — *Haltbarkeit*, *Verbrauch & Öffnen*, *Einkauf*, *Beschreibung*, *Weitere Einstellungen* —, die zugeklappt in einer Zeile sagen, was darin gesetzt ist („geöffnet: 3 Tage“, „gehört zu Schokolade“). Offene Bereiche bleiben beim nächsten Mal offen. Beim Einkauf stehen Menge und Einheit nebeneinander, Einzel-/Gesamtpreis ist ein Umschalter neben dem Preis, Geschäft, Standort und Notiz liegen unter einem Bereich, der den Standort schon nennt, und die leere Produktübersicht erscheint erst mit einem Produkt.
+
+Fehler zeigen sich erst, wenn man ein Feld bearbeitet oder speichern will — nicht als rote Wand auf einem leeren Formular. Fehlt beim Speichern etwas in einem zugeklappten Bereich, klappt er auf und ist markiert. Und der Preishinweis („entspricht 2,25 € pro Packung“) hat eine feste Zeile: Er erschien bisher erst beim Verlassen des Preisfelds und schob den OK-Knopf genau in dem Moment weg, in dem man ihn antippte — das Antippen ging dann ins Leere. Alles in [`grocy_forms.js`](public/js/grocy_forms.js); die Views selbst bleiben unverändert, Feld-IDs und -Namen auch, Grocys eigene Skripte laufen wie gehabt.
+
+|  |  |
+|---|---|
+| <img src="docs/img/forms-product.png" alt="Produktformular" width="240"> | <img src="docs/img/forms-purchase.png" alt="Einkauf" width="240"> |
+| Produkt: das Wichtige oben, der Rest in Bereichen | Einkauf: kompakt, Details unter einem Bereich |
+
 **Datumseingabe, die mitdenkt.** Das MHD-Feld versteht neben `20270515` auch `15052027` und vierstellig `1505` — Tag zuerst, Monat zuerst nur, wenn das kein Datum ergibt. Das Jahr bleibt das aktuelle.
 
 **Eigenes App-Icon und funktionierender Homescreen-Start.** Manifest mit allen Größen inklusive maskable-Variante, dazu ein `apple-touch-icon` — ohne das legte iOS bei „Zum Homescreen“ einen Screenshot der Seite ab.
@@ -205,6 +214,7 @@ Das Redesign liegt weitgehend in eigenen Dateien (`grocy_theme.css`, `grocy_mobi
 | `views/profiles.blade.php`, `views/components/profileswitcher.blade.php`, `public/js/grocy_profiles.js`, `public/viewjs/profiles.js` | Profile: Verwaltung und Profilwechsler |
 | `services/BarcodeLookupService.php`, `controllers/Api/BarcodeLookupApiController.php`, `controllers/BarcodeLookupController.php` | Barcode-Suche: Such-Kette, KI-Websuche, Anlegen aus der Vorschau |
 | `public/js/grocy_barcodelookup.js`, `views/barcodelookupsettings.blade.php`, `public/viewjs/barcodelookupsettings.js`, `public/viewjs/components/productpicker.js` | Barcode-Suche: Dialog mit Vorschau, Einstellungen; die Taste „E“ der Produktauswahl öffnet den neuen Dialog |
+| `public/js/grocy_forms.js` | Kürzere Formulare: Produktformular und Einkauf in Basis und aufklappbare Bereiche gegliedert, Fehler erst nach Bearbeiten oder Speichern |
 | `public/js/grocy_quchange.js`, `views/productform.blade.php` | „Bestand in anderer Einheit zählen“: Bestandseinheit eines schon gekauften Produkts wechseln, mit automatisch angelegter Umrechnung |
 | `composer.json`, `composer.lock` | Das offizielle Anthropic-PHP-SDK für die KI-Websuche |
 
