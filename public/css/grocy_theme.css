@@ -80,8 +80,13 @@
 	--g-topbar-h: 60px;
 	--g-sidebar-w: 268px;
 	--g-sidebar-rail-w: 76px;
-	--g-bottomnav-h: 60px;
+	--g-bottomnav-h: 56px;
 	--g-safe-bottom: env(safe-area-inset-bottom, 0px);
+	/* The bottom bar doesn't need all of the iPhone's 34pt home indicator
+	   area: with all of it, its labels sat ~50pt above the screen edge, well
+	   above where iOS's own tab bars put them (~37pt). 8pt less still keeps
+	   the indicator clear. */
+	--g-bottomnav-safe: max(calc(env(safe-area-inset-bottom, 0px) - 8px), 0px);
 
 	--g-transition: 160ms cubic-bezier(0.4, 0, 0.2, 1);
 }

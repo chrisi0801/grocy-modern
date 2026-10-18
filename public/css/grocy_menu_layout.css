@@ -537,8 +537,8 @@ body.nav-drawer-open #nav-drawer-backdrop {
 	z-index: 1036;
 	display: none;
 	align-items: stretch;
-	height: calc(var(--g-bottomnav-h) + var(--g-safe-bottom));
-	padding-bottom: var(--g-safe-bottom);
+	height: calc(var(--g-bottomnav-h) + var(--g-bottomnav-safe));
+	padding-bottom: var(--g-bottomnav-safe);
 	background-color: var(--g-surface);
 	border-top: 1px solid var(--g-border);
 	box-shadow: 0 -2px 12px rgba(16, 24, 40, 0.06);
