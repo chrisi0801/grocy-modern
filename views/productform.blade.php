@@ -387,6 +387,26 @@
 					@endforeach
 				</select>
 				<div class="invalid-feedback">{{ $__t('A quantity unit is required') }}</div>
+				{{-- Grocy Modern: once in stock, only units with a conversion are offered - this sets one up --}}
+				@if($mode == 'edit')
+				@php
+				$quChangeUnits = [];
+				foreach ($quantityunitsAll as $qu) { $quChangeUnits[] = ['id' => (int)$qu->id, 'name' => $qu->name, 'name_plural' => $qu->name_plural]; }
+				$quChangeOffered = 0;
+				foreach ($quantityunitsReferenced as $qu) { $quChangeOffered++; }
+				@endphp
+				@if($quChangeOffered < count($quChangeUnits))
+				<button type="button"
+					class="btn btn-link btn-sm px-0"
+					id="qu-stock-change-button"
+					data-units="{{ json_encode($quChangeUnits) }}"
+					data-current-qu="{{ $product->qu_id_stock }}"
+					data-product-id="{{ $product->id }}"><i class="fa-solid fa-right-left"></i> {{ $__t('Count stock in another unit') }}</button>
+				@push('pageScripts')
+				<script src="{{ $U('/js/grocy_quchange.js?v=', true) }}{{ $version }}"></script>
+				@endpush
+				@endif
+				@endif
 			</div>
 
 			<div class="form-group">

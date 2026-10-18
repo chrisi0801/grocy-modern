@@ -333,7 +333,7 @@ GrocyBarcodeLookup.Show = function (data, afterAi)
 		+ GrocyBarcodeLookup.Select("barcode-lookup-group", __t("Product group"), data.options.product_groups, result.product_group_id, true)
 		+ '<div class="form-row"><div class="col-6">' + GrocyBarcodeLookup.Select("barcode-lookup-location", __t("Default location"), data.options.locations, result.location_id, false) + "</div>"
 		+ '<div class="col-6">' + GrocyBarcodeLookup.Select("barcode-lookup-qu", __t("Quantity unit"), data.options.quantity_units, result.qu_id, false) + "</div></div>"
-		+ '<small class="form-text text-muted barcode-lookup-qu-hint">' + __t("Stock is counted in this unit. After the first purchase it can only be changed by adding a unit conversion to the product.") + "</small>"
+		+ '<small class="form-text text-muted barcode-lookup-qu-hint">' + __t('Stock is counted in this unit. To change it after the first purchase, use "Count stock in another unit" on the product.') + "</small>"
 		+ '<div class="form-row mt-3"><div class="col-6"><div class="form-group">'
 		+ '<label for="barcode-lookup-min-stock">' + __t("Minimum stock amount") + "</label>"
 		+ '<input type="number" class="form-control" id="barcode-lookup-min-stock" inputmode="decimal" min="0" step="any" value="' + GrocyBarcodeLookup.Escape(result.min_stock_amount || 0) + '">'

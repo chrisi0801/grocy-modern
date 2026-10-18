@@ -3368,7 +3368,7 @@ msgstr ""
 msgid "This can take up to a minute."
 msgstr ""
 
-msgid "Stock is counted in this unit. After the first purchase it can only be changed by adding a unit conversion to the product."
+msgid "Stock is counted in this unit. To change it after the first purchase, use \"Count stock in another unit\" on the product."
 msgstr ""
 
 msgid "This cannot be negative"
@@ -3402,4 +3402,25 @@ msgid "Per search on average"
 msgstr ""
 
 msgid "Calculated from the tokens and web searches of every lookup at the published prices; what counts is the bill in the Anthropic console."
+msgstr ""
+
+msgid "Count stock in another unit"
+msgstr ""
+
+msgid "Since its first purchase, the stock of this product is counted in \"%s\". For another unit grocy needs to know how the two relate - everything in stock, on shopping lists and in recipes is converted then."
+msgstr ""
+
+msgid "New unit"
+msgstr ""
+
+msgid "Conversion"
+msgstr ""
+
+msgid "Please enter a number greater than 0"
+msgstr ""
+
+msgid "Change and save"
+msgstr ""
+
+msgid "In stock now: %1$s - afterwards: %2$s"
 msgstr ""
