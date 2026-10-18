@@ -107,7 +107,7 @@ GrocyConnection.ApiFunction = function (url)
 // A few requests are slow by nature - the web search of the barcode lookup
 // searches the web, that takes its time
 GrocyConnection.SlowRequests = [
-	{ pattern: /^barcodelookup\/lookup\/[^/]+\/ai$/, timeout: 180000 },
+	{ pattern: /^barcodelookup\/lookup\/[^/]+\/ai$/, timeout: 300000 },
 	{ pattern: /^barcodelookup\/lookup\//, timeout: 60000 },
 	{ pattern: /^barcodelookup\/products$/, timeout: 60000 }
 ];

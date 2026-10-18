@@ -98,7 +98,15 @@ if (prefillProduct2)
 }
 if (typeof prefillProduct !== "undefined")
 {
-	var possibleOptionElement = $("#product_id option[data-additional-searchdata*='" + prefillProduct.replace("'", "\\'") + "']").first();
+	// Grocy Modern: the exact name first - "Milch" must not select "Buttermilch"
+	var possibleOptionElement = $("#product_id option").filter(function ()
+	{
+		return $(this).text().trim().toLowerCase() === prefillProduct.trim().toLowerCase();
+	}).first();
+	if (possibleOptionElement.length === 0)
+	{
+		possibleOptionElement = $("#product_id option[data-additional-searchdata*='" + prefillProduct.replace("'", "\\'") + "']").first();
+	}
 	if (possibleOptionElement.length === 0)
 	{
 		possibleOptionElement = $("#product_id option:contains('" + prefillProduct.replace("'", "\\'") + "')").first();

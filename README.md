@@ -112,16 +112,26 @@ Grocy fragt bei einem unbekannten Barcode nur Open Food Facts — also nur Leben
 
 1. **die anderen Profile** — kennt der andere Haushalt das Produkt schon, wird es samt Bild übernommen,
 2. **die Open-Facts-Datenbanken** — Lebensmittel, Drogerie/Kosmetik (Open Beauty Facts), Haushalt und Sonstiges (Open Products Facts), Tierfutter; kostenlos, ohne Konto,
-3. **auf Wunsch die KI-Websuche** — Claude (Opus 5.5) sucht den Barcode in Onlineshops und Produktdatenbanken. Nur auf Knopfdruck, nur wenn eingerichtet.
+3. **auf Wunsch die KI-Websuche** — Claude sucht den Barcode in Onlineshops und Produktdatenbanken und öffnet vielversprechende Seiten, um die Nummer dort zu prüfen. Nur auf Knopfdruck, nur wenn eingerichtet. Findet die Suche über die Nummer nichts, hilft ein Stichwort von der Packung (z. B. Marke und Produktname): Damit sucht Claude nach dem Produkt selbst und prüft dessen Barcode.
 
 |  |  |  |
 |---|---|---|
 | <img src="docs/img/barcode-preview.png" alt="Vorschau" width="240"> | <img src="docs/img/barcode-notfound.png" alt="Nichts gefunden" width="240"> | <img src="docs/img/barcode-ai.png" alt="KI-Websuche" width="240"> |
-| Treffer als Vorschau zum Bestätigen | Unbekannt: auf Wunsch KI-Websuche | Ergebnis der KI mit Quelle und Sicherheit |
+| Treffer als Vorschau zum Bestätigen | Unbekannt: KI-Websuche, optional mit Hinweis von der Packung | Ergebnis der KI mit Quelle, Sicherheit, Begründung und Kosten |
 
-**Nichts wird ungefragt angelegt.** Jeder Treffer erscheint als Vorschau: Name (mit Marke), Packungsgröße, dazu Vorschläge für Produktgruppe, Standort und Mengeneinheit aus dem, was es im Profil schon gibt. Diese Vorschläge werden mit der Zeit besser: Die Suche merkt sich, welche Gruppe, welchen Standort und welche Einheit man für eine Open-Facts-Kategorie (z. B. „Toilettenpapier“) gewählt hat, und schlägt Standort und Einheit vor, die andere Produkte derselben Gruppe haben. Gibt es schon ein Produkt mit dem Namen, bietet die Vorschau an, den Barcode dort hinzuzufügen. Nach dem Bestätigen geht es zurück zum Einkauf, mit dem neuen Produkt ausgewählt.
+**Nichts wird ungefragt angelegt.** Jeder Treffer erscheint als Vorschau: Name (mit Marke), Packungsgröße, dazu Vorschläge für Produktgruppe, Standort, Mengeneinheit und Haltbarkeit aus dem, was es im Profil schon gibt, und ein Feld für den Mindestbestand. Diese Vorschläge werden mit der Zeit besser: Die Suche merkt sich, was man für eine Open-Facts-Kategorie (z. B. „Toilettenpapier“) gewählt hat, und übernimmt beim Wechsel der Produktgruppe deren üblichen Standort, die Einheit und die Haltbarkeit — Non-Food etwa ist dann gleich „nie überfällig“, und der Einkauf fragt kein Fälligkeitsdatum ab. Die Mengeneinheit sollte gleich stimmen: Nach dem ersten Einkauf lässt Grocy sie nur noch über eine Umrechnung am Produkt ändern (Stammdaten → Produkt → *Umrechnungen*, z. B. 1 Packung = 8 Rollen). Gibt es schon ein Produkt mit dem Namen, bietet die Vorschau an, den Barcode dort hinzuzufügen. Nach dem Bestätigen geht es zurück zum Einkauf, mit dem neuen Produkt ausgewählt.
 
-**KI-Websuche einrichten:** Schraubenschlüssel → *Barcode-Suche* (nur Administratoren des Hauptprofils). Dort den API-Key von [console.anthropic.com](https://console.anthropic.com) eintragen — alternativ als Umgebungsvariable `ANTHROPIC_API_KEY` im Container — und ein Monatslimit festlegen (Standard 100). Eine Suche kostet grob 5–8 Cent (10 $ je 1.000 Websuchen plus Tokens); die Seite zeigt den Verbrauch des Monats und schätzt die Kosten. An Anthropic gehen nur der Barcode und die Namen eurer Produktgruppen, Standorte und Einheiten. Lehnt die Sicherheitsprüfung des Modells eine Anfrage ab, wiederholt die API sie automatisch auf dem dafür vorgesehenen Ersatzmodell (`fallbacks: "default"`).
+**KI-Websuche einrichten:** Schraubenschlüssel → *Barcode-Suche* (nur Administratoren des Hauptprofils). Dort den API-Key von [console.anthropic.com](https://console.anthropic.com) eintragen — alternativ als Umgebungsvariable `ANTHROPIC_API_KEY` im Container —, das Modell wählen, die Zahl der Websuchen pro Anfrage (1–5, Standard 3) und ein Monatslimit (Standard 100).
+
+| Modell | Preis je Million Tokens (Eingabe / Ausgabe) | |
+|---|---|---|
+| Claude Opus 5.5 | 4 $ / 20 $ | gründlichste Suche |
+| Claude Sonnet 5.5 | 2 $ / 10 $ | halber Preis |
+| Claude Haiku 5.5 | 0,10 $ / 0,50 $ | Bruchteil; Websuche ohne dynamische Filterung |
+
+Dazu kommt jede Websuche mit 1 Cent (10 $ je 1.000), egal welches Modell — bei Haiku machen die Suchen fast die ganzen Kosten aus. Die meisten Tokens entstehen durch die Inhalte der gefundenen Seiten, die das Modell liest; mit Opus kamen so in der Praxis gut 15 Cent pro Suche zusammen. Was eine Suche gekostet hat, zeigt der Dialog direkt danach; die Einstellungsseite rechnet den Monat aus den tatsächlichen Tokens und Suchen jeder Anfrage zusammen und zeigt den Schnitt pro Suche. Maßgeblich bleibt die Abrechnung in der Anthropic-Konsole.
+
+Findet die KI nichts, sagt sie kurz, was sie gesucht hat; bricht die Suche ab (keine Antwort, abgelehnt, zu lang), steht der Grund im Dialog. An Anthropic gehen nur der Barcode, ein eventueller Hinweis und die Namen eurer Produktgruppen, Standorte und Einheiten. Bei Opus und Sonnet ist `fallbacks: "default"` gesetzt: Lehnt eine Sicherheitsprüfung des Modells eine Anfrage ab, wiederholt die API sie auf dem dafür vorgesehenen Ersatzmodell. Bei Überlastung hilft das nicht — dann zeigt der Dialog den Fehler, und die Suche lässt sich einfach noch einmal starten. Haiku hat keinen solchen Ersatz.
 
 Die Open-Facts-Datenbanken erlauben 15 Abfragen pro Minute; für einen Haushalt reicht das weit. Welche gefragt werden, lässt sich mit `Setting('BARCODE_LOOKUP_OPENFACTS_URLS', '…')` ändern.
 

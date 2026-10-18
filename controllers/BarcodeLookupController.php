@@ -17,7 +17,8 @@ class BarcodeLookupController extends BaseController
 
 		return $this->RenderPage($response, 'barcodelookupsettings', [
 			'settings' => $settings,
-			'estimatedCost' => BarcodeLookupService::EstimatedCost($settings['usage'])
+			'estimatedCost' => BarcodeLookupService::EstimatedCost($settings['usage']),
+			'averageCost' => $settings['usage']['lookups'] > 0 ? BarcodeLookupService::TotalCost($settings['usage']) / $settings['usage']['lookups'] : null
 		]);
 	}
 }

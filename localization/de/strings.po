@@ -3615,8 +3615,6 @@ msgstr "Hinterlegten Key entfernen"
 msgid "At most this many searches per month"
 msgstr "Höchstens so viele Suchen pro Monat"
 
-msgid "A guard against surprises on the bill - one search costs roughly 5 to 8 cents."
-msgstr "Schutz vor Überraschungen auf der Rechnung - eine Suche kostet grob 5 bis 8 Cent."
 
 msgid "Check the key"
 msgstr "Key prüfen"
@@ -3630,8 +3628,6 @@ msgstr "Davon ausgeführte Websuchen"
 msgid "Estimated cost"
 msgstr "Geschätzte Kosten"
 
-msgid "Model: %s. The estimate uses the published prices; what counts is the bill in the Anthropic console."
-msgstr "Modell: %s. Die Schätzung nutzt die veröffentlichten Preise; maßgeblich ist die Abrechnung in der Anthropic-Konsole."
 
 msgid "The barcode lookup failed"
 msgstr "Die Barcode-Suche ist fehlgeschlagen"
@@ -3648,8 +3644,6 @@ msgstr "Auch die Websuche hat zu diesem Barcode kein Produkt gefunden."
 msgid "Neither your other profiles nor the Open Facts databases know this barcode."
 msgstr "Weder deine anderen Profile noch die Open-Facts-Datenbanken kennen diesen Barcode."
 
-msgid "The web search with AI (Claude) looks for the barcode in online shops and product databases. It costs a few cents and takes up to half a minute - %s searches left this month."
-msgstr "Die KI-Websuche (Claude) sucht den Barcode in Onlineshops und Produktdatenbanken. Das kostet ein paar Cent und dauert bis zu einer halben Minute - diesen Monat noch %s Suchen übrig."
 
 msgid "The monthly limit for web searches with AI is reached"
 msgstr "Das Monatslimit für KI-Websuchen ist erreicht"
@@ -3663,8 +3657,6 @@ msgstr "Mit KI im Netz suchen"
 msgid "Claude is searching the web"
 msgstr "Claude sucht im Netz"
 
-msgid "This can take up to half a minute."
-msgstr "Das kann bis zu einer halben Minute dauern."
 
 msgid "certain"
 msgstr "sicher"
@@ -3728,3 +3720,72 @@ msgstr "Dieser Barcode gehört schon zu einem Produkt"
 
 msgid "Please choose a location and a quantity unit"
 msgstr "Bitte einen Standort und eine Mengeneinheit wählen"
+
+msgid "Claude declined this request"
+msgstr "Claude hat diese Anfrage abgelehnt"
+
+msgid "The answer of the AI was cut off"
+msgstr "Die Antwort der KI wurde abgeschnitten"
+
+msgid "The AI ended its search without a result"
+msgstr "Die KI hat die Suche ohne Ergebnis beendet"
+
+msgid "The web search took too long and was stopped"
+msgstr "Die Websuche hat zu lange gedauert und wurde abgebrochen"
+
+msgid "%1$s, about %2$s cents"
+msgstr "%1$s, etwa %2$s Cent"
+
+msgid "With a hint from the package - for example brand and product name - the AI can search for the product itself and check its barcode."
+msgstr "Mit einem Hinweis von der Packung - zum Beispiel Marke und Produktname - kann die KI nach dem Produkt selbst suchen und seinen Barcode prüfen."
+
+msgid "The web search with AI (Claude) looks for the barcode in online shops and product databases. It costs a few cents and takes up to a minute - %s searches left this month."
+msgstr "Die KI-Websuche (Claude) sucht den Barcode in Onlineshops und Produktdatenbanken. Sie kostet ein paar Cent und dauert bis zu einer Minute - diesen Monat noch %s Suchen."
+
+msgid "What does the package say? (optional)"
+msgstr "Was steht auf der Packung? (optional)"
+
+msgid "e.g. Hakle feuchtes Toilettenpapier"
+msgstr "z. B. Hakle feuchtes Toilettenpapier"
+
+msgid "Search again"
+msgstr "Erneut suchen"
+
+msgid "This can take up to a minute."
+msgstr "Das kann bis zu einer Minute dauern."
+
+msgid "Stock is counted in this unit. After the first purchase it can only be changed by adding a unit conversion to the product."
+msgstr "In dieser Einheit wird der Bestand gezählt. Nach dem ersten Einkauf lässt sie sich nur noch über eine Umrechnung am Produkt ändern."
+
+msgid "This cannot be negative"
+msgstr "Das darf nicht negativ sein"
+
+msgid "Keeps for (days)"
+msgstr "Haltbar (Tage)"
+
+msgid "With 0 days the due date is asked for on every purchase."
+msgstr "Bei 0 Tagen wird das Fälligkeitsdatum bei jedem Einkauf abgefragt."
+
+msgid "Model"
+msgstr "Modell"
+
+msgid "$%1$s / $%2$s per million tokens"
+msgstr "%1$s $ / %2$s $ je Million Tokens"
+
+msgid "Opus searches most thoroughly, Sonnet costs half as much, Haiku only a fraction. Every web search costs 1 cent on top, whatever the model."
+msgstr "Opus sucht am gründlichsten, Sonnet kostet die Hälfte, Haiku nur einen Bruchteil. Jede Websuche kostet unabhängig vom Modell 1 Cent extra."
+
+msgid "Web searches per lookup"
+msgstr "Websuchen pro Anfrage"
+
+msgid "More searches find more, and cost more."
+msgstr "Mehr Suchen finden mehr - und kosten mehr."
+
+msgid "A guard against surprises on the bill. What a search costs is shown after it, and the average below."
+msgstr "Schutz vor Überraschungen auf der Rechnung. Was eine Suche gekostet hat, steht direkt danach im Dialog, der Durchschnitt hier unten."
+
+msgid "Per search on average"
+msgstr "Pro Suche im Schnitt"
+
+msgid "Calculated from the tokens and web searches of every lookup at the published prices; what counts is the bill in the Anthropic console."
+msgstr "Berechnet aus den Tokens und Websuchen jeder Anfrage zu den veröffentlichten Preisen; maßgeblich ist die Abrechnung in der Anthropic-Konsole."

@@ -133,6 +133,35 @@ GrocyBarcodeLookup.ShowMessage = function (text, isError)
 	GrocyBarcodeLookup.ShowManualOptions(GrocyBarcodeLookup.State.data);
 };
 
+// What Claude said about its search, and what it cost
+GrocyBarcodeLookup.AiReport = function (data)
+{
+	var html = "";
+
+	if (data.ai_note)
+	{
+		html += '<p class="barcode-lookup-ai-note' + (data.ai_problem ? " text-danger" : "") + '"><i class="fa-solid fa-comment-dots"></i> ' + GrocyBarcodeLookup.Escape(data.ai_note) + "</p>";
+	}
+
+	if (data.ai_cost !== undefined)
+	{
+		html += '<p class="barcode-lookup-note barcode-lookup-cost">' + __t("%1$s, about %2$s cents", GrocyBarcodeLookup.Escape(data.ai_model), (data.ai_cost * 100).toLocaleString(undefined, { maximumFractionDigits: 1 })) + "</p>";
+	}
+
+	return html;
+};
+
+// The paid search: what it does, an optional hint from the package, the
+// button to start it
+GrocyBarcodeLookup.AiOffer = function (ai, again)
+{
+	return '<p class="barcode-lookup-note">' + (again
+		? __t("With a hint from the package - for example brand and product name - the AI can search for the product itself and check its barcode.")
+		: __t("The web search with AI (Claude) looks for the barcode in online shops and product databases. It costs a few cents and takes up to a minute - %s searches left this month.", ai.remaining)) + "</p>"
+		+ '<div class="form-group mb-0"><label for="barcode-lookup-ai-hint">' + __t("What does the package say? (optional)") + "</label>"
+		+ '<input type="text" class="form-control" id="barcode-lookup-ai-hint" maxlength="200" autocomplete="off" placeholder="' + GrocyBarcodeLookup.Escape(__t("e.g. Hakle feuchtes Toilettenpapier")) + '"></div>';
+};
+
 // Nothing found anywhere free: the paid search, or by hand as before
 GrocyBarcodeLookup.ShowNotFound = function (data, afterAi)
 {
@@ -143,20 +172,33 @@ GrocyBarcodeLookup.ShowNotFound = function (data, afterAi)
 			: __t("Neither your other profiles nor the Open Facts databases know this barcode."))
 		+ "</div></div>";
 
-	if (!afterAi && ai.available)
+	if (afterAi)
 	{
-		html += '<p class="barcode-lookup-note">' + __t("The web search with AI (Claude) looks for the barcode in online shops and product databases. It costs a few cents and takes up to half a minute - %s searches left this month.", ai.remaining) + "</p>";
+		html += GrocyBarcodeLookup.AiReport(data);
 	}
-	else if (!afterAi && ai.reason === "limit")
+
+	if (ai.available)
+	{
+		html += GrocyBarcodeLookup.AiOffer(ai, afterAi);
+	}
+	else if (ai.reason === "limit")
 	{
 		html += '<p class="barcode-lookup-note">' + __t("The monthly limit for web searches with AI is reached") + "</p>";
 	}
 
 	GrocyBarcodeLookup.Body().html(html);
-	GrocyBarcodeLookup.ShowManualOptions(data, !afterAi && ai.available);
+	GrocyBarcodeLookup.ShowManualOptions(data, ai.available, afterAi);
 };
 
-GrocyBarcodeLookup.ShowManualOptions = function (data, offerAi)
+// "Search with AI instead" on a preview: the offer, with room for a hint
+GrocyBarcodeLookup.ShowAiOffer = function ()
+{
+	var data = GrocyBarcodeLookup.State.data;
+	GrocyBarcodeLookup.Body().html(GrocyBarcodeLookup.AiOffer(data.ai, false));
+	GrocyBarcodeLookup.ShowManualOptions(data, true, false);
+};
+
+GrocyBarcodeLookup.ShowManualOptions = function (data, offerAi, again)
 {
 	var buttons = [
 		{ label: __t("Cancel"), className: "btn-secondary", callback: GrocyBarcodeLookup.Close },
@@ -174,20 +216,29 @@ GrocyBarcodeLookup.ShowManualOptions = function (data, offerAi)
 	if (offerAi)
 	{
 		buttons.push({
-			label: '<i class="fa-solid fa-wand-magic-sparkles"></i> ' + __t("Search the web with AI"),
+			label: '<i class="fa-solid fa-wand-magic-sparkles"></i> ' + (again ? __t("Search again") : __t("Search the web with AI")),
 			className: "btn-primary",
 			callback: GrocyBarcodeLookup.SearchWithAi
 		});
 	}
 
 	GrocyBarcodeLookup.SetButtons(buttons);
+	$("#barcode-lookup-ai-hint").on("keydown", function (e)
+	{
+		if (e.key === "Enter")
+		{
+			e.preventDefault();
+			GrocyBarcodeLookup.SearchWithAi();
+		}
+	});
 };
 
 GrocyBarcodeLookup.SearchWithAi = function ()
 {
-	GrocyBarcodeLookup.ShowProgress([__t("Claude is searching the web")], __t("This can take up to half a minute."));
+	var hint = ($("#barcode-lookup-ai-hint").val() || "").trim();
+	GrocyBarcodeLookup.ShowProgress([__t("Claude is searching the web")], __t("This can take up to a minute."));
 
-	Grocy.Api.Post("barcodelookup/lookup/" + encodeURIComponent(GrocyBarcodeLookup.State.barcode) + "/ai", {},
+	Grocy.Api.Post("barcodelookup/lookup/" + encodeURIComponent(GrocyBarcodeLookup.State.barcode) + "/ai", { "hint": hint },
 		function (data)
 		{
 			GrocyBarcodeLookup.Show(data, true);
@@ -264,6 +315,11 @@ GrocyBarcodeLookup.Show = function (data, afterAi)
 
 	html += "</div></div>";
 
+	if (afterAi)
+	{
+		html += GrocyBarcodeLookup.AiReport(data);
+	}
+
 	if (result.existing_product)
 	{
 		html += '<div class="alert alert-info barcode-lookup-existing">' + __t('There already is a product "%s". Perhaps this is just another barcode for it?', GrocyBarcodeLookup.Escape(result.existing_product.name))
@@ -277,6 +333,18 @@ GrocyBarcodeLookup.Show = function (data, afterAi)
 		+ GrocyBarcodeLookup.Select("barcode-lookup-group", __t("Product group"), data.options.product_groups, result.product_group_id, true)
 		+ '<div class="form-row"><div class="col-6">' + GrocyBarcodeLookup.Select("barcode-lookup-location", __t("Default location"), data.options.locations, result.location_id, false) + "</div>"
 		+ '<div class="col-6">' + GrocyBarcodeLookup.Select("barcode-lookup-qu", __t("Quantity unit"), data.options.quantity_units, result.qu_id, false) + "</div></div>"
+		+ '<small class="form-text text-muted barcode-lookup-qu-hint">' + __t("Stock is counted in this unit. After the first purchase it can only be changed by adding a unit conversion to the product.") + "</small>"
+		+ '<div class="form-row mt-3"><div class="col-6"><div class="form-group">'
+		+ '<label for="barcode-lookup-min-stock">' + __t("Minimum stock amount") + "</label>"
+		+ '<input type="number" class="form-control" id="barcode-lookup-min-stock" inputmode="decimal" min="0" step="any" value="' + GrocyBarcodeLookup.Escape(result.min_stock_amount || 0) + '">'
+		+ '<div class="invalid-feedback">' + __t("This cannot be negative") + "</div></div></div>"
+		+ '<div class="col-6"><div class="form-group">'
+		+ '<label for="barcode-lookup-due-days">' + __t("Keeps for (days)") + "</label>"
+		+ '<input type="number" class="form-control" id="barcode-lookup-due-days" inputmode="numeric" min="0" step="1">'
+		+ '<div class="custom-control custom-checkbox mt-1"><input type="checkbox" class="custom-control-input" id="barcode-lookup-never-overdue">'
+		+ '<label class="custom-control-label" for="barcode-lookup-never-overdue">' + __t("Never overdue") + "</label></div>"
+		+ "</div></div></div>"
+		+ '<small class="form-text text-muted barcode-lookup-due-hint">' + __t("With 0 days the due date is asked for on every purchase.") + "</small>"
 		+ "</form>";
 
 	if (result.learned)
@@ -285,6 +353,8 @@ GrocyBarcodeLookup.Show = function (data, afterAi)
 	}
 
 	GrocyBarcodeLookup.Body().html(html);
+	GrocyBarcodeLookup.SetDueDays(result.default_best_before_days);
+	GrocyBarcodeLookup.FollowGroup(data.group_defaults || {});
 
 	var buttons = [{ label: __t("Cancel"), className: "btn-secondary", callback: GrocyBarcodeLookup.Close }];
 
@@ -294,12 +364,67 @@ GrocyBarcodeLookup.Show = function (data, afterAi)
 		buttons.push({
 			label: '<i class="fa-solid fa-wand-magic-sparkles"></i> ' + __t("Search with AI instead"),
 			className: "btn-outline-dark",
-			callback: GrocyBarcodeLookup.SearchWithAi
+			callback: GrocyBarcodeLookup.ShowAiOffer
 		});
 	}
 
 	buttons.push({ label: '<i class="fa-solid fa-check"></i> ' + __t("Create product"), className: "btn-success", callback: GrocyBarcodeLookup.Create });
 	GrocyBarcodeLookup.SetButtons(buttons);
+};
+
+// -1 is grocy's "never overdue", 0 asks for the date on purchase
+GrocyBarcodeLookup.SetDueDays = function (days)
+{
+	days = parseInt(days, 10) || 0;
+	$("#barcode-lookup-never-overdue").prop("checked", days === -1);
+	$("#barcode-lookup-due-days").val(days === -1 ? "" : days).prop("disabled", days === -1);
+};
+
+GrocyBarcodeLookup.DueDays = function ()
+{
+	return $("#barcode-lookup-never-overdue").prop("checked") ? -1 : Math.max(0, parseInt($("#barcode-lookup-due-days").val(), 10) || 0);
+};
+
+// Choosing another group brings that group's usual location, unit and due
+// days along - unless they were already set by hand
+GrocyBarcodeLookup.FollowGroup = function (groupDefaults)
+{
+	var touched = {};
+
+	$("#barcode-lookup-location, #barcode-lookup-qu, #barcode-lookup-due-days, #barcode-lookup-never-overdue").on("change", function ()
+	{
+		touched[this.id] = true;
+	});
+
+	$("#barcode-lookup-never-overdue").on("change", function ()
+	{
+		$("#barcode-lookup-due-days").prop("disabled", this.checked);
+	});
+
+	$("#barcode-lookup-group").on("change", function ()
+	{
+		var defaults = groupDefaults[$(this).val()];
+
+		if (!defaults)
+		{
+			return;
+		}
+
+		if (!touched["barcode-lookup-location"] && defaults.location_id && $('#barcode-lookup-location option[value="' + defaults.location_id + '"]').length)
+		{
+			$("#barcode-lookup-location").val(defaults.location_id);
+		}
+
+		if (!touched["barcode-lookup-qu"] && defaults.qu_id && $('#barcode-lookup-qu option[value="' + defaults.qu_id + '"]').length)
+		{
+			$("#barcode-lookup-qu").val(defaults.qu_id);
+		}
+
+		if (!touched["barcode-lookup-due-days"] && !touched["barcode-lookup-never-overdue"] && defaults.default_best_before_days !== undefined && defaults.default_best_before_days !== null)
+		{
+			GrocyBarcodeLookup.SetDueDays(defaults.default_best_before_days);
+		}
+	});
 };
 
 // Back to the page the lookup came from, with the product selected there
@@ -327,7 +452,8 @@ GrocyBarcodeLookup.Create = function ()
 		"location_id": $("#barcode-lookup-location").val(),
 		"qu_id": $("#barcode-lookup-qu").val(),
 		"package_size": result.package_size || "",
-		"default_best_before_days": result.default_best_before_days || 0,
+		"default_best_before_days": GrocyBarcodeLookup.DueDays(),
+		"min_stock_amount": Math.max(0, parseFloat($("#barcode-lookup-min-stock").val()) || 0),
 		"image_url": result.image_url && result.image_url !== "profile" ? result.image_url : "",
 		"picture_profile": result.picture ? result.picture.profile : "",
 		"picture_file": result.picture ? result.picture.file : "",

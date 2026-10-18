@@ -33,14 +33,24 @@ class BarcodeLookupService extends BaseService
 	const CATEGORY_MAP_FILE = 'barcode_category_map.json';
 	const DEFAULT_MONTHLY_LIMIT = 100;
 
-	// Claude
-	const AI_MODEL = 'claude-opus-5-5';
-	const AI_MAX_SEARCHES = 4;
-	// Published prices at the time of writing, for the "estimated cost" shown
-	// in the settings - the bill is what counts
-	const AI_PRICE_INPUT_PER_MTOK = 4.0;
-	const AI_PRICE_OUTPUT_PER_MTOK = 20.0;
+	// Claude - the models to choose from, with their published prices (USD per
+	// million tokens) at the time of writing, for the costs shown in the
+	// settings; the bill is what counts. Haiku has no server-side fallback
+	// and no dynamic filtering for the web tools, so it gets the basic ones.
+	const AI_MODELS = [
+		'claude-opus-5-5' => ['label' => 'Claude Opus 5.5', 'input' => 4.0, 'output' => 20.0, 'cache_read' => 0.20, 'web_tools' => 'current', 'fallbacks' => true],
+		'claude-sonnet-5-5' => ['label' => 'Claude Sonnet 5.5', 'input' => 2.0, 'output' => 10.0, 'cache_read' => 0.20, 'web_tools' => 'current', 'fallbacks' => true],
+		// Above 100k prompt tokens per request Haiku costs five times as much;
+		// its cache reads are assumed at a tenth of the input price
+		'claude-haiku-5-5' => ['label' => 'Claude Haiku 5.5', 'input' => 0.10, 'output' => 0.50, 'cache_read' => 0.01, 'long_above' => 100000, 'long_input' => 0.50, 'long_output' => 2.50, 'web_tools' => 'basic', 'fallbacks' => false]
+	];
+	const DEFAULT_AI_MODEL = 'claude-opus-5-5';
+	const DEFAULT_MAX_SEARCHES = 3;
+	const AI_MAX_FETCHES = 3;
 	const AI_PRICE_PER_SEARCH = 0.01;
+	// Used for months recorded before the cost was stored per lookup
+	const LEGACY_PRICE_INPUT_PER_MTOK = 4.0;
+	const LEGACY_PRICE_OUTPUT_PER_MTOK = 20.0;
 
 	const OPEN_FACTS = [
 		'https://world.openfoodfacts.org' => 'Open Food Facts',
@@ -81,7 +91,14 @@ class BarcodeLookupService extends BaseService
 		}
 
 		$settings = is_array($settings) ? $settings : [];
-		return $settings + ['ai_enabled' => false, 'api_key' => '', 'monthly_limit' => self::DEFAULT_MONTHLY_LIMIT, 'usage' => []];
+		$settings += ['ai_enabled' => false, 'api_key' => '', 'monthly_limit' => self::DEFAULT_MONTHLY_LIMIT, 'ai_model' => self::DEFAULT_AI_MODEL, 'max_searches' => self::DEFAULT_MAX_SEARCHES, 'usage' => []];
+
+		if (!isset(self::AI_MODELS[$settings['ai_model']]))
+		{
+			$settings['ai_model'] = self::DEFAULT_AI_MODEL;
+		}
+
+		return $settings;
 	}
 
 	private static function SaveSettings(array $settings): void
@@ -119,7 +136,9 @@ class BarcodeLookupService extends BaseService
 			'key_from_environment' => $storedKey === '' && getenv('ANTHROPIC_API_KEY') !== false && getenv('ANTHROPIC_API_KEY') !== '',
 			'usage' => $settings['usage'][$month] ?? ['lookups' => 0, 'searches' => 0, 'input_tokens' => 0, 'output_tokens' => 0],
 			'usage_month' => $month,
-			'model' => self::AI_MODEL,
+			'model' => $settings['ai_model'],
+			'models' => array_map(fn ($id, $model) => ['id' => $id, 'label' => $model['label'], 'input' => $model['input'], 'output' => $model['output']], array_keys(self::AI_MODELS), self::AI_MODELS),
+			'max_searches' => (int)$settings['max_searches'],
 			'can_manage' => $this->CanManageSettings()
 		];
 	}
@@ -134,6 +153,12 @@ class BarcodeLookupService extends BaseService
 		$settings = self::Settings();
 		$settings['ai_enabled'] = filter_var($data['ai_enabled'] ?? false, FILTER_VALIDATE_BOOLEAN);
 		$settings['monthly_limit'] = max(0, min(10000, (int)($data['monthly_limit'] ?? self::DEFAULT_MONTHLY_LIMIT)));
+		$settings['max_searches'] = max(1, min(5, (int)($data['max_searches'] ?? self::DEFAULT_MAX_SEARCHES)));
+
+		if (isset($data['ai_model']) && isset(self::AI_MODELS[$data['ai_model']]))
+		{
+			$settings['ai_model'] = $data['ai_model'];
+		}
 
 		// Empty means "keep the stored key"; removing it is explicit
 		if (!empty($data['remove_key']))
@@ -156,7 +181,8 @@ class BarcodeLookupService extends BaseService
 			throw new BarcodeLookupPermissionException($this->T('Only an administrator of the main profile can change this'));
 		}
 
-		$key = self::ApiKey(self::Settings());
+		$settings = self::Settings();
+		$key = self::ApiKey($settings);
 
 		if ($key === '')
 		{
@@ -166,8 +192,8 @@ class BarcodeLookupService extends BaseService
 		try
 		{
 			$client = new AnthropicClient(apiKey: $key, requestOptions: ['timeout' => 15, 'maxRetries' => 1]);
-			$model = $client->models->retrieve(self::AI_MODEL);
-			return ['ok' => true, 'message' => $this->T('The key works - %s is available', $model->displayName ?? self::AI_MODEL)];
+			$model = $client->models->retrieve($settings['ai_model']);
+			return ['ok' => true, 'message' => $this->T('The key works - %s is available', $model->displayName ?? $settings['ai_model'])];
 		}
 		catch (AuthenticationException $ex)
 		{
@@ -234,22 +260,37 @@ class BarcodeLookupService extends BaseService
 		return null;
 	}
 
-	// The location and unit most products of that group already have - a
-	// new pack of toilet paper goes where the other hygiene products are
-	private function TypicalForGroup(?int $groupId): array
+	// The location, unit and due days most products of a group already have -
+	// a new pack of toilet paper goes where the other hygiene products are,
+	// and is never overdue like them. Per group, so the preview can follow
+	// when the group is changed there.
+	private ?array $GroupDefaults = null;
+
+	private function GroupDefaults(): array
 	{
-		if ($groupId === null)
+		if ($this->GroupDefaults !== null)
 		{
-			return ['location_id' => null, 'qu_id' => null];
+			return $this->GroupDefaults;
 		}
 
-		$most = function (string $column) use ($groupId)
-		{
-			$value = DatabaseService::GetInstance()->ExecuteDbQuery('SELECT ' . $column . ' FROM products WHERE product_group_id = ' . (int)$groupId . ' AND ' . $column . ' IS NOT NULL GROUP BY ' . $column . ' ORDER BY COUNT(*) DESC LIMIT 1')->fetchColumn();
-			return $value !== false ? (int)$value : null;
-		};
+		$defaults = [];
 
-		return ['location_id' => $most('location_id'), 'qu_id' => $most('qu_id_stock')];
+		foreach (['location_id' => 'location_id', 'qu_id' => 'qu_id_stock', 'default_best_before_days' => 'default_best_before_days'] as $key => $column)
+		{
+			$rows = DatabaseService::GetInstance()->ExecuteDbQuery('SELECT product_group_id, ' . $column . ' AS value, COUNT(*) AS count FROM products WHERE product_group_id IS NOT NULL AND ' . $column . ' IS NOT NULL GROUP BY product_group_id, ' . $column . ' ORDER BY product_group_id, count DESC')->fetchAll(\PDO::FETCH_ASSOC);
+
+			foreach ($rows as $row)
+			{
+				$defaults[(int)$row['product_group_id']][$key] ??= (int)$row['value'];
+			}
+		}
+
+		return $this->GroupDefaults = $defaults;
+	}
+
+	private function TypicalForGroup(?int $groupId): array
+	{
+		return ($this->GroupDefaults()[(int)$groupId] ?? []) + ['location_id' => null, 'qu_id' => null, 'default_best_before_days' => null];
 	}
 
 	private function Presets(array $options): array
@@ -283,7 +324,7 @@ class BarcodeLookupService extends BaseService
 		return is_array($map) ? $map : [];
 	}
 
-	private function Learn(array $tags, ?int $groupId, ?int $locationId, ?int $quId): void
+	private function Learn(array $tags, ?int $groupId, ?int $locationId, ?int $quId, int $dueDays): void
 	{
 		if (count($tags) === 0 || ($groupId === null && $locationId === null))
 		{
@@ -295,16 +336,16 @@ class BarcodeLookupService extends BaseService
 		// The most specific categories say the most
 		foreach (array_slice(array_reverse($tags), 0, 3) as $tag)
 		{
-			$map[(string)$tag] = ['product_group_id' => $groupId, 'location_id' => $locationId, 'qu_id' => $quId];
+			$map[(string)$tag] = ['product_group_id' => $groupId, 'location_id' => $locationId, 'qu_id' => $quId, 'default_best_before_days' => $dueDays];
 		}
 
 		file_put_contents(self::CategoryMapPath(), json_encode($map, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES), LOCK_EX);
 	}
 
 	/**
-	 * Fills in what a source left open: group from what was learned, location
-	 * and unit from the group, the rest from the user's presets. Only ids that
-	 * exist here survive.
+	 * Fills in what a source left open: group from what was learned, location,
+	 * unit and due days from the group, the rest from the user's presets. Only
+	 * ids that exist here survive.
 	 */
 	private function Complete(array $proposal, array $options): array
 	{
@@ -325,6 +366,7 @@ class BarcodeLookupService extends BaseService
 					$proposal['product_group_id'] = $valid($options['product_groups'], $map[$tag]['product_group_id'] ?? null);
 					$proposal['location_id'] ??= $valid($options['locations'], $map[$tag]['location_id'] ?? null);
 					$proposal['qu_id'] ??= $valid($options['quantity_units'], $map[$tag]['qu_id'] ?? null);
+					$proposal['default_best_before_days'] ??= $map[$tag]['default_best_before_days'] ?? null;
 					$proposal['learned'] = true;
 					break;
 				}
@@ -332,14 +374,13 @@ class BarcodeLookupService extends BaseService
 		}
 
 		$typical = $this->TypicalForGroup($proposal['product_group_id']);
-		$proposal['location_id'] ??= $typical['location_id'];
-		$proposal['qu_id'] ??= $typical['qu_id'];
+		$proposal['location_id'] ??= $valid($options['locations'], $typical['location_id']);
+		$proposal['qu_id'] ??= $valid($options['quantity_units'], $typical['qu_id']);
+		$proposal['default_best_before_days'] ??= $typical['default_best_before_days'];
 
 		$presets = $this->Presets($options);
-		if (empty($proposal['default_best_before_days']))
-		{
-			$proposal['default_best_before_days'] = max(0, (int)(UsersService::GetInstance()->GetUserSettings(GROCY_USER_ID)['product_presets_default_due_days'] ?? 0));
-		}
+		$proposal['default_best_before_days'] = max(-1, (int)($proposal['default_best_before_days'] ?? UsersService::GetInstance()->GetUserSettings(GROCY_USER_ID)['product_presets_default_due_days'] ?? 0));
+		$proposal['min_stock_amount'] = max(0, (float)($proposal['min_stock_amount'] ?? 0));
 		$proposal['product_group_id'] ??= $valid($options['product_groups'], $presets['product_group_id']);
 		$proposal['location_id'] ??= $valid($options['locations'], $presets['location_id']);
 		$proposal['qu_id'] ??= $valid($options['quantity_units'], $presets['qu_id']);
@@ -375,7 +416,7 @@ class BarcodeLookupService extends BaseService
 				$pdo = new \PDO('sqlite:' . $dbPath);
 				$pdo->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION);
 				$statement = $pdo->prepare('
-					SELECT p.name, p.description, p.picture_file_name, p.default_best_before_days,
+					SELECT p.name, p.description, p.picture_file_name, p.default_best_before_days, p.min_stock_amount,
 						pg.name AS group_name, l.name AS location_name, qu.name AS qu_name
 					FROM product_barcodes b
 					JOIN products p ON p.id = b.product_id
@@ -405,6 +446,7 @@ class BarcodeLookupService extends BaseService
 				'package_size' => null,
 				'description' => $row['description'] ?: null,
 				'default_best_before_days' => (int)$row['default_best_before_days'],
+				'min_stock_amount' => (float)$row['min_stock_amount'],
 				// Same names, same things - whatever exists here is taken over
 				'product_group_id' => self::IdByName($options['product_groups'], $row['group_name']),
 				'location_id' => self::IdByName($options['locations'], $row['location_name']),
@@ -506,7 +548,8 @@ class BarcodeLookupService extends BaseService
 				'brand' => $brand !== '' ? $brand : null,
 				'package_size' => $packageSize,
 				'description' => null,
-				'default_best_before_days' => 0,
+				// Unknown - the product group decides
+				'default_best_before_days' => null,
 				'product_group_id' => null,
 				'location_id' => null,
 				// "8 Rollen": if there is a unit "Rolle", that is the one
@@ -559,18 +602,26 @@ class BarcodeLookupService extends BaseService
 			$proposal = $this->Complete($proposal, $options);
 		}
 
-		return ['barcode' => $barcode, 'result' => $proposal, 'options' => $options, 'ai' => $this->AiStatus()];
+		return ['barcode' => $barcode, 'result' => $proposal, 'options' => $options, 'group_defaults' => $this->GroupDefaults(), 'ai' => $this->AiStatus()];
 	}
 
 	// --- source 3: Claude with web search ----------------------------------------
 
-	private function AiPrompt(string $barcode, array $options): string
+	private function AiPrompt(string $barcode, array $options, string $hint): string
 	{
 		$list = fn (array $rows) => count($rows) > 0 ? implode(', ', array_map(fn ($row) => '"' . $row['name'] . '"', $rows)) : '(none)';
 
-		return 'Identify the retail product with the barcode (EAN/GTIN) ' . $barcode . '. It was just scanned in a private household in ' . GROCY_LOCALE . ' and is to be added to the household\'s stock list.' . "\n\n"
-			. 'Search the web for this exact barcode number - shop listings and product databases often show it. Only report a product when a source actually connects it to this barcode; a product that merely looks plausible is not a match.' . "\n\n"
-			. 'Report the result with the report_product tool, exactly once. Write the name the way someone would put it on a shopping list in the household\'s language: brand and product, without marketing words (for example "Zewa Toilettenpapier Soft 3-lagig").' . "\n\n"
+		$prompt = 'Identify the retail product with the barcode (EAN/GTIN) ' . $barcode . '. It was just scanned in a private household in ' . GROCY_LOCALE . ' and is to be added to the household\'s stock list.' . "\n\n"
+			. 'How to search: search for the bare number first, then for "EAN ' . $barcode . '". Local online shops, drugstores and barcode databases often list the EAN on the product page even when the search snippet does not show it - open the most promising page with web_fetch to check. A barcode database you can also open directly: https://www.ean-search.org/?q=' . $barcode . ' (if it cannot be fetched, go on with the search).' . "\n\n";
+
+		if ($hint !== '')
+		{
+			$prompt .= 'The person who scanned it read this on the package: "' . $hint . '". Use it to search for the product, and check whether a source lists this barcode for it. If the product fits the hint but no source confirms the barcode, you may still report it, with confidence "low", and say so in the note.' . "\n\n";
+		}
+
+		return $prompt
+			. 'Only report a product when a source connects it to this barcode' . ($hint !== '' ? ' or it clearly fits the hint' : '') . '; a product that merely looks plausible is not a match.' . "\n\n"
+			. 'Report the result with the report_product tool, exactly once - also when nothing was found. Write the name the way someone would put it on a shopping list in the household\'s language: brand and product, without marketing words (for example "Zewa Toilettenpapier Soft 3-lagig").' . "\n\n"
 			. 'For product_group, location and quantity_unit choose the best fitting entry of these lists, or leave the field empty when none fits:' . "\n"
 			. '- product groups: ' . $list($options['product_groups']) . "\n"
 			. '- locations in the household: ' . $list($options['locations']) . "\n"
@@ -604,17 +655,38 @@ class BarcodeLookupService extends BaseService
 					'location' => $choice($options['locations'], 'Where in the household this is usually kept.'),
 					'quantity_unit' => $choice($options['quantity_units'], 'How it is counted in stock.'),
 					'source_url' => ['type' => 'string', 'description' => 'The page that connects the barcode to the product.'],
-					'confidence' => ['type' => 'string', 'enum' => ['high', 'medium', 'low']]
+					'confidence' => ['type' => 'string', 'enum' => ['high', 'medium', 'low']],
+					'note' => ['type' => 'string', 'description' => 'One or two short sentences for the household, in its language: where the product was found - or, when nothing matched, what was searched and what came up instead.']
 				],
-				'required' => ['found', 'name', 'brand', 'package_size', 'product_group', 'location', 'quantity_unit', 'source_url', 'confidence'],
+				'required' => ['found', 'name', 'brand', 'package_size', 'product_group', 'location', 'quantity_unit', 'source_url', 'confidence', 'note'],
 				'additionalProperties' => false
 			]
 		];
 	}
 
+	// Tokens and searches of one response, priced for the model it was meant for
+	private static function AddUsage(array &$usage, $response, array $model): void
+	{
+		$input = (int)$response->usage->inputTokens;
+		$cacheRead = (int)($response->usage->cacheReadInputTokens ?? 0);
+		$cacheWrite = (int)($response->usage->cacheCreationInputTokens ?? 0);
+		$output = (int)$response->usage->outputTokens;
+		$searches = (int)($response->usage->serverToolUse->webSearchRequests ?? 0);
+
+		$long = isset($model['long_above']) && $input + $cacheRead + $cacheWrite > $model['long_above'];
+		$inputPrice = $long ? $model['long_input'] : $model['input'];
+		$outputPrice = $long ? $model['long_output'] : $model['output'];
+
+		$usage['input_tokens'] += $input + $cacheRead + $cacheWrite;
+		$usage['output_tokens'] += $output;
+		$usage['searches'] += $searches;
+		$usage['cost'] += ($input * $inputPrice + $cacheWrite * $inputPrice * 1.25 + $cacheRead * $model['cache_read'] + $output * $outputPrice) / 1000000
+			+ $searches * self::AI_PRICE_PER_SEARCH;
+	}
+
 	// Counts against the monthly limit, and keeps the numbers for the
 	// settings page; under a lock, several lookups may end at once
-	private function RecordUsage(int $inputTokens, int $outputTokens, int $searches): void
+	private function RecordUsage(array $lookup): void
 	{
 		$handle = fopen(self::SettingsPath() . '.lock', 'c');
 		flock($handle, LOCK_EX);
@@ -622,10 +694,13 @@ class BarcodeLookupService extends BaseService
 		$settings = self::Settings();
 		$month = date('Y-m');
 		$usage = $settings['usage'][$month] ?? ['lookups' => 0, 'searches' => 0, 'input_tokens' => 0, 'output_tokens' => 0];
+		// Lookups recorded before the cost was kept per lookup are estimated once
+		$usage['cost'] ??= self::LegacyCost($usage);
 		$usage['lookups']++;
-		$usage['searches'] += $searches;
-		$usage['input_tokens'] += $inputTokens;
-		$usage['output_tokens'] += $outputTokens;
+		$usage['searches'] += $lookup['searches'];
+		$usage['input_tokens'] += $lookup['input_tokens'];
+		$usage['output_tokens'] += $lookup['output_tokens'];
+		$usage['cost'] = round($usage['cost'] + $lookup['cost'], 6);
 		$settings['usage'][$month] = $usage;
 		self::SaveSettings($settings);
 
@@ -633,14 +708,24 @@ class BarcodeLookupService extends BaseService
 		fclose($handle);
 	}
 
-	public static function EstimatedCost(array $usage): float
+	private static function LegacyCost(array $usage): float
 	{
-		return round(($usage['input_tokens'] ?? 0) / 1000000 * self::AI_PRICE_INPUT_PER_MTOK
-			+ ($usage['output_tokens'] ?? 0) / 1000000 * self::AI_PRICE_OUTPUT_PER_MTOK
-			+ ($usage['searches'] ?? 0) * self::AI_PRICE_PER_SEARCH, 2);
+		return ($usage['input_tokens'] ?? 0) / 1000000 * self::LEGACY_PRICE_INPUT_PER_MTOK
+			+ ($usage['output_tokens'] ?? 0) / 1000000 * self::LEGACY_PRICE_OUTPUT_PER_MTOK
+			+ ($usage['searches'] ?? 0) * self::AI_PRICE_PER_SEARCH;
 	}
 
-	public function LookupWithAi(string $barcode): array
+	public static function TotalCost(array $usage): float
+	{
+		return (float)($usage['cost'] ?? self::LegacyCost($usage));
+	}
+
+	public static function EstimatedCost(array $usage): float
+	{
+		return round(self::TotalCost($usage), 2);
+	}
+
+	public function LookupWithAi(string $barcode, string $hint = ''): array
 	{
 		$barcode = self::NormalizeBarcode($barcode);
 		if ($barcode === '')
@@ -656,47 +741,55 @@ class BarcodeLookupService extends BaseService
 				: $this->T('The web search with AI is not set up'));
 		}
 
-		// A web search takes its time - more than PHP's default allows
-		@set_time_limit(180);
+		$settings = self::Settings();
+		$modelId = $settings['ai_model'];
+		$model = self::AI_MODELS[$modelId];
+		$hint = mb_substr(trim(preg_replace('/\s+/u', ' ', $hint)), 0, 200);
+
+		// Searching and opening pages takes its time - more than PHP's default allows
+		@set_time_limit(300);
 
 		$options = $this->Options();
-		$client = new AnthropicClient(apiKey: self::ApiKey(self::Settings()), requestOptions: ['timeout' => 150, 'maxRetries' => 1]);
-		$messages = [['role' => 'user', 'content' => $this->AiPrompt($barcode, $options)]];
-		$tools = [
+		$client = new AnthropicClient(apiKey: self::ApiKey($settings), requestOptions: ['timeout' => 150, 'maxRetries' => 1]);
+		$current = $model['web_tools'] === 'current';
+		$request = [
+			'model' => $modelId,
+			'maxTokens' => 16000,
+			'messages' => [['role' => 'user', 'content' => $this->AiPrompt($barcode, $options, $hint)]],
 			// Array keys are the SDK's property names (camelCase), not the wire names
-			['type' => 'web_search_20260209', 'name' => 'web_search', 'maxUses' => self::AI_MAX_SEARCHES],
-			$this->AiTool($options)
+			'tools' => [
+				['type' => $current ? 'web_search_20260209' : 'web_search_20250305', 'name' => 'web_search', 'maxUses' => (int)$settings['max_searches']],
+				// Opening a shop page shows whether it really lists this barcode;
+				// a page can be long, so it is cut
+				['type' => $current ? 'web_fetch_20260209' : 'web_fetch_20250910', 'name' => 'web_fetch', 'maxUses' => self::AI_MAX_FETCHES, 'maxContentTokens' => 8000],
+				$this->AiTool($options)
+			],
+			'outputConfig' => ['effort' => 'medium']
 		];
 
+		if ($model['fallbacks'])
+		{
+			// Should a safety classifier decline the request, the API re-runs
+			// it on the recommended fallback model by itself
+			$request['fallbacks'] = 'default';
+			$request['betas'] = ['server-side-fallback-2026-07-01'];
+		}
+
 		$report = null;
-		$inputTokens = 0;
-		$outputTokens = 0;
-		$searches = 0;
+		$problem = null;
+		$askedForReport = false;
+		$usage = ['input_tokens' => 0, 'output_tokens' => 0, 'searches' => 0, 'cost' => 0.0];
 
 		try
 		{
-			// A long server-side search may pause the turn; it continues with
-			// the same request plus what came back so far
-			for ($round = 0; $round < 3 && $report === null; $round++)
+			for ($round = 0; $round < 5; $round++)
 			{
-				$response = $client->beta->messages->create(
-					model: self::AI_MODEL,
-					maxTokens: 16000,
-					messages: $messages,
-					tools: $tools,
-					outputConfig: ['effort' => 'medium'],
-					// Should a safety classifier decline the request, the API
-					// re-runs it on the recommended fallback model by itself
-					fallbacks: 'default',
-					betas: ['server-side-fallback-2026-07-01']
-				);
-
-				$inputTokens += (int)$response->usage->inputTokens + (int)($response->usage->cacheReadInputTokens ?? 0) + (int)($response->usage->cacheCreationInputTokens ?? 0);
-				$outputTokens += (int)$response->usage->outputTokens;
-				$searches += (int)($response->usage->serverToolUse->webSearchRequests ?? 0);
+				$response = $client->beta->messages->create(...$request);
+				self::AddUsage($usage, $response, $model);
 
 				if ($response->stopReason === 'refusal')
 				{
+					$problem = $this->T('Claude declined this request');
 					break;
 				}
 
@@ -708,12 +801,40 @@ class BarcodeLookupService extends BaseService
 					}
 				}
 
-				if ($report !== null || $response->stopReason !== 'pause_turn')
+				if ($report !== null)
 				{
 					break;
 				}
 
-				$messages[] = ['role' => 'assistant', 'content' => json_decode(json_encode($response->content), true)];
+				if ($response->stopReason === 'max_tokens')
+				{
+					$problem = $this->T('The answer of the AI was cut off');
+					break;
+				}
+
+				$request['messages'][] = ['role' => 'assistant', 'content' => json_decode(json_encode($response->content), true)];
+
+				// A long server-side search may pause the turn; it continues
+				// with the same request plus what came back so far
+				if ($response->stopReason === 'pause_turn')
+				{
+					continue;
+				}
+
+				// Done without reporting - asked once more, it usually does
+				if ($askedForReport)
+				{
+					$problem = $this->T('The AI ended its search without a result');
+					break;
+				}
+
+				$request['messages'][] = ['role' => 'user', 'content' => 'Please report your result now with the report_product tool - found=false if no source connects a product to this barcode.'];
+				$askedForReport = true;
+			}
+
+			if ($report === null && $problem === null)
+			{
+				$problem = $this->T('The web search took too long and was stopped');
 			}
 		}
 		catch (AuthenticationException $ex)
@@ -730,9 +851,9 @@ class BarcodeLookupService extends BaseService
 		}
 		finally
 		{
-			if ($inputTokens > 0 || $outputTokens > 0)
+			if ($usage['input_tokens'] > 0 || $usage['output_tokens'] > 0)
 			{
-				$this->RecordUsage($inputTokens, $outputTokens, $searches);
+				$this->RecordUsage($usage);
 			}
 		}
 
@@ -748,7 +869,8 @@ class BarcodeLookupService extends BaseService
 				'brand' => trim((string)($report['brand'] ?? '')) ?: null,
 				'package_size' => trim((string)($report['package_size'] ?? '')) ?: null,
 				'description' => null,
-				'default_best_before_days' => 0,
+				// Unknown - the product group decides
+				'default_best_before_days' => null,
 				'product_group_id' => self::IdByName($options['product_groups'], $report['product_group'] ?? null),
 				'location_id' => self::IdByName($options['locations'], $report['location'] ?? null),
 				'qu_id' => self::IdByName($options['quantity_units'], $report['quantity_unit'] ?? null, ['name', 'name_plural']),
@@ -760,7 +882,18 @@ class BarcodeLookupService extends BaseService
 			], $options);
 		}
 
-		return ['barcode' => $barcode, 'result' => $result, 'options' => $options, 'ai' => $this->AiStatus()];
+		return [
+			'barcode' => $barcode,
+			'result' => $result,
+			'options' => $options,
+			'group_defaults' => $this->GroupDefaults(),
+			'ai' => $this->AiStatus(),
+			// What Claude says about its search, or why there is no answer
+			'ai_note' => $problem ?? (is_array($report) ? (mb_substr(trim((string)($report['note'] ?? '')), 0, 500) ?: null) : null),
+			'ai_problem' => $problem !== null,
+			'ai_cost' => round($usage['cost'], 4),
+			'ai_model' => $model['label']
+		];
 	}
 
 	// --- taking a proposal over ----------------------------------------------------
@@ -801,6 +934,8 @@ class BarcodeLookupService extends BaseService
 		}
 
 		$description = trim((string)($data['package_size'] ?? ''));
+		$dueDays = max(-1, min(99999, (int)($data['default_best_before_days'] ?? 0)));
+		$minStock = max(0, min(999999, round((float)($data['min_stock_amount'] ?? 0), 4)));
 
 		$product = $this->DB->products()->createRow([
 			'name' => $name,
@@ -811,7 +946,9 @@ class BarcodeLookupService extends BaseService
 			'qu_id_stock' => $quId,
 			'qu_id_consume' => $quId,
 			'qu_id_price' => $quId,
-			'default_best_before_days' => max(0, (int)($data['default_best_before_days'] ?? 0))
+			// -1: never overdue, 0: the date is asked for on purchase
+			'default_best_before_days' => $dueDays,
+			'min_stock_amount' => $minStock
 		]);
 		$product->save();
 		$productId = (int)$product->id;
@@ -827,7 +964,7 @@ class BarcodeLookupService extends BaseService
 			$this->DB->products($productId)->update(['picture_file_name' => $picture]);
 		}
 
-		$this->Learn(array_values(array_filter((array)($data['category_tags'] ?? []), 'is_string')), $groupId, $locationId, $quId);
+		$this->Learn(array_values(array_filter((array)($data['category_tags'] ?? []), 'is_string')), $groupId, $locationId, $quId, $dueDays);
 
 		return $productId;
 	}

@@ -52,7 +52,7 @@ class BarcodeLookupApiController extends BaseApiController
 	public function LookupWithAi(Request $request, Response $response, array $args)
 	{
 		User::CheckPermission($request, User::PERMISSION_MASTER_DATA_EDIT);
-		return $this->Run($response, fn () => BarcodeLookupService::GetInstance()->LookupWithAi((string)$args['barcode']));
+		return $this->Run($response, fn () => BarcodeLookupService::GetInstance()->LookupWithAi((string)$args['barcode'], (string)($this->Body($request)['hint'] ?? '')));
 	}
 
 	public function CreateProduct(Request $request, Response $response, array $args)

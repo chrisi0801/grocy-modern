@@ -57,6 +57,30 @@
 				</div>
 
 				<div class="form-group">
+					<label for="ai_model">{{ $__t('Model') }}</label>
+					<select class="custom-control custom-select"
+						id="ai_model">
+						@foreach($settings['models'] as $model)
+						<option value="{{ $model['id'] }}"
+							@if($model['id']==$settings['model']) selected @endif>{{ $model['label'] }} - {{ $__t('$%1$s / $%2$s per million tokens', rtrim(rtrim(number_format($model['input'], 2, ',', ''), '0'), ','), rtrim(rtrim(number_format($model['output'], 2, ',', ''), '0'), ',')) }}</option>
+						@endforeach
+					</select>
+					<small class="form-text text-muted">{{ $__t('Opus searches most thoroughly, Sonnet costs half as much, Haiku only a fraction. Every web search costs 1 cent on top, whatever the model.') }}</small>
+				</div>
+
+				<div class="form-group">
+					<label for="max_searches">{{ $__t('Web searches per lookup') }}</label>
+					<input type="number"
+						inputmode="numeric"
+						class="form-control"
+						id="max_searches"
+						min="1"
+						max="5"
+						value="{{ $settings['max_searches'] }}">
+					<small class="form-text text-muted">{{ $__t('More searches find more, and cost more.') }}</small>
+				</div>
+
+				<div class="form-group">
 					<label for="monthly_limit">{{ $__t('At most this many searches per month') }}</label>
 					<input type="number"
 						inputmode="numeric"
@@ -65,7 +89,7 @@
 						min="0"
 						max="10000"
 						value="{{ $settings['monthly_limit'] }}">
-					<small class="form-text text-muted">{{ $__t('A guard against surprises on the bill - one search costs roughly 5 to 8 cents.') }}</small>
+					<small class="form-text text-muted">{{ $__t('A guard against surprises on the bill. What a search costs is shown after it, and the average below.') }}</small>
 				</div>
 
 				<div class="d-flex flex-wrap"
@@ -96,8 +120,14 @@
 				<td>{{ $__t('Estimated cost') }}</td>
 				<td class="text-right">{{ number_format($estimatedCost, 2, ',', '.') }} $</td>
 			</tr>
+			@if($averageCost !== null)
+			<tr>
+				<td>{{ $__t('Per search on average') }}</td>
+				<td class="text-right">{{ number_format($averageCost * 100, 1, ',', '.') }} ct</td>
+			</tr>
+			@endif
 		</table>
-		<p class="small text-muted">{{ $__t('Model: %s. The estimate uses the published prices; what counts is the bill in the Anthropic console.', $settings['model']) }}</p>
+		<p class="small text-muted">{{ $__t('Calculated from the tokens and web searches of every lookup at the published prices; what counts is the bill in the Anthropic console.') }}</p>
 	</div>
 </div>
 @stop

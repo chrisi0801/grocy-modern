@@ -22,6 +22,8 @@ $("#save-barcodelookup-settings-button").on("click", function (e)
 		"ai_enabled": $("#ai_enabled").is(":checked"),
 		"api_key": $("#api_key").val().trim(),
 		"monthly_limit": $("#monthly_limit").val(),
+		"ai_model": $("#ai_model").val(),
+		"max_searches": $("#max_searches").val(),
 		"remove_key": $("#remove_key").is(":checked")
 	};
 
